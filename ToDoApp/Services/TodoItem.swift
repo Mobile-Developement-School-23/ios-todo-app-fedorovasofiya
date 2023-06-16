@@ -67,13 +67,11 @@ extension TodoItem {
             let idString = dictionary["id"] as? String,
             let id = UUID(uuidString: idString),
             let text = dictionary["text"] as? String,
-            let importanceString = dictionary["importance"] as? String,
-            Importance.allCases.contains(where: { $0.rawValue == importanceString }) || importanceString.isEmpty,
+            let importance = Importance(rawValue: dictionary["importance"] as? String ?? "обычная"),
             let isDone = dictionary["isDone"] as? Bool,
             let creationDateTimeInterval = dictionary["creationDate"] as? TimeInterval
         else { return nil }
-        
-        let importance = Importance(rawValue: importanceString) ?? .regular
+    
         let creationDate = Date(timeIntervalSince1970: creationDateTimeInterval)
         
         var deadline: Date? {
@@ -142,14 +140,13 @@ extension TodoItem {
         guard
             columns.count == 7,
             let id = UUID(uuidString: columns[0]),
-            Importance.allCases.contains(where: { $0.rawValue == columns[2] }) || columns[2].isEmpty,
+            let importance = Importance(rawValue: (columns[2].isEmpty ? "обычная" : columns[2])),
             let isDoneInt = Int(columns[4]),
             isDoneInt == 0 || isDoneInt == 1,
             let creationDateTimeInterval = Double(columns[5])
         else { return nil }
         
         let text = columns[1]
-        let importance = Importance(rawValue: columns[2]) ?? .regular
         let isDone = isDoneInt != 0
         let creationDate = Date(timeIntervalSince1970: creationDateTimeInterval)
         
