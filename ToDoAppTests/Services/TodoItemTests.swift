@@ -10,7 +10,7 @@ import XCTest
 
 final class TodoItemTests: XCTestCase {
     
-    func testIsDoneValueAfterInit() {
+    func testIsDoneValueAfterDefaultInit() {
         let item = TodoItem(text: "text", importance: .important, deadline: nil, modificationDate: nil)
         XCTAssertEqual(item.isDone, false)
     }

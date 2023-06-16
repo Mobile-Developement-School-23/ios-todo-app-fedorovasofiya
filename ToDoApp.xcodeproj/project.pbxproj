@@ -41,6 +41,7 @@
 		EB8D42A32A3CAD37002180BC /* FileCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileCache.swift; sourceTree = "<group>"; };
 		EB8D42AA2A3CAFD2002180BC /* ToDoAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ToDoAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		EB8D42AC2A3CAFD2002180BC /* TodoItemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoItemTests.swift; sourceTree = "<group>"; };
+		EBB11E5D2A3D0260009FDEA0 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,6 +65,7 @@
 		EB8D427F2A3CABC7002180BC = {
 			isa = PBXGroup;
 			children = (
+				EBB11E5D2A3D0260009FDEA0 /* README.md */,
 				EB8D428A2A3CABC7002180BC /* ToDoApp */,
 				EB8D42AB2A3CAFD2002180BC /* ToDoAppTests */,
 				EB8D42892A3CABC7002180BC /* Products */,
