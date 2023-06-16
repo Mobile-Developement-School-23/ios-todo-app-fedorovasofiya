@@ -9,7 +9,7 @@ import Foundation
 
 struct TodoItem: Hashable {
     
-    enum Importance: String {
+    enum Importance: String, CaseIterable {
         case unimportant = "неважная"
         case regular = "обычная"
         case important = "важная"
@@ -67,11 +67,13 @@ extension TodoItem {
             let idString = dictionary["id"] as? String,
             let id = UUID(uuidString: idString),
             let text = dictionary["text"] as? String,
-            let importance = Importance(rawValue: dictionary["importance"] as? String ?? "обычная"),
+            let importanceString = dictionary["importance"] as? String,
+            Importance.allCases.contains(where: { $0.rawValue == importanceString }) || importanceString.isEmpty,
             let isDone = dictionary["isDone"] as? Bool,
             let creationDateTimeInterval = dictionary["creationDate"] as? TimeInterval
         else { return nil }
         
+        let importance = Importance(rawValue: importanceString) ?? .regular
         let creationDate = Date(timeIntervalSince1970: creationDateTimeInterval)
         
         var deadline: Date? {
@@ -83,6 +85,83 @@ extension TodoItem {
         }
         var modificationDate: Date? {
             if let modificationDateTimeInterval = dictionary["modificationDate"] as? TimeInterval {
+                return Date(timeIntervalSince1970: modificationDateTimeInterval)
+            } else {
+                return nil
+            }
+        }
+        
+        return TodoItem(
+            id: id,
+            text: text,
+            importance: importance,
+            deadline: deadline,
+            isDone: isDone,
+            creationDate: creationDate,
+            modificationDate: modificationDate
+        )
+    }
+    
+}
+
+// MARK: - CSV Parsing
+
+extension TodoItem {
+    
+    static let csvColumnsDelimiter = ";"
+    static let csvRowsDelimiter = "\r"
+    static let csvTitles = "id;text;importance;deadline;isDone;creationDate;modificationDate"
+    
+    var csv: String {
+        var string = String()
+        string.append(id.uuidString)
+        string.append(TodoItem.csvColumnsDelimiter)
+        string.append(text)
+        string.append(TodoItem.csvColumnsDelimiter)
+        if importance != .regular {
+            string.append(importance.rawValue)
+        }
+        string.append(TodoItem.csvColumnsDelimiter)
+        if let deadline = deadline {
+            string.append(deadline.timeIntervalSince1970.description)
+        }
+        string.append(TodoItem.csvColumnsDelimiter)
+        string.append((isDone ? 1 : 0).description)
+        string.append(TodoItem.csvColumnsDelimiter)
+        string.append(creationDate.timeIntervalSince1970.description)
+        string.append(TodoItem.csvColumnsDelimiter)
+        if let modificationDate = modificationDate {
+            string.append(modificationDate.timeIntervalSince1970.description)
+        }
+        return string
+    }
+    
+    static func parse(csv: String) -> TodoItem? {
+        let columns = csv.components(separatedBy: TodoItem.csvColumnsDelimiter)
+        
+        guard
+            columns.count == 7,
+            let id = UUID(uuidString: columns[0]),
+            Importance.allCases.contains(where: { $0.rawValue == columns[2] }) || columns[2].isEmpty,
+            let isDoneInt = Int(columns[4]),
+            isDoneInt == 0 || isDoneInt == 1,
+            let creationDateTimeInterval = Double(columns[5])
+        else { return nil }
+        
+        let text = columns[1]
+        let importance = Importance(rawValue: columns[2]) ?? .regular
+        let isDone = isDoneInt != 0
+        let creationDate = Date(timeIntervalSince1970: creationDateTimeInterval)
+        
+        var deadline: Date? {
+            if let deadlineTimeInterval = Double(columns[3]) {
+                return Date(timeIntervalSince1970: deadlineTimeInterval)
+            } else {
+                return nil
+            }
+        }
+        var modificationDate: Date? {
+            if let modificationDateTimeInterval = Double(columns[6]) {
                 return Date(timeIntervalSince1970: modificationDateTimeInterval)
             } else {
                 return nil
