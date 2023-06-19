@@ -9,10 +9,14 @@ import Foundation
 
 struct TodoItem: Hashable {
     
-    enum Importance: String, CaseIterable {
+    enum Importance: String {
         case unimportant = "неважная"
         case regular = "обычная"
         case important = "важная"
+    }
+    
+    private enum Properties: CodingKey {
+        case id, text, importance, deadline, isDone, creationDate, modificationDate
     }
     
     let id: UUID
@@ -29,7 +33,7 @@ struct TodoItem: Hashable {
         importance: Importance,
         deadline: Date?,
         isDone: Bool = false,
-        creationDate: Date = .now,
+        creationDate: Date = Date(),
         modificationDate: Date?
     ) {
         self.id = id
@@ -48,46 +52,36 @@ struct TodoItem: Hashable {
 extension TodoItem {
     
     var json: Any {
-        var dictionary: [String : Any] = [:]
-        dictionary["id"] = id.uuidString
-        dictionary["text"] = text
+        var dictionary: [String: Any] = [:]
+        dictionary[Properties.id.stringValue] = id.uuidString
+        dictionary[Properties.text.stringValue] = text
         if importance != .regular {
-            dictionary["importance"] = importance.rawValue
+            dictionary[Properties.importance.stringValue] = importance.rawValue
         }
-        dictionary["deadline"] = deadline?.timeIntervalSince1970
-        dictionary["isDone"] = isDone
-        dictionary["creationDate"] = creationDate.timeIntervalSince1970
-        dictionary["modificationDate"] = modificationDate?.timeIntervalSince1970
+        dictionary[Properties.deadline.stringValue] = deadline?.timeIntervalSince1970
+        dictionary[Properties.isDone.stringValue] = isDone
+        dictionary[Properties.creationDate.stringValue] = creationDate.timeIntervalSince1970
+        dictionary[Properties.modificationDate.stringValue] = modificationDate?.timeIntervalSince1970
         return dictionary
     }
     
     static func parse(json: Any) -> TodoItem? {
         guard
-            let dictionary = json as? [String : Any],
-            let idString = dictionary["id"] as? String,
+            let dictionary = json as? [String: Any],
+            let idString = dictionary[Properties.id.stringValue] as? String,
             let id = UUID(uuidString: idString),
-            let text = dictionary["text"] as? String,
-            let importance = Importance(rawValue: dictionary["importance"] as? String ?? "обычная"),
-            let isDone = dictionary["isDone"] as? Bool,
-            let creationDateTimeInterval = dictionary["creationDate"] as? TimeInterval
+            let text = dictionary[Properties.text.stringValue] as? String,
+            let importance = (dictionary[Properties.importance.stringValue] as? String)
+                .map(Importance.init(rawValue:)) ?? Importance.regular,
+            let isDone = dictionary[Properties.isDone.stringValue] as? Bool,
+            let creationDateTimeInterval = dictionary[Properties.creationDate.stringValue] as? TimeInterval
         else { return nil }
     
         let creationDate = Date(timeIntervalSince1970: creationDateTimeInterval)
-        
-        var deadline: Date? {
-            if let deadlineTimeInterval = dictionary["deadline"] as? TimeInterval {
-                return Date(timeIntervalSince1970: deadlineTimeInterval)
-            } else {
-                return nil
-            }
-        }
-        var modificationDate: Date? {
-            if let modificationDateTimeInterval = dictionary["modificationDate"] as? TimeInterval {
-                return Date(timeIntervalSince1970: modificationDateTimeInterval)
-            } else {
-                return nil
-            }
-        }
+        let deadline = (dictionary[Properties.deadline.stringValue] as? TimeInterval)
+            .map { interval in Date(timeIntervalSince1970: interval) }
+        let modificationDate = (dictionary[Properties.modificationDate.stringValue] as? TimeInterval)
+            .map { interval in Date(timeIntervalSince1970: interval) }
         
         return TodoItem(
             id: id,
@@ -108,30 +102,29 @@ extension TodoItem {
     
     static let csvColumnsDelimiter = ";"
     static let csvRowsDelimiter = "\r"
-    static let csvTitles = "id;text;importance;deadline;isDone;creationDate;modificationDate"
+    
+    static var csvTitles: String {
+        var values = [String]()
+        values.append(Properties.id.stringValue)
+        values.append(Properties.text.stringValue)
+        values.append(Properties.importance.stringValue)
+        values.append(Properties.deadline.stringValue)
+        values.append(Properties.isDone.stringValue)
+        values.append(Properties.creationDate.stringValue)
+        values.append(Properties.modificationDate.stringValue)
+        return values.joined(separator: TodoItem.csvColumnsDelimiter)
+    }
     
     var csv: String {
-        var string = String()
-        string.append(id.uuidString)
-        string.append(TodoItem.csvColumnsDelimiter)
-        string.append(text)
-        string.append(TodoItem.csvColumnsDelimiter)
-        if importance != .regular {
-            string.append(importance.rawValue)
-        }
-        string.append(TodoItem.csvColumnsDelimiter)
-        if let deadline = deadline {
-            string.append(deadline.timeIntervalSince1970.description)
-        }
-        string.append(TodoItem.csvColumnsDelimiter)
-        string.append((isDone ? 1 : 0).description)
-        string.append(TodoItem.csvColumnsDelimiter)
-        string.append(creationDate.timeIntervalSince1970.description)
-        string.append(TodoItem.csvColumnsDelimiter)
-        if let modificationDate = modificationDate {
-            string.append(modificationDate.timeIntervalSince1970.description)
-        }
-        return string
+        var values = [String]()
+        values.append(id.uuidString)
+        values.append(text)
+        values.append(importance != .regular ? importance.rawValue : "")
+        values.append(deadline?.timeIntervalSince1970.description ?? "")
+        values.append((isDone ? 1 : 0).description)
+        values.append(creationDate.timeIntervalSince1970.description)
+        values.append(modificationDate?.timeIntervalSince1970.description ?? "")
+        return values.joined(separator: TodoItem.csvColumnsDelimiter)
     }
     
     static func parse(csv: String) -> TodoItem? {
@@ -140,30 +133,17 @@ extension TodoItem {
         guard
             columns.count == 7,
             let id = UUID(uuidString: columns[0]),
-            let importance = Importance(rawValue: (columns[2].isEmpty ? "обычная" : columns[2])),
+            let importance = (columns[2].isEmpty ? nil : columns[2]).map(Importance.init(rawValue:)) ?? .regular,
             let isDoneInt = Int(columns[4]),
             isDoneInt == 0 || isDoneInt == 1,
-            let creationDateTimeInterval = Double(columns[5])
+            let creationDateTimeInterval = TimeInterval(columns[5])
         else { return nil }
         
         let text = columns[1]
         let isDone = isDoneInt != 0
         let creationDate = Date(timeIntervalSince1970: creationDateTimeInterval)
-        
-        var deadline: Date? {
-            if let deadlineTimeInterval = Double(columns[3]) {
-                return Date(timeIntervalSince1970: deadlineTimeInterval)
-            } else {
-                return nil
-            }
-        }
-        var modificationDate: Date? {
-            if let modificationDateTimeInterval = Double(columns[6]) {
-                return Date(timeIntervalSince1970: modificationDateTimeInterval)
-            } else {
-                return nil
-            }
-        }
+        let deadline = TimeInterval(columns[3]).map { interval in Date(timeIntervalSince1970: interval) }
+        let modificationDate = TimeInterval(columns[6]).map { interval in Date(timeIntervalSince1970: interval) }
         
         return TodoItem(
             id: id,
