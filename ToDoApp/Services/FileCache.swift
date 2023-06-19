@@ -9,7 +9,7 @@ import Foundation
 
 class FileCache {
     
-    private(set) var todoItems: Dictionary<UUID, TodoItem> = [:]
+    private(set) var todoItems: [UUID: TodoItem] = [:]
     
     // MARK: - Public Methods
     
@@ -22,9 +22,7 @@ class FileCache {
     }
     
     func saveItems(jsonFileName: String) throws {
-        let itemsArray = todoItems.values.map { item in
-            item.json
-        }
+        let itemsArray = todoItems.values.map(\.json)
         let jsonData = try JSONSerialization.data(withJSONObject: itemsArray, options: [.prettyPrinted, .sortedKeys])
         try saveDataToDocuments(jsonData, fileName: jsonFileName)
     }
@@ -32,11 +30,9 @@ class FileCache {
     func loadItems(jsonFileName: String) throws {
         let jsonData = try loadDataFromDocuments(fileName: jsonFileName)
         let decodedData = try JSONSerialization.jsonObject(with: jsonData, options: [])
-        guard
-            let itemsArray = decodedData as? [Dictionary<String, Any>]
-        else { return }
+        guard let itemsArray = decodedData as? [String: Any] else { return }
         
-        var newTodoItems: Dictionary<UUID, TodoItem> = [:]
+        var newTodoItems: [UUID: TodoItem] = [:]
         itemsArray.forEach { dictionary in
             if let item = TodoItem.parse(json: dictionary) {
                 newTodoItems[item.id] = item
@@ -59,7 +55,7 @@ class FileCache {
         let csvString = try loadStringFromDocuments(fileName: csvFileName)
         var rows = csvString.components(separatedBy: TodoItem.csvRowsDelimiter)
         rows.removeFirst()
-        var newTodoItems: Dictionary<UUID, TodoItem> = [:]
+        var newTodoItems: [UUID: TodoItem] = [:]
         rows.forEach { row in
             if let item = TodoItem.parse(csv: row) {
                 newTodoItems[item.id] = item

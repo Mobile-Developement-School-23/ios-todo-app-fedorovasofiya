@@ -15,33 +15,10 @@ final class TodoItemTests: XCTestCase {
         XCTAssertEqual(item.isDone, false)
     }
     
-    func testJsonValueWhichShouldHaveAllProperties() throws {
+    func testEquivalencyOfJSONValue() throws {
         let item = TodoItem(text: "text", importance: .unimportant, deadline: .now + 100, modificationDate: .now + 10)
-        let json = try XCTUnwrap(item.json as? Dictionary<String, Any>)
+        let json = try XCTUnwrap(item.json as? [String: Any])
         XCTAssertEqual(json.count, 7)
-    }
-    
-    func testJsonValueWithAllPropertiesExceptDeadline() throws {
-        let item = TodoItem(text: "text", importance: .unimportant, deadline: nil, modificationDate: .now + 10)
-        let json = try XCTUnwrap(item.json as? Dictionary<String, Any>)
-        XCTAssertEqual(json.count, 6)
-    }
-    
-    func testJsonValueWithAllPropertiesExceptModificationDate() throws {
-        let item = TodoItem(text: "text", importance: .unimportant, deadline: .now + 100, modificationDate: nil)
-        let json = try XCTUnwrap(item.json as? Dictionary<String, Any>)
-        XCTAssertEqual(json.count, 6)
-    }
-    
-    func testJsonValueWithRegularImportance() throws {
-        let item = TodoItem(text: "text", importance: .regular, deadline: .now + 100, modificationDate: .now + 10)
-        let json = try XCTUnwrap(item.json as? Dictionary<String, Any>)
-        XCTAssertFalse(json.values.contains(where: { $0 as? String == item.importance.rawValue }))
-    }
-    
-    func testEquivalencyOfJsonValue() throws {
-        let item = TodoItem(text: "text", importance: .unimportant, deadline: .now + 100, modificationDate: .now + 10)
-        let json = try XCTUnwrap(item.json as? Dictionary<String, Any>)
         XCTAssertTrue(json.values.contains(where: { $0 as? String == item.id.uuidString }))
         XCTAssertTrue(json.values.contains(where: { $0 as? String == item.text }))
         XCTAssertTrue(json.values.contains(where: { $0 as? String == item.importance.rawValue }))
@@ -51,9 +28,27 @@ final class TodoItemTests: XCTestCase {
         XCTAssertTrue(json.values.contains(where: { $0 as? Double == item.modificationDate?.timeIntervalSince1970 }))
     }
     
-    func testEquivalencyOfJsonParsing() {
+    func testJSONValueWithAllPropertiesExceptDeadline() throws {
+        let item = TodoItem(text: "text", importance: .unimportant, deadline: nil, modificationDate: .now + 10)
+        let json = try XCTUnwrap(item.json as? [String: Any])
+        XCTAssertEqual(json.count, 6)
+    }
+    
+    func testJSONValueWithAllPropertiesExceptModificationDate() throws {
+        let item = TodoItem(text: "text", importance: .unimportant, deadline: .now + 100, modificationDate: nil)
+        let json = try XCTUnwrap(item.json as? [String: Any])
+        XCTAssertEqual(json.count, 6)
+    }
+    
+    func testJSONValueWithRegularImportance() throws {
+        let item = TodoItem(text: "text", importance: .regular, deadline: .now + 100, modificationDate: .now + 10)
+        let json = try XCTUnwrap(item.json as? [String: Any])
+        XCTAssertFalse(json.values.contains(where: { $0 as? String == item.importance.rawValue }))
+    }
+    
+    func testEquivalencyOfJSONParsing() {
         let item = TodoItem(text: "text", importance: .unimportant, deadline: .now + 100, modificationDate: .now + 10)
-        var dictionary: [String : Any] = [:]
+        var dictionary: [String: Any] = [:]
         dictionary["id"] = item.id.uuidString
         dictionary["text"] = item.text
         dictionary["importance"] = item.importance.rawValue
@@ -73,14 +68,14 @@ final class TodoItemTests: XCTestCase {
         XCTAssertEqual(parsedItem?.modificationDate?.timeIntervalSince1970, item.modificationDate?.timeIntervalSince1970)
     }
     
-    func testJsonParsingWithInvalidJsonArgument() {
-        let dictionary: Dictionary<Int, Int> = [1 : 2, 3 : 4]
+    func testJSONParsingWithInvalidJSONArgument() {
+        let dictionary: [Int: Int] = [1: 2, 3: 4]
         let parsedItem = TodoItem.parse(json: dictionary)
         XCTAssertNil(parsedItem)
     }
     
-    func testJsonParsingWithoutImportance() {
-        var dictionary: [String : Any] = [:]
+    func testJSONParsingWithoutImportance() {
+        var dictionary: [String: Any] = [:]
         dictionary["id"] = UUID().uuidString
         dictionary["text"] = "text"
         dictionary["deadline"] = Date().timeIntervalSince1970
@@ -92,8 +87,8 @@ final class TodoItemTests: XCTestCase {
         XCTAssertEqual(parsedItem?.importance, TodoItem.Importance.regular)
     }
     
-    func testJsonParsingWithoutDeadline() {
-        var dictionary: [String : Any] = [:]
+    func testJSONParsingWithoutDeadline() {
+        var dictionary: [String: Any] = [:]
         dictionary["id"] = UUID().uuidString
         dictionary["text"] = "text"
         dictionary["importance"] = TodoItem.Importance.important.rawValue
@@ -105,8 +100,8 @@ final class TodoItemTests: XCTestCase {
         XCTAssertNil(parsedItem?.deadline)
     }
     
-    func testJsonParsingWithoutModificationDate() {
-        var dictionary: [String : Any] = [:]
+    func testJSONParsingWithoutModificationDate() {
+        var dictionary: [String: Any] = [:]
         dictionary["id"] = UUID().uuidString
         dictionary["text"] = "text"
         dictionary["importance"] = TodoItem.Importance.important.rawValue
@@ -118,8 +113,8 @@ final class TodoItemTests: XCTestCase {
         XCTAssertNil(parsedItem?.modificationDate)
     }
     
-    func testJsonParsingWithInvalidId() {
-        var dictionary: [String : Any] = [:]
+    func testJSONParsingWithInvalidId() {
+        var dictionary: [String: Any] = [:]
         dictionary["id"] = "abc"
         dictionary["text"] = "text"
         dictionary["importance"] = TodoItem.Importance.important.rawValue
@@ -131,8 +126,8 @@ final class TodoItemTests: XCTestCase {
         XCTAssertNil(parsedItem)
     }
     
-    func testJsonParsingWithoutId() {
-        var dictionary: [String : Any] = [:]
+    func testJSONParsingWithoutId() {
+        var dictionary: [String: Any] = [:]
         dictionary["text"] = "text"
         dictionary["importance"] = TodoItem.Importance.important.rawValue
         dictionary["deadline"] = Date().timeIntervalSince1970
@@ -143,8 +138,8 @@ final class TodoItemTests: XCTestCase {
         XCTAssertNil(parsedItem)
     }
     
-    func testJsonParsingWithIncorrectImportance() {
-        var dictionary: [String : Any] = [:]
+    func testJSONParsingWithIncorrectImportance() {
+        var dictionary: [String: Any] = [:]
         dictionary["id"] = UUID().uuidString
         dictionary["text"] = "text"
         dictionary["importance"] = "123"
@@ -156,8 +151,8 @@ final class TodoItemTests: XCTestCase {
         XCTAssertNil(parsedItem)
     }
     
-    func testJsonParsingWithoutText() {
-        var dictionary: [String : Any] = [:]
+    func testJSONParsingWithoutText() {
+        var dictionary: [String: Any] = [:]
         dictionary["id"] = UUID().uuidString
         dictionary["importance"] = "123"
         dictionary["deadline"] = Date().timeIntervalSince1970
@@ -168,8 +163,8 @@ final class TodoItemTests: XCTestCase {
         XCTAssertNil(parsedItem)
     }
     
-    func testJsonParsingWithIncorrectCreationDate() {
-        var dictionary: [String : Any] = [:]
+    func testJSONParsingWithIncorrectCreationDate() {
+        var dictionary: [String: Any] = [:]
         dictionary["id"] = UUID().uuidString
         dictionary["text"] = "text"
         dictionary["importance"] = TodoItem.Importance.important.rawValue
@@ -181,8 +176,8 @@ final class TodoItemTests: XCTestCase {
         XCTAssertNil(parsedItem)
     }
     
-    func testJsonParsingWithoutIsDone() {
-        var dictionary: [String : Any] = [:]
+    func testJSONParsingWithoutIsDone() {
+        var dictionary: [String: Any] = [:]
         dictionary["id"] = UUID().uuidString
         dictionary["text"] = "text"
         dictionary["importance"] = TodoItem.Importance.important.rawValue
@@ -193,8 +188,8 @@ final class TodoItemTests: XCTestCase {
         XCTAssertNil(parsedItem)
     }
     
-    func testJsonParsingWithIncorrectIsDoneValue() {
-        var dictionary: [String : Any] = [:]
+    func testJSONParsingWithIncorrectIsDoneValue() {
+        var dictionary: [String: Any] = [:]
         dictionary["id"] = UUID().uuidString
         dictionary["text"] = "text"
         dictionary["importance"] = TodoItem.Importance.important.rawValue
@@ -206,31 +201,7 @@ final class TodoItemTests: XCTestCase {
         XCTAssertNil(parsedItem)
     }
     
-    func testCsvValueWithAllPropertiesExceptDeadline() {
-        let item = TodoItem(text: "text", importance: .unimportant, deadline: nil, modificationDate: .now + 10)
-        let csvString = item.csv
-        let columns = csvString.components(separatedBy: TodoItem.csvColumnsDelimiter)
-        XCTAssertEqual(columns.count, 7)
-        XCTAssertTrue(columns[3].isEmpty)
-    }
-
-    func testCsvValueWithAllPropertiesExceptModificationDate() {
-        let item = TodoItem(text: "text", importance: .unimportant, deadline: .now + 100, modificationDate: nil)
-        let csvString = item.csv
-        let columns = csvString.components(separatedBy: TodoItem.csvColumnsDelimiter)
-        XCTAssertEqual(columns.count, 7)
-        XCTAssertTrue(columns[6].isEmpty)
-    }
-
-    func testCsvValueWithRegularImportance() {
-        let item = TodoItem(text: "text", importance: .regular, deadline: .now + 100, modificationDate: .now + 10)
-        let csvString = item.csv
-        let columns = csvString.components(separatedBy: TodoItem.csvColumnsDelimiter)
-        XCTAssertEqual(columns.count, 7)
-        XCTAssertTrue(columns[2].isEmpty)
-    }
-
-    func testEquivalencyOfCsvValue() {
+    func testEquivalencyOfCSVValue() {
         let item = TodoItem(text: "text", importance: .unimportant, deadline: .now + 100, modificationDate: .now + 10)
         let csvString = item.csv
         let columns = csvString.components(separatedBy: TodoItem.csvColumnsDelimiter)
@@ -244,7 +215,31 @@ final class TodoItemTests: XCTestCase {
         XCTAssertEqual(Double(columns[6]), item.modificationDate?.timeIntervalSince1970)
     }
     
-    func testEquivalencyOfCsvParsing() throws {
+    func testCSVValueWithAllPropertiesExceptDeadline() {
+        let item = TodoItem(text: "text", importance: .unimportant, deadline: nil, modificationDate: .now + 10)
+        let csvString = item.csv
+        let columns = csvString.components(separatedBy: TodoItem.csvColumnsDelimiter)
+        XCTAssertEqual(columns.count, 7)
+        XCTAssertTrue(columns[3].isEmpty)
+    }
+
+    func testCSVValueWithAllPropertiesExceptModificationDate() {
+        let item = TodoItem(text: "text", importance: .unimportant, deadline: .now + 100, modificationDate: nil)
+        let csvString = item.csv
+        let columns = csvString.components(separatedBy: TodoItem.csvColumnsDelimiter)
+        XCTAssertEqual(columns.count, 7)
+        XCTAssertTrue(columns[6].isEmpty)
+    }
+
+    func testCSVValueWithRegularImportance() {
+        let item = TodoItem(text: "text", importance: .regular, deadline: .now + 100, modificationDate: .now + 10)
+        let csvString = item.csv
+        let columns = csvString.components(separatedBy: TodoItem.csvColumnsDelimiter)
+        XCTAssertEqual(columns.count, 7)
+        XCTAssertTrue(columns[2].isEmpty)
+    }
+    
+    func testEquivalencyOfCSVParsing() throws {
         let item = TodoItem(text: "text", importance: .unimportant, deadline: .now + 100, modificationDate: .now + 10)
         var csv: String = String()
         csv.append(item.id.uuidString)
@@ -272,13 +267,13 @@ final class TodoItemTests: XCTestCase {
         XCTAssertEqual(parsedItem?.modificationDate?.timeIntervalSince1970, item.modificationDate?.timeIntervalSince1970)
     }
 
-    func testCsvParsingWithInvalidCsvArgument() {
+    func testCSVParsingWithInvalidCSVArgument() {
         let invalidString = "abcdef12345"
         let parsedItem = TodoItem.parse(csv: invalidString)
         XCTAssertNil(parsedItem)
     }
     
-    func testCsvParsingWithIncorrectColumnsCount() {
+    func testCSVParsingWithIncorrectColumnsCount() {
         var csv: String = String()
         csv.append(UUID().uuidString)
         csv.append(TodoItem.csvColumnsDelimiter)
@@ -290,7 +285,7 @@ final class TodoItemTests: XCTestCase {
         XCTAssertNil(parsedItem)
     }
 
-    func testCsvParsingWithoutImportance() {
+    func testCSVParsingWithoutImportance() {
         var csv: String = String()
         csv.append(UUID().uuidString)
         csv.append(TodoItem.csvColumnsDelimiter)
@@ -310,7 +305,7 @@ final class TodoItemTests: XCTestCase {
         XCTAssertEqual(parsedItem?.importance, TodoItem.Importance.regular)
     }
 
-    func testCsvParsingWithoutDeadline() {
+    func testCSVParsingWithoutDeadline() {
         var csv: String = String()
         csv.append(UUID().uuidString)
         csv.append(TodoItem.csvColumnsDelimiter)
@@ -330,7 +325,7 @@ final class TodoItemTests: XCTestCase {
         XCTAssertNil(parsedItem?.deadline)
     }
 
-    func testCsvParsingWithoutModificationDate() throws {
+    func testCSVParsingWithoutModificationDate() throws {
         var csv: String = String()
         csv.append(UUID().uuidString)
         csv.append(TodoItem.csvColumnsDelimiter)
@@ -350,7 +345,7 @@ final class TodoItemTests: XCTestCase {
         XCTAssertNil(parsedItem?.modificationDate)
     }
 
-    func testCsvParsingWithInvalidId() {
+    func testCSVParsingWithInvalidId() {
         var csv: String = String()
         csv.append("abc")
         csv.append(TodoItem.csvColumnsDelimiter)
@@ -370,7 +365,7 @@ final class TodoItemTests: XCTestCase {
         XCTAssertNil(parsedItem)
     }
 
-    func testCsvParsingWithoutId() throws {
+    func testCSVParsingWithoutId() throws {
         var csv: String = String()
         csv.append(TodoItem.csvColumnsDelimiter)
         csv.append("text")
@@ -389,7 +384,7 @@ final class TodoItemTests: XCTestCase {
         XCTAssertNil(parsedItem)
     }
 
-    func testCsvParsingWithIncorrectImportance() {
+    func testCSVParsingWithIncorrectImportance() {
         var csv: String = String()
         csv.append(UUID().uuidString)
         csv.append(TodoItem.csvColumnsDelimiter)
@@ -409,7 +404,7 @@ final class TodoItemTests: XCTestCase {
         XCTAssertNil(parsedItem)
     }
 
-    func testCsvParsingWithIncorrectCreationDate() throws {
+    func testCSVParsingWithIncorrectCreationDate() throws {
         var csv: String = String()
         csv.append(UUID().uuidString)
         csv.append(TodoItem.csvColumnsDelimiter)
@@ -429,7 +424,7 @@ final class TodoItemTests: XCTestCase {
         XCTAssertNil(parsedItem)
     }
 
-    func testCsvParsingWithoutIsDone() throws {
+    func testCSVParsingWithoutIsDone() throws {
         var csv: String = String()
         csv.append(UUID().uuidString)
         csv.append(TodoItem.csvColumnsDelimiter)
@@ -448,7 +443,7 @@ final class TodoItemTests: XCTestCase {
         XCTAssertNil(parsedItem)
     }
 
-    func testCsvParsingWithIncorrectIsDoneValue() throws {
+    func testCSVParsingWithIncorrectIsDoneValue() throws {
         var csv: String = String()
         csv.append(UUID().uuidString)
         csv.append(TodoItem.csvColumnsDelimiter)
