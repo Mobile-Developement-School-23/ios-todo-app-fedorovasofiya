@@ -24,7 +24,7 @@ final class TodoViewController: UIViewController {
         setupNavigationItem()
         setupScrollView()
         setupTextView()
-        
+        setupDeleteButton()
     }
     
 // MARK: - UI Setup
@@ -43,7 +43,6 @@ final class TodoViewController: UIViewController {
             target: self,
             action: #selector(didTapSaveButton)
         )
-        navigationItem.rightBarButtonItem?.isEnabled = false
     }
     
     private func setupScrollView() {
@@ -60,8 +59,8 @@ final class TodoViewController: UIViewController {
     }
     
     private func setupTextView() {
-        textView.backgroundColor = UIColor(named: "BackSecondary")
         textView.isScrollEnabled = false
+        textView.backgroundColor = UIColor(named: "BackSecondary")
         textView.layer.cornerRadius = Constants.cornerRadius
         textView.font = .systemFont(ofSize: Constants.fontSize, weight: .regular)
         textView.textContainerInset = UIEdgeInsets(
@@ -70,7 +69,8 @@ final class TodoViewController: UIViewController {
             bottom: Constants.margin,
             right: Constants.margin
         )
-//        textView.text = Constants.fish
+        textView.text = L10n.todoTextPlaceholder
+        textView.textColor = UIColor(named: "LabelTertiary")
         scrollView.addSubview(textView)
         
         textView.translatesAutoresizingMaskIntoConstraints = false
@@ -80,6 +80,24 @@ final class TodoViewController: UIViewController {
             textView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: Constants.margin),
             textView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: -Constants.margin),
             textView.heightAnchor.constraint(greaterThanOrEqualToConstant: Constants.textDefaultHeight)
+        ])
+    }
+    
+    private func setupDeleteButton() {
+        deleteButton.backgroundColor = UIColor(named: "BackSecondary")
+        deleteButton.layer.cornerRadius = Constants.cornerRadius
+        deleteButton.titleLabel?.font = .systemFont(ofSize: Constants.fontSize, weight: .regular)
+        deleteButton.setTitle(L10n.deleteButtonTitle, for: .normal)
+        deleteButton.setTitleColor(UIColor(named: "Red"), for: .normal)
+        deleteButton.setTitleColor(UIColor(named: "LabelTertiary"), for: .disabled)
+        scrollView.addSubview(deleteButton)
+        
+        deleteButton.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            deleteButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.margin),
+            deleteButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.margin),
+            deleteButton.topAnchor.constraint(equalTo: textView.bottomAnchor, constant: Constants.margin),
+            deleteButton.heightAnchor.constraint(equalToConstant: Constants.buttonHeight)
         ])
     }
     
@@ -98,12 +116,13 @@ final class TodoViewController: UIViewController {
 // MARK: - Constants
 
 extension TodoViewController {
-    struct Constants {
+    
+    private struct Constants {
         static let margin: CGFloat = 16
         static let textDefaultHeight: CGFloat = 120
         static let fontSize: CGFloat = 17
         static let cornerRadius: CGFloat = 16
-        
-//        static let fish = "В рамках спецификации современных стандартов, непосредственные участники технического прогресса могут быть ассоциативно распределены по отраслям. Господа, начало повседневной работы по формированию позиции не даёт нам иного выбора, кроме определения позиций, занимаемых участниками в отношении поставленных задач. Сложно сказать, почему действия представителей оппозиции преданы социально-демократической анафеме. Следует отметить, что понимание сути ресурсосберегающих технологий способствует подготовке и реализации направлений прогрессивного развития. Противоположная точка зрения подразумевает, что базовые сценарии поведения пользователей лишь добавляют фракционных разногласий и заблокированы в рамках своих собственных рациональных ограничений! И нет сомнений, что явные признаки победы институционализации, вне зависимости от их уровня, должны быть в равной степени предоставлены сами себе. Приятно, граждане, наблюдать, как активно развивающиеся страны третьего мира объективно рассмотрены соответствующими инстанциями. Значимость этих проблем настолько очевидна, что дальнейшее развитие различных форм деятельности предопределяет высокую востребованность экономической целесообразности принимаемых решений. В целом, конечно, высокое качество позиционных исследований не даёт нам иного выбора, кроме определения форм воздействия. Являясь всего лишь частью общей картины, представители современных социальных резервов могут быть указаны как претенденты на роль ключевых факторов."
+        static let buttonHeight: CGFloat = 56
     }
+    
 }
