@@ -10,6 +10,8 @@ import Foundation
 final class TodoItemViewModel: TodoItemViewOutput {
     
     var todoItemLoaded: ((TodoItem) -> ())?
+    var successfullySaved: (() -> ())?
+    var errorOccurred: ((String) -> ())?
     
     private let fileCache: FileCache
     private let cacheFileName = "cache"
@@ -25,8 +27,11 @@ final class TodoItemViewModel: TodoItemViewOutput {
         do {
             try fileCache.loadItemsFromJSON(fileName: cacheFileName)
         } catch {
-            print(error.localizedDescription)
+            if let errorOccurred = errorOccurred {
+                errorOccurred(error.localizedDescription)
+            }
         }
+        
         if let newItem = fileCache.todoItems.values.first,
            let todoItemLoaded = todoItemLoaded {
             todoItem = newItem
@@ -34,10 +39,27 @@ final class TodoItemViewModel: TodoItemViewOutput {
         }
     }
     
-    func saveItem(text: String?, importance: Importance, deadline: Date?) {
-        guard let text = text else {
-            return
+    func saveItem(text: String, importance: Importance, deadline: Date?) {
+        updateTodoItem(text: text, importance: importance, deadline: deadline)
+        
+        guard let todoItem = todoItem else { return }
+        fileCache.addItem(todoItem)
+        do {
+            try fileCache.saveItemsToJSON(fileName: cacheFileName)
+        } catch {
+            if let errorOccurred = errorOccurred {
+                errorOccurred(error.localizedDescription)
+            }
         }
+        
+        if let successfullySaved = successfullySaved {
+            successfullySaved()
+        }
+    }
+    
+    // MARK: - Private Methods
+    
+    private func updateTodoItem(text: String, importance: Importance, deadline: Date?) {
         guard let todoItem = todoItem else { return }
         let newItem = TodoItem(
             id: todoItem.id,
@@ -49,12 +71,6 @@ final class TodoItemViewModel: TodoItemViewOutput {
             modificationDate: todoItem.modificationDate
         )
         self.todoItem = newItem
-        fileCache.addItem(newItem)
-        do {
-            try fileCache.saveItemsToJSON(fileName: cacheFileName)
-        } catch {
-            print(error.localizedDescription)
-        }
     }
     
 }

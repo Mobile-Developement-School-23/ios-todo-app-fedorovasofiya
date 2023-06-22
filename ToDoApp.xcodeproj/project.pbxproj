@@ -21,6 +21,7 @@
 		EBD34FF12A44D2B400129695 /* DateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBD34FF02A44D2B400129695 /* DateService.swift */; };
 		EBD34FF42A44D2D400129695 /* DateServiceImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBD34FF32A44D2D400129695 /* DateServiceImpl.swift */; };
 		EBD34FF62A44E0D800129695 /* Importance.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBD34FF52A44E0D800129695 /* Importance.swift */; };
+		EBD34FFA2A44EBB700129695 /* UIViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBD34FF92A44EBB700129695 /* UIViewController+Extensions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -52,6 +53,7 @@
 		EBD34FF02A44D2B400129695 /* DateService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateService.swift; sourceTree = "<group>"; };
 		EBD34FF32A44D2D400129695 /* DateServiceImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateServiceImpl.swift; sourceTree = "<group>"; };
 		EBD34FF52A44E0D800129695 /* Importance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Importance.swift; sourceTree = "<group>"; };
+		EBD34FF92A44EBB700129695 /* UIViewController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extensions.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -158,6 +160,7 @@
 		EB8D42A52A3CAD3D002180BC /* Service */ = {
 			isa = PBXGroup;
 			children = (
+				EBD34FF72A44EB9B00129695 /* Extensions */,
 				EB6B61E52A4234670011F01F /* Common */,
 				EB6B61E32A4226F20011F01F /* Models */,
 				EB6B61E42A42270C0011F01F /* Services */,
@@ -222,6 +225,22 @@
 				EBD34FF32A44D2D400129695 /* DateServiceImpl.swift */,
 			);
 			path = DateService;
+			sourceTree = "<group>";
+		};
+		EBD34FF72A44EB9B00129695 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				EBD34FF82A44EBA100129695 /* UIKit */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		EBD34FF82A44EBA100129695 /* UIKit */ = {
+			isa = PBXGroup;
+			children = (
+				EBD34FF92A44EBB700129695 /* UIViewController+Extensions.swift */,
+			);
+			path = UIKit;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -328,6 +347,7 @@
 				EBD34FF42A44D2D400129695 /* DateServiceImpl.swift in Sources */,
 				EBD34FE82A4461C300129695 /* TodoItemViewOutput.swift in Sources */,
 				EB8D42902A3CABC7002180BC /* TodoItemViewController.swift in Sources */,
+				EBD34FFA2A44EBB700129695 /* UIViewController+Extensions.swift in Sources */,
 				EBD34FF62A44E0D800129695 /* Importance.swift in Sources */,
 				EB8D428C2A3CABC7002180BC /* AppDelegate.swift in Sources */,
 				EB8D42A22A3CAD1B002180BC /* TodoItem.swift in Sources */,

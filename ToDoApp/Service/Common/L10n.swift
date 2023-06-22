@@ -17,5 +17,9 @@ struct L10n {
     static let importanceLabelText = "Важность"
     static let toDoByLabelText = "Сделать до"
     static let regularImportanceChoice = "нет"
+    static let errorAlertTitle = "Что-то пошло не так..."
+    static let successAlertTitle = "Успешно"
+    static let successfullSavingMessage = "Дело сохранено!"
+    static let textIsEmpty = "Добавьте текст!"
     
 }

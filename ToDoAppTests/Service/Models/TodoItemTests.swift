@@ -84,14 +84,14 @@ final class TodoItemTests: XCTestCase {
         dictionary["modificationDate"] = Date().timeIntervalSince1970
         let parsedItem = TodoItem.parse(json: dictionary)
         XCTAssertNotNil(parsedItem)
-        XCTAssertEqual(parsedItem?.importance, TodoItem.Importance.regular)
+        XCTAssertEqual(parsedItem?.importance, Importance.regular)
     }
     
     func testJSONParsingWithoutDeadline() {
         var dictionary: [String: Any] = [:]
         dictionary["id"] = UUID().uuidString
         dictionary["text"] = "text"
-        dictionary["importance"] = TodoItem.Importance.important.rawValue
+        dictionary["importance"] = Importance.important.rawValue
         dictionary["isDone"] = true
         dictionary["creationDate"] = Date().timeIntervalSince1970
         dictionary["modificationDate"] = Date().timeIntervalSince1970
@@ -104,7 +104,7 @@ final class TodoItemTests: XCTestCase {
         var dictionary: [String: Any] = [:]
         dictionary["id"] = UUID().uuidString
         dictionary["text"] = "text"
-        dictionary["importance"] = TodoItem.Importance.important.rawValue
+        dictionary["importance"] = Importance.important.rawValue
         dictionary["deadline"] = Date().timeIntervalSince1970
         dictionary["isDone"] = true
         dictionary["creationDate"] = Date().timeIntervalSince1970
@@ -117,7 +117,7 @@ final class TodoItemTests: XCTestCase {
         var dictionary: [String: Any] = [:]
         dictionary["id"] = "abc"
         dictionary["text"] = "text"
-        dictionary["importance"] = TodoItem.Importance.important.rawValue
+        dictionary["importance"] = Importance.important.rawValue
         dictionary["deadline"] = Date().timeIntervalSince1970
         dictionary["isDone"] = true
         dictionary["creationDate"] = Date().timeIntervalSince1970
@@ -129,7 +129,7 @@ final class TodoItemTests: XCTestCase {
     func testJSONParsingWithoutId() {
         var dictionary: [String: Any] = [:]
         dictionary["text"] = "text"
-        dictionary["importance"] = TodoItem.Importance.important.rawValue
+        dictionary["importance"] = Importance.important.rawValue
         dictionary["deadline"] = Date().timeIntervalSince1970
         dictionary["isDone"] = true
         dictionary["creationDate"] = Date().timeIntervalSince1970
@@ -167,7 +167,7 @@ final class TodoItemTests: XCTestCase {
         var dictionary: [String: Any] = [:]
         dictionary["id"] = UUID().uuidString
         dictionary["text"] = "text"
-        dictionary["importance"] = TodoItem.Importance.important.rawValue
+        dictionary["importance"] = Importance.important.rawValue
         dictionary["deadline"] = Date().timeIntervalSince1970
         dictionary["isDone"] = true
         dictionary["creationDate"] = "123"
@@ -180,7 +180,7 @@ final class TodoItemTests: XCTestCase {
         var dictionary: [String: Any] = [:]
         dictionary["id"] = UUID().uuidString
         dictionary["text"] = "text"
-        dictionary["importance"] = TodoItem.Importance.important.rawValue
+        dictionary["importance"] = Importance.important.rawValue
         dictionary["deadline"] = Date().timeIntervalSince1970
         dictionary["creationDate"] = Date().timeIntervalSince1970
         dictionary["modificationDate"] = Date().timeIntervalSince1970
@@ -192,7 +192,7 @@ final class TodoItemTests: XCTestCase {
         var dictionary: [String: Any] = [:]
         dictionary["id"] = UUID().uuidString
         dictionary["text"] = "text"
-        dictionary["importance"] = TodoItem.Importance.important.rawValue
+        dictionary["importance"] = Importance.important.rawValue
         dictionary["deadline"] = Date().timeIntervalSince1970
         dictionary["isDone"] = "123"
         dictionary["creationDate"] = Date().timeIntervalSince1970
@@ -279,7 +279,7 @@ final class TodoItemTests: XCTestCase {
         csv.append(TodoItem.csvColumnsDelimiter)
         csv.append("text")
         csv.append(TodoItem.csvColumnsDelimiter)
-        csv.append(TodoItem.Importance.important.rawValue)
+        csv.append(Importance.important.rawValue)
         
         let parsedItem = TodoItem.parse(csv: csv)
         XCTAssertNil(parsedItem)
@@ -302,7 +302,7 @@ final class TodoItemTests: XCTestCase {
         
         let parsedItem = TodoItem.parse(csv: csv)
         XCTAssertNotNil(parsedItem)
-        XCTAssertEqual(parsedItem?.importance, TodoItem.Importance.regular)
+        XCTAssertEqual(parsedItem?.importance, Importance.regular)
     }
 
     func testCSVParsingWithoutDeadline() {
@@ -311,7 +311,7 @@ final class TodoItemTests: XCTestCase {
         csv.append(TodoItem.csvColumnsDelimiter)
         csv.append("text")
         csv.append(TodoItem.csvColumnsDelimiter)
-        csv.append(TodoItem.Importance.important.rawValue)
+        csv.append(Importance.important.rawValue)
         csv.append(TodoItem.csvColumnsDelimiter)
         csv.append(TodoItem.csvColumnsDelimiter)
         csv.append("1")
@@ -331,7 +331,7 @@ final class TodoItemTests: XCTestCase {
         csv.append(TodoItem.csvColumnsDelimiter)
         csv.append("text")
         csv.append(TodoItem.csvColumnsDelimiter)
-        csv.append(TodoItem.Importance.important.rawValue)
+        csv.append(Importance.important.rawValue)
         csv.append(TodoItem.csvColumnsDelimiter)
         csv.append(Date().timeIntervalSince1970.description)
         csv.append(TodoItem.csvColumnsDelimiter)
@@ -351,7 +351,7 @@ final class TodoItemTests: XCTestCase {
         csv.append(TodoItem.csvColumnsDelimiter)
         csv.append("text")
         csv.append(TodoItem.csvColumnsDelimiter)
-        csv.append(TodoItem.Importance.important.rawValue)
+        csv.append(Importance.important.rawValue)
         csv.append(TodoItem.csvColumnsDelimiter)
         csv.append(Date().timeIntervalSince1970.description)
         csv.append(TodoItem.csvColumnsDelimiter)
@@ -370,7 +370,7 @@ final class TodoItemTests: XCTestCase {
         csv.append(TodoItem.csvColumnsDelimiter)
         csv.append("text")
         csv.append(TodoItem.csvColumnsDelimiter)
-        csv.append(TodoItem.Importance.important.rawValue)
+        csv.append(Importance.important.rawValue)
         csv.append(TodoItem.csvColumnsDelimiter)
         csv.append(Date().timeIntervalSince1970.description)
         csv.append(TodoItem.csvColumnsDelimiter)
@@ -410,7 +410,7 @@ final class TodoItemTests: XCTestCase {
         csv.append(TodoItem.csvColumnsDelimiter)
         csv.append("text")
         csv.append(TodoItem.csvColumnsDelimiter)
-        csv.append(TodoItem.Importance.important.rawValue)
+        csv.append(Importance.important.rawValue)
         csv.append(TodoItem.csvColumnsDelimiter)
         csv.append(Date().timeIntervalSince1970.description)
         csv.append(TodoItem.csvColumnsDelimiter)
@@ -430,7 +430,7 @@ final class TodoItemTests: XCTestCase {
         csv.append(TodoItem.csvColumnsDelimiter)
         csv.append("text")
         csv.append(TodoItem.csvColumnsDelimiter)
-        csv.append(TodoItem.Importance.important.rawValue)
+        csv.append(Importance.important.rawValue)
         csv.append(TodoItem.csvColumnsDelimiter)
         csv.append(Date().timeIntervalSince1970.description)
         csv.append(TodoItem.csvColumnsDelimiter)
@@ -449,7 +449,7 @@ final class TodoItemTests: XCTestCase {
         csv.append(TodoItem.csvColumnsDelimiter)
         csv.append("text")
         csv.append(TodoItem.csvColumnsDelimiter)
-        csv.append(TodoItem.Importance.important.rawValue)
+        csv.append(Importance.important.rawValue)
         csv.append(TodoItem.csvColumnsDelimiter)
         csv.append(Date().timeIntervalSince1970.description)
         csv.append(TodoItem.csvColumnsDelimiter)

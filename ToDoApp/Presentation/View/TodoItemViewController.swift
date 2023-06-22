@@ -60,6 +60,7 @@ final class TodoItemViewController: UIViewController {
         registerKeyboardNotifications()
         addDateLabelTapGestureRecognizer()
         addTapGestureRecognizerToDismissKeyboard()
+        
         bindViewModel()
         viewOutput.loadItem()
     }
@@ -101,6 +102,8 @@ final class TodoItemViewController: UIViewController {
         textView.backgroundColor = UIColor(named: "BackSecondary")
         textView.layer.cornerRadius = Constants.cornerRadius
         textView.font = .systemFont(ofSize: Constants.fontSize, weight: .regular)
+        textView.text = L10n.todoTextPlaceholder
+        textView.textColor = UIColor(named: "LabelTertiary")
         textView.textContainerInset = UIEdgeInsets(
             top: Constants.margin,
             left: Constants.margin,
@@ -303,7 +306,12 @@ final class TodoItemViewController: UIViewController {
     @objc private func didTapSaveButton() {
         dismissKeyboard()
         
-        let text = textView.textColor == UIColor(named: "LabelTertiary") ? nil : textView.text
+        guard
+            let text = textView.textColor == UIColor(named: "LabelTertiary") ? nil : textView.text
+        else {
+            self.presentAlert(title: L10n.textIsEmpty)
+            return
+        }
         let importance = Importance.getValue(index: importanceControl.selectedSegmentIndex)
         let deadline = deadlineSwitch.isOn ? dateService.getDate(from: dateLabel.text ?? "") : nil
         viewOutput.saveItem(text: text, importance: importance, deadline: deadline)
@@ -400,6 +408,14 @@ final class TodoItemViewController: UIViewController {
             if let deadline = todoItem.deadline {
                 self?.updateDeadline(deadline: deadline)
             }
+        }
+        
+        viewOutput.successfullySaved = { [weak self] in
+            self?.presentAlert(title: L10n.successAlertTitle, message: L10n.successfullSavingMessage)
+        }
+        
+        viewOutput.errorOccurred = { [weak self] description in
+            self?.presentAlert(title: L10n.errorAlertTitle, message: description)
         }
     }
     
