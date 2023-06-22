@@ -356,7 +356,10 @@ final class TodoViewController: UIViewController {
     
     private func updateDateViewVisibility() {
         if detailsStackView.arrangedSubviews.count == 2 {
-            detailsStackView.addArrangedSubview(dateView)
+            UIView.animate(withDuration: 0.5) {
+                self.detailsStackView.addArrangedSubview(self.dateView)
+                self.view.layoutIfNeeded()
+            }
         } else {
             hideDateView()
         }
@@ -364,8 +367,11 @@ final class TodoViewController: UIViewController {
     
     private func hideDateView() {
         if detailsStackView.arrangedSubviews.count == 3 {
-            let view = detailsStackView.arrangedSubviews.last
-            view?.removeFromSuperview()
+            UIView.animate(withDuration: 0.5) {
+                let view = self.detailsStackView.arrangedSubviews.last
+                view?.removeFromSuperview()
+                self.view.layoutIfNeeded()
+            }
         }
     }
 
