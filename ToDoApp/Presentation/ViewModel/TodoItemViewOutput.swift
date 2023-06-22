@@ -10,4 +10,5 @@ import Foundation
 protocol TodoItemViewOutput {
     var todoItemLoaded: ((TodoItem) -> ())? { get set }
     func loadItem()
+    func saveItem(text: String?, importance: Importance, deadline: Date?)
 }

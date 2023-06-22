@@ -26,11 +26,13 @@ final class TodoItemViewController: UIViewController {
     private lazy var deleteButton = UIButton()
     
     private var viewOutput: TodoItemViewOutput
+    private var dateService: DateService
     
     // MARK: - Life Cycle
     
-    init(viewOutput: TodoItemViewOutput) {
+    init(viewOutput: TodoItemViewOutput, dateService: DateService) {
         self.viewOutput = viewOutput
+        self.dateService = dateService
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -146,6 +148,7 @@ final class TodoItemViewController: UIViewController {
         importanceControl.insertSegment(with: arrowImage, at: 0, animated: true)
         importanceControl.insertSegment(withTitle: L10n.regularImportanceChoice, at: 1, animated: true)
         importanceControl.insertSegment(with: exclamationmarkImage, at: 2, animated: true)
+        importanceControl.selectedSegmentIndex = 1
         importanceControl.translatesAutoresizingMaskIntoConstraints = false
         importanceView.addSubview(importanceControl)
         
@@ -225,7 +228,6 @@ final class TodoItemViewController: UIViewController {
     }
     
     private func setupDatePicker() {
-        // сделать недоступной дату до сегодня
         datePicker.datePickerMode = .date
         datePicker.preferredDatePickerStyle = .inline
         datePicker.translatesAutoresizingMaskIntoConstraints = false
@@ -236,6 +238,8 @@ final class TodoItemViewController: UIViewController {
             datePicker.trailingAnchor.constraint(equalTo: dateView.trailingAnchor, constant: -8),
             datePicker.centerYAnchor.constraint(equalTo: dateView.centerYAnchor)
         ])
+        
+        datePicker.addTarget(self, action: #selector(handleDatePicker), for: .valueChanged)
     }
     
     private func setupDateView() {
@@ -297,21 +301,40 @@ final class TodoItemViewController: UIViewController {
     }
     
     @objc private func didTapSaveButton() {
+        dismissKeyboard()
         
+        let text = textView.textColor == UIColor(named: "LabelTertiary") ? nil : textView.text
+        let importance = Importance.getValue(index: importanceControl.selectedSegmentIndex)
+        let deadline = deadlineSwitch.isOn ? dateService.getDate(from: dateLabel.text ?? "") : nil
+        viewOutput.saveItem(text: text, importance: importance, deadline: deadline)
     }
     
     @objc private func switchChanged() {
         if deadlineSwitch.isOn {
-            dateLabel.text = "2 июня 2021"
+            guard let nextDay = dateService.getNextDay() else { return }
+            dateLabel.text = dateService.getString(from: nextDay)
         } else {
-            dateLabel.text = ""
+            dateLabel.text = nil
             if detailsStackView.arrangedSubviews.count == 3 {
                 hideDateView()
             }
         }
     }
     
+    @objc private func handleDatePicker() {
+        dateLabel.text = dateService.getString(from: datePicker.date)
+    }
+    
     @objc private func dateLabelTapped() {
+        guard
+            let selectedDateString = dateLabel.text,
+            let selectedDate = dateService.getDate(from: selectedDateString)
+        else {
+            return
+        }
+        datePicker.date = selectedDate
+        let currentDate = Date()
+        datePicker.minimumDate = selectedDate < currentDate ? selectedDate : currentDate
         toggleDateViewVisibility()
     }
     
@@ -337,6 +360,37 @@ final class TodoItemViewController: UIViewController {
         textView.endEditing(true)
     }
     
+    // MARK: - NotificationCenter
+    
+    private func registerKeyboardNotifications() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillShow),
+            name: UIResponder.keyboardWillShowNotification,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillHide),
+            name: UIResponder.keyboardWillHideNotification,
+            object: nil
+        )
+    }
+    
+    // MARK: - GestureRecognizers
+    
+    private func addTapGestureRecognizerToDismissKeyboard() {
+        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tapGestureRecognizer.cancelsTouchesInView = false
+        view.addGestureRecognizer(tapGestureRecognizer)
+    }
+    
+    private func addDateLabelTapGestureRecognizer() {
+        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(dateLabelTapped))
+        dateLabel.isUserInteractionEnabled = true
+        dateLabel.addGestureRecognizer(tapGestureRecognizer)
+    }
+    
     // MARK: - Tools
     
     private func bindViewModel() {
@@ -359,54 +413,14 @@ final class TodoItemViewController: UIViewController {
         }
     }
     
-    private func updateImportanceControl(importance: TodoItem.Importance) {
-        switch importance {
-        case .unimportant:
-            importanceControl.selectedSegmentIndex = 0
-        case .regular:
-            importanceControl.selectedSegmentIndex = 1
-        case .important:
-            importanceControl.selectedSegmentIndex = 2
-        }
+    private func updateImportanceControl(importance: Importance) {
+        importanceControl.selectedSegmentIndex = importance.index
     }
     
     private func updateDeadline(deadline: Date) {
-        let dateFormatter = DateFormatter()
-        dateFormatter.setLocalizedDateFormatFromTemplate("dd MMMM yyyy")
-        dateLabel.text = dateFormatter.string(from: deadline)
-        
-        if detailsStackView.arrangedSubviews.count == 2 {
-            datePicker.date = deadline
-            deadlineSwitch.isOn = true
-            showDateView()
-        }
-    }
-    
-    private func registerKeyboardNotifications() {
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(keyboardWillShow),
-            name: UIResponder.keyboardWillShowNotification,
-            object: nil
-        )
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(keyboardWillHide),
-            name: UIResponder.keyboardWillHideNotification,
-            object: nil
-        )
-    }
-    
-    private func addTapGestureRecognizerToDismissKeyboard() {
-        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
-        tapGestureRecognizer.cancelsTouchesInView = false
-        view.addGestureRecognizer(tapGestureRecognizer)
-    }
-    
-    private func addDateLabelTapGestureRecognizer() {
-        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(dateLabelTapped))
-        dateLabel.isUserInteractionEnabled = true
-        dateLabel.addGestureRecognizer(tapGestureRecognizer)
+        dateLabel.text = dateService.getString(from: deadline)
+        deadlineSwitch.isOn = true
+        datePicker.date = deadline
     }
     
     private func toggleDateViewVisibility() {

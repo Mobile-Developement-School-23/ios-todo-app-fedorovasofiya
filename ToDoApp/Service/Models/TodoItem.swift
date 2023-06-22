@@ -9,12 +9,6 @@ import Foundation
 
 struct TodoItem: Hashable {
     
-    enum Importance: String {
-        case unimportant
-        case regular
-        case important
-    }
-    
     private enum Properties: CodingKey {
         case id, text, importance, deadline, isDone, creationDate, modificationDate
     }
