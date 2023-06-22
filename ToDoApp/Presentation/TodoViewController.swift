@@ -39,6 +39,8 @@ final class TodoViewController: UIViewController {
         setupDateView()
         setupDetailsStackView()
         setupDeleteButton()
+        
+        addDateLabelTapGestureRecognizer()
     }
     
 // MARK: - UI Setup
@@ -175,7 +177,6 @@ final class TodoViewController: UIViewController {
     }
     
     private func setupDateLabel() {
-        dateLabel.text = "2 июня 2021"
         dateLabel.textColor = UIColor(named: "Blue")
         dateLabel.font = .systemFont(ofSize: Constants.smallFontSize, weight: .semibold)
         dateLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -288,16 +289,38 @@ final class TodoViewController: UIViewController {
     }
     
     @objc private func switchChanged() {
-        // при нажатии на дату
         if deadlineSwitch.isOn {
-            if detailsStackView.arrangedSubviews.count == 2 {
-                detailsStackView.addArrangedSubview(dateView)
-            }
+            dateLabel.text = "2 июня 2021"
         } else {
-            if detailsStackView.arrangedSubviews.count == 3 {
-                let view = detailsStackView.arrangedSubviews.last
-                view?.removeFromSuperview()
-            }
+            dateLabel.text = ""
+            hideDateView()
+        }
+    }
+    
+    @objc private func dateLabelTapped() {
+        updateDateViewVisibility()
+    }
+    
+// MARK: - Tools
+    
+    private func addDateLabelTapGestureRecognizer() {
+        let dateLabelTap = UITapGestureRecognizer(target: self, action: #selector(dateLabelTapped))
+        dateLabel.isUserInteractionEnabled = true
+        dateLabel.addGestureRecognizer(dateLabelTap)
+    }
+    
+    private func updateDateViewVisibility() {
+        if detailsStackView.arrangedSubviews.count == 2 {
+            detailsStackView.addArrangedSubview(dateView)
+        } else {
+            hideDateView()
+        }
+    }
+    
+    private func hideDateView() {
+        if detailsStackView.arrangedSubviews.count == 3 {
+            let view = detailsStackView.arrangedSubviews.last
+            view?.removeFromSuperview()
         }
     }
 
