@@ -1,95 +1,18 @@
 //
 //  FileCache.swift
-//  ToDoList
+//  ToDoApp
 //
-//  Created by Sonya Fedorova on 15.06.2023.
+//  Created by Sonya Fedorova on 22.06.2023.
 //
 
 import Foundation
 
-class FileCache {
-    
-    private(set) var todoItems: [UUID: TodoItem] = [:]
-    
-    // MARK: - Public Methods
-    
-    func addItem(_ item: TodoItem) {
-        todoItems[item.id] = item
-    }
-    
-    func deleteItem(with id: UUID) {
-        todoItems.removeValue(forKey: id)
-    }
-    
-    func saveItems(jsonFileName: String) throws {
-        let itemsArray = todoItems.values.map(\.json)
-        let jsonData = try JSONSerialization.data(withJSONObject: itemsArray, options: [.prettyPrinted, .sortedKeys])
-        try saveDataToDocuments(jsonData, fileName: jsonFileName)
-    }
-    
-    func loadItems(jsonFileName: String) throws {
-        let jsonData = try loadDataFromDocuments(fileName: jsonFileName)
-        let decodedData = try JSONSerialization.jsonObject(with: jsonData, options: [])
-        guard let itemsArray = decodedData as? [String: Any] else { return }
-        
-        var newTodoItems: [UUID: TodoItem] = [:]
-        itemsArray.forEach { dictionary in
-            if let item = TodoItem.parse(json: dictionary) {
-                newTodoItems[item.id] = item
-            }
-        }
-        todoItems = newTodoItems
-    }
-    
-    func saveItems(csvFileName: String) throws {
-        var csvString = TodoItem.csvTitles
-        csvString.append(TodoItem.csvRowsDelimiter)
-        todoItems.values.forEach { item in
-            csvString.append(item.csv)
-            csvString.append(TodoItem.csvRowsDelimiter)
-        }
-        try saveStringToDocuments(csvString, fileName: csvFileName)
-    }
-    
-    func loadItems(csvFileName: String) throws {
-        let csvString = try loadStringFromDocuments(fileName: csvFileName)
-        var rows = csvString.components(separatedBy: TodoItem.csvRowsDelimiter)
-        rows.removeFirst()
-        var newTodoItems: [UUID: TodoItem] = [:]
-        rows.forEach { row in
-            if let item = TodoItem.parse(csv: row) {
-                newTodoItems[item.id] = item
-            }
-        }
-        todoItems = newTodoItems
-    }
-    
-    // MARK: - Private Methods
-    
-    private func getDocumentsDirectory() -> URL {
-        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-        let documentsDirectory = paths[0]
-        return documentsDirectory
-    }
-    
-    private func saveDataToDocuments(_ data: Data, fileName: String) throws {
-        let fileURL = getDocumentsDirectory().appendingPathComponent(fileName)
-        try data.write(to: fileURL)
-    }
-    
-    private func loadDataFromDocuments(fileName: String) throws -> Data {
-        let fileURL = getDocumentsDirectory().appendingPathComponent(fileName)
-        return try Data(contentsOf: fileURL)
-    }
-    
-    private func saveStringToDocuments(_ string: String, fileName: String) throws {
-        let fileURL = getDocumentsDirectory().appendingPathComponent(fileName)
-        try string.write(to: fileURL, atomically: true, encoding: .utf8)
-    }
-    
-    private func loadStringFromDocuments(fileName: String) throws -> String {
-        let fileURL = getDocumentsDirectory().appendingPathComponent(fileName)
-        return try String(contentsOf: fileURL, encoding: .utf8)
-    }
-    
+protocol FileCache {
+    var todoItems: [UUID: TodoItem] { get }
+    func addItem(_ item: TodoItem)
+    func deleteItem(with id: UUID)
+    func saveItemsToJSON(fileName: String) throws
+    func loadItemsFromJSON(fileName: String) throws
+    func saveItemsToCSV(fileName: String) throws
+    func loadItemsFromCSV(fileName: String) throws
 }

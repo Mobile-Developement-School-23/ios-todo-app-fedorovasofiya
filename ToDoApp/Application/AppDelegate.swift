@@ -17,7 +17,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
         
-        let viewController = TodoViewController()
+        let viewModel = TodoItemViewModel(fileCache: FileCacheImpl())
+        let viewController = TodoItemViewController(viewOutput: viewModel)
         let navigationController = UINavigationController(rootViewController: viewController)
         window = UIWindow()
         window?.rootViewController = navigationController
