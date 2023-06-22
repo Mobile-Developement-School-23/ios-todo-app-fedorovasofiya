@@ -26,6 +26,10 @@ final class TodoViewController: UIViewController {
     private lazy var deleteButton = UIButton()
     
 // MARK: - Life Cycle
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -40,7 +44,9 @@ final class TodoViewController: UIViewController {
         setupDetailsStackView()
         setupDeleteButton()
         
+        registerKeyboardNotifications()
         addDateLabelTapGestureRecognizer()
+        addTapGestureRecognizerToDismissKeyboard()
     }
     
 // MARK: - UI Setup
@@ -165,10 +171,6 @@ final class TodoViewController: UIViewController {
         deadlineLabel.translatesAutoresizingMaskIntoConstraints = false
         deadlineView.addSubview(deadlineLabel)
         
-//        NSLayoutConstraint.activate([
-//            deadlineLabel.leadingAnchor.constraint(equalTo: deadlineView.leadingAnchor, constant: Constants.margin),
-//            deadlineLabel.centerYAnchor.constraint(equalTo: deadlineView.centerYAnchor)
-//        ])
         NSLayoutConstraint.activate([
             deadlineLabel.leadingAnchor.constraint(equalTo: deadlineView.leadingAnchor, constant: Constants.margin),
             deadlineLabel.topAnchor.constraint(lessThanOrEqualTo: deadlineView.topAnchor, constant: 17),
@@ -212,6 +214,7 @@ final class TodoViewController: UIViewController {
     }
     
     private func setupDatePicker() {
+        // сделать недоступной дату до сегодня
         datePicker.datePickerMode = .date
         datePicker.preferredDatePickerStyle = .inline
 //        datePicker.date = Calendar.current.date(byAdding: DateComponents(day: 1), to: Date()) ?? Date()
@@ -301,12 +304,54 @@ final class TodoViewController: UIViewController {
         updateDateViewVisibility()
     }
     
+    @objc private func keyboardWillShow(notification: Notification) {
+        guard
+            let userInfo = notification.userInfo,
+            let keyboardFrame = (userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue
+        else {
+            return
+        }
+        let keyboardHeight = keyboardFrame.height
+        let contentInsets = UIEdgeInsets(top: 0, left: 0, bottom: keyboardHeight, right: 0)
+        scrollView.contentInset = contentInsets
+        scrollView.scrollIndicatorInsets = contentInsets
+    }
+    
+    @objc private func keyboardWillHide() {
+        scrollView.contentInset = .zero
+        scrollView.scrollIndicatorInsets = .zero
+    }
+    
+    @objc private func dismissKeyboard() {
+        textView.endEditing(true)
+    }
+    
 // MARK: - Tools
     
+    private func registerKeyboardNotifications() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillShow),
+            name: UIResponder.keyboardWillShowNotification,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(keyboardWillHide),
+            name: UIResponder.keyboardWillHideNotification,
+            object: nil
+        )
+    }
+    
+    private func addTapGestureRecognizerToDismissKeyboard() {
+        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        view.addGestureRecognizer(tapGestureRecognizer)
+    }
+    
     private func addDateLabelTapGestureRecognizer() {
-        let dateLabelTap = UITapGestureRecognizer(target: self, action: #selector(dateLabelTapped))
+        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(dateLabelTapped))
         dateLabel.isUserInteractionEnabled = true
-        dateLabel.addGestureRecognizer(dateLabelTap)
+        dateLabel.addGestureRecognizer(tapGestureRecognizer)
     }
     
     private func updateDateViewVisibility() {
@@ -340,7 +385,7 @@ extension TodoViewController {
         static let defaultHeight: CGFloat = 56
         static let separatorHeight: CGFloat = 1 / UIScreen.main.scale
         
-        static let fish = "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. "
+        static let fish = "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. "
     }
     
 }
