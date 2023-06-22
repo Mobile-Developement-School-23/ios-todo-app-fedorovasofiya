@@ -14,5 +14,8 @@ struct L10n {
     static let saveButtonTitle = "Сохранить"
     static let deleteButtonTitle = "Удалить"
     static let todoTextPlaceholder = "Что надо сделать?"
+    static let importanceLabelText = "Важность"
+    static let toDoByLabelText = "Сделать до"
+    static let regularImportanceChoice = "нет"
     
 }
