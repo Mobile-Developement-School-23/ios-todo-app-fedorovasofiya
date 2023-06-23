@@ -1,5 +1,5 @@
 //
-//  FileCacheImpl.swift
+//  FileCache.swift
 //  ToDoList
 //
 //  Created by Sonya Fedorova on 15.06.2023.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-class FileCacheImpl: FileCache {
+class FileCache {
     
     private(set) var todoItems: [UUID: TodoItem] = [:]
     
@@ -21,16 +21,16 @@ class FileCacheImpl: FileCache {
         todoItems.removeValue(forKey: id)
     }
     
-    func saveItemsToJSON(fileName: String) throws {
+    func saveItems(jsonFileName: String) throws {
         let itemsArray = todoItems.values.map(\.json)
         let jsonData = try JSONSerialization.data(withJSONObject: itemsArray, options: [.prettyPrinted, .sortedKeys])
-        try saveDataToDocuments(jsonData, fileName: "\(fileName).json")
+        try saveDataToDocuments(jsonData, fileName: jsonFileName)
     }
     
-    func loadItemsFromJSON(fileName: String) throws {
-        let jsonData = try loadDataFromDocuments(fileName: "\(fileName).json")
+    func loadItems(jsonFileName: String) throws {
+        let jsonData = try loadDataFromDocuments(fileName: jsonFileName)
         let decodedData = try JSONSerialization.jsonObject(with: jsonData, options: [])
-        guard let itemsArray = decodedData as? [[String: Any]] else { return }
+        guard let itemsArray = decodedData as? [String: Any] else { return }
         
         var newTodoItems: [UUID: TodoItem] = [:]
         itemsArray.forEach { dictionary in
@@ -41,18 +41,18 @@ class FileCacheImpl: FileCache {
         todoItems = newTodoItems
     }
     
-    func saveItemsToCSV(fileName: String) throws {
+    func saveItems(csvFileName: String) throws {
         var csvString = TodoItem.csvTitles
         csvString.append(TodoItem.csvRowsDelimiter)
         todoItems.values.forEach { item in
             csvString.append(item.csv)
             csvString.append(TodoItem.csvRowsDelimiter)
         }
-        try saveStringToDocuments(csvString, fileName: "\(fileName).csv")
+        try saveStringToDocuments(csvString, fileName: csvFileName)
     }
     
-    func loadItemsFromCSV(fileName: String) throws {
-        let csvString = try loadStringFromDocuments(fileName: "\(fileName).csv")
+    func loadItems(csvFileName: String) throws {
+        let csvString = try loadStringFromDocuments(fileName: csvFileName)
         var rows = csvString.components(separatedBy: TodoItem.csvRowsDelimiter)
         rows.removeFirst()
         var newTodoItems: [UUID: TodoItem] = [:]
