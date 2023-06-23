@@ -39,8 +39,8 @@ final class TodoItemViewModel: TodoItemViewOutput {
         }
     }
     
-    func saveItem(text: String, importance: Importance, deadline: Date?) {
-        updateTodoItem(text: text, importance: importance, deadline: deadline)
+    func saveItem(text: String, importance: Importance, deadline: Date?, textColor: String) {
+        updateTodoItem(text: text, importance: importance, deadline: deadline, textColor: textColor)
         
         guard let todoItem = todoItem else { return }
         fileCache.addItem(todoItem)
@@ -59,7 +59,7 @@ final class TodoItemViewModel: TodoItemViewOutput {
     
     // MARK: - Private Methods
     
-    private func updateTodoItem(text: String, importance: Importance, deadline: Date?) {
+    private func updateTodoItem(text: String, importance: Importance, deadline: Date?, textColor: String) {
         if let currentTodoItem = todoItem {
             let newItem = TodoItem(
                 id: currentTodoItem.id,
@@ -68,11 +68,12 @@ final class TodoItemViewModel: TodoItemViewOutput {
                 deadline: deadline,
                 isDone: currentTodoItem.isDone,
                 creationDate: currentTodoItem.creationDate,
-                modificationDate: currentTodoItem.modificationDate
+                modificationDate: currentTodoItem.modificationDate,
+                textColor: textColor
             )
             self.todoItem = newItem
         } else {
-            self.todoItem = TodoItem(text: text, importance: importance, deadline: deadline)
+            self.todoItem = TodoItem(text: text, importance: importance, deadline: deadline, textColor: textColor)
         }
     }
     

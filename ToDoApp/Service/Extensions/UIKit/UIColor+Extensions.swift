@@ -34,16 +34,13 @@ extension UIColor {
 
 extension UIColor {
     
-    var hex: String? {
+    var hex: String {
         var red: CGFloat = 0
         var green: CGFloat = 0
         var blue: CGFloat = 0
-        if self.getRed(&red, green: &green, blue: &blue, alpha: nil) {
-            let rgb: Int = (Int)(red * 255) << 16 | (Int)(green * 255) << 8 | (Int)(blue * 255)
-            return NSString(format:"#%06x", rgb) as String
-        } else {
-            return nil
-        }
+        getRed(&red, green: &green, blue: &blue, alpha: nil)
+        let rgb: Int = (Int)(red * 255) << 16 | (Int)(green * 255) << 8 | (Int)(blue * 255)
+        return NSString(format:"#%06x", rgb) as String
     }
     
     static func convertHexToUIColor(hex: String) -> UIColor {

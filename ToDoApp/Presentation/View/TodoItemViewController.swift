@@ -64,7 +64,6 @@ final class TodoItemViewController: UIViewController {
         setupDateView()
         setupDetailsStackView()
         setupDeleteButton()
-        applySelectedColor()
         
         registerKeyboardNotifications()
         addDateLabelTapGestureRecognizer()
@@ -191,7 +190,7 @@ final class TodoItemViewController: UIViewController {
     }
     
     private func setupColorLabel() {
-        colorLabel.text = L10n.colorLabelText
+        addColorTextToColorLabel(text: getTextColor().hex)
         colorLabel.font = .systemFont(ofSize: Constants.fontSize, weight: .regular)
         colorLabel.translatesAutoresizingMaskIntoConstraints = false
         colorView.addSubview(colorLabel)
@@ -425,7 +424,8 @@ final class TodoItemViewController: UIViewController {
         }
         let importance = Importance.getValue(index: importanceControl.selectedSegmentIndex)
         let deadline = deadlineSwitch.isOn ? dateService.getDate(from: selectedDateLabel.text ?? "") : nil
-        viewOutput.saveItem(text: text, importance: importance, deadline: deadline)
+        let textColor = getTextColor().hex
+        viewOutput.saveItem(text: text, importance: importance, deadline: deadline, textColor: textColor)
     }
     
     @objc private func toggleColorPickerVisibility() {
@@ -527,6 +527,9 @@ final class TodoItemViewController: UIViewController {
             if let deadline = todoItem.deadline {
                 self?.updateDeadline(deadline: deadline)
             }
+            let color = UIColor.convertHexToUIColor(hex: todoItem.textColor)
+            self?.changeColorOfTextView(color: color)
+            self?.addColorTextToColorLabel(text: todoItem.textColor)
         }
         
         viewOutput.successfullySaved = { [weak self] in
@@ -611,17 +614,15 @@ final class TodoItemViewController: UIViewController {
     private func applySelectedColor() {
         let newColor = getTextColor()
         changeColorOfTextView(color: newColor)
-        if let hexString = newColor.hex {
-            changeTextOfColorLabel(text: L10n.colorLabelText + ": " + hexString)
-        }
+        addColorTextToColorLabel(text: newColor.hex)
     }
     
     private func changeColorOfTextView(color: UIColor) {
         textView.textColor = color
     }
     
-    private func changeTextOfColorLabel(text: String) {
-        colorLabel.text = text
+    private func addColorTextToColorLabel(text: String) {
+        colorLabel.text = L10n.colorLabelText + ": " + text
     }
     
     private func getTextColor() -> UIColor {

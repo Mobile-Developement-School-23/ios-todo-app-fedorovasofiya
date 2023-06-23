@@ -55,8 +55,8 @@ final class LightnessSelectionSlider: ColorfulSlider {
 
 extension LightnessSelectionSlider {
     private struct Constants {
-        static let minLightness: Float = -1
-        static let maxLightness: Float = 1
+        static let minLightness: Float = -0.75
+        static let maxLightness: Float = 0.75
         static let defaultLightness: Float = 0
         static let defaultMainColor: UIColor = .red
         static let defaultColors: [CGColor] = [

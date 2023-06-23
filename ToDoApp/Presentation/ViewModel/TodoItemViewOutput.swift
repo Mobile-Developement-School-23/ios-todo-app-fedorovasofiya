@@ -12,5 +12,5 @@ protocol TodoItemViewOutput {
     var successfullySaved: (() -> ())? { get set }
     var errorOccurred: ((String) -> ())? { get set }
     func loadItem()
-    func saveItem(text: String, importance: Importance, deadline: Date?)
+    func saveItem(text: String, importance: Importance, deadline: Date?, textColor: String)
 }
