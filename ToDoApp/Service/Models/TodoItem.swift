@@ -9,14 +9,8 @@ import Foundation
 
 struct TodoItem: Hashable {
     
-    enum Importance: String {
-        case unimportant
-        case regular
-        case important
-    }
-    
     private enum Properties: CodingKey {
-        case id, text, importance, deadline, isDone, creationDate, modificationDate
+        case id, text, importance, deadline, isDone, creationDate, modificationDate, textColor
     }
     
     let id: UUID
@@ -26,6 +20,7 @@ struct TodoItem: Hashable {
     let isDone: Bool
     let creationDate: Date
     let modificationDate: Date?
+    let textColor: String
     
     init(
         id: UUID = UUID(),
@@ -34,7 +29,8 @@ struct TodoItem: Hashable {
         deadline: Date?,
         isDone: Bool = false,
         creationDate: Date = Date(),
-        modificationDate: Date?
+        modificationDate: Date? = nil,
+        textColor: String
     ) {
         self.id = id
         self.text = text
@@ -43,6 +39,7 @@ struct TodoItem: Hashable {
         self.isDone = isDone
         self.creationDate = creationDate
         self.modificationDate = modificationDate
+        self.textColor = textColor
     }
     
 }
@@ -62,6 +59,7 @@ extension TodoItem {
         dictionary[Properties.isDone.stringValue] = isDone
         dictionary[Properties.creationDate.stringValue] = creationDate.timeIntervalSince1970
         dictionary[Properties.modificationDate.stringValue] = modificationDate?.timeIntervalSince1970
+        dictionary[Properties.textColor.stringValue] = textColor
         return dictionary
     }
     
@@ -74,9 +72,10 @@ extension TodoItem {
             let importance = (dictionary[Properties.importance.stringValue] as? String)
                 .map(Importance.init(rawValue:)) ?? Importance.regular,
             let isDone = dictionary[Properties.isDone.stringValue] as? Bool,
-            let creationDateTimeInterval = dictionary[Properties.creationDate.stringValue] as? TimeInterval
+            let creationDateTimeInterval = dictionary[Properties.creationDate.stringValue] as? TimeInterval,
+            let textColor = dictionary[Properties.textColor.stringValue] as? String
         else { return nil }
-    
+        
         let creationDate = Date(timeIntervalSince1970: creationDateTimeInterval)
         let deadline = (dictionary[Properties.deadline.stringValue] as? TimeInterval)
             .map { interval in Date(timeIntervalSince1970: interval) }
@@ -90,7 +89,8 @@ extension TodoItem {
             deadline: deadline,
             isDone: isDone,
             creationDate: creationDate,
-            modificationDate: modificationDate
+            modificationDate: modificationDate,
+            textColor: textColor
         )
     }
     
@@ -112,6 +112,7 @@ extension TodoItem {
         values.append(Properties.isDone.stringValue)
         values.append(Properties.creationDate.stringValue)
         values.append(Properties.modificationDate.stringValue)
+        values.append(Properties.textColor.stringValue)
         return values.joined(separator: TodoItem.csvColumnsDelimiter)
     }
     
@@ -124,6 +125,7 @@ extension TodoItem {
         values.append((isDone ? 1 : 0).description)
         values.append(creationDate.timeIntervalSince1970.description)
         values.append(modificationDate?.timeIntervalSince1970.description ?? "")
+        values.append(textColor)
         return values.joined(separator: TodoItem.csvColumnsDelimiter)
     }
     
@@ -131,7 +133,7 @@ extension TodoItem {
         let columns = csv.components(separatedBy: TodoItem.csvColumnsDelimiter)
         
         guard
-            columns.count == 7,
+            columns.count == 8,
             let id = UUID(uuidString: columns[0]),
             let importance = (columns[2].isEmpty ? nil : columns[2]).map(Importance.init(rawValue:)) ?? .regular,
             let isDoneInt = Int(columns[4]),
@@ -144,6 +146,7 @@ extension TodoItem {
         let creationDate = Date(timeIntervalSince1970: creationDateTimeInterval)
         let deadline = TimeInterval(columns[3]).map { interval in Date(timeIntervalSince1970: interval) }
         let modificationDate = TimeInterval(columns[6]).map { interval in Date(timeIntervalSince1970: interval) }
+        let textColor = columns[7]
         
         return TodoItem(
             id: id,
@@ -152,7 +155,8 @@ extension TodoItem {
             deadline: deadline,
             isDone: isDone,
             creationDate: creationDate,
-            modificationDate: modificationDate
+            modificationDate: modificationDate,
+            textColor: textColor
         )
     }
     
