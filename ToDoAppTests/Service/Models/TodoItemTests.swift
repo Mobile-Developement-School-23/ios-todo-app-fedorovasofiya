@@ -11,14 +11,16 @@ import XCTest
 final class TodoItemTests: XCTestCase {
     
     func testIsDoneValueAfterDefaultInit() {
-        let item = TodoItem(text: "text", importance: .important, deadline: nil, modificationDate: nil)
+        let item = TodoItem(text: "text", importance: .important, deadline: nil, modificationDate: nil,
+                            textColor: "#8989FF")
         XCTAssertEqual(item.isDone, false)
     }
     
     func testEquivalencyOfJSONValue() throws {
-        let item = TodoItem(text: "text", importance: .unimportant, deadline: .now + 100, modificationDate: .now + 10)
+        let item = TodoItem(text: "text", importance: .unimportant, deadline: .now + 100, modificationDate: .now + 10,
+                            textColor: "#8989FF")
         let json = try XCTUnwrap(item.json as? [String: Any])
-        XCTAssertEqual(json.count, 7)
+        XCTAssertEqual(json.count, 8)
         XCTAssertTrue(json.values.contains(where: { $0 as? String == item.id.uuidString }))
         XCTAssertTrue(json.values.contains(where: { $0 as? String == item.text }))
         XCTAssertTrue(json.values.contains(where: { $0 as? String == item.importance.rawValue }))
@@ -26,28 +28,33 @@ final class TodoItemTests: XCTestCase {
         XCTAssertTrue(json.values.contains(where: { $0 as? Bool == item.isDone }))
         XCTAssertTrue(json.values.contains(where: { $0 as? Double == item.creationDate.timeIntervalSince1970 }))
         XCTAssertTrue(json.values.contains(where: { $0 as? Double == item.modificationDate?.timeIntervalSince1970 }))
+        XCTAssertTrue(json.values.contains(where: { $0 as? String == item.textColor }))
     }
     
     func testJSONValueWithAllPropertiesExceptDeadline() throws {
-        let item = TodoItem(text: "text", importance: .unimportant, deadline: nil, modificationDate: .now + 10)
+        let item = TodoItem(text: "text", importance: .unimportant, deadline: nil, modificationDate: .now + 10,
+                            textColor: "#8989FF")
         let json = try XCTUnwrap(item.json as? [String: Any])
-        XCTAssertEqual(json.count, 6)
+        XCTAssertEqual(json.count, 7)
     }
     
     func testJSONValueWithAllPropertiesExceptModificationDate() throws {
-        let item = TodoItem(text: "text", importance: .unimportant, deadline: .now + 100, modificationDate: nil)
+        let item = TodoItem(text: "text", importance: .unimportant, deadline: .now + 100, modificationDate: nil,
+                            textColor: "#8989FF")
         let json = try XCTUnwrap(item.json as? [String: Any])
-        XCTAssertEqual(json.count, 6)
+        XCTAssertEqual(json.count, 7)
     }
     
     func testJSONValueWithRegularImportance() throws {
-        let item = TodoItem(text: "text", importance: .regular, deadline: .now + 100, modificationDate: .now + 10)
+        let item = TodoItem(text: "text", importance: .regular, deadline: .now + 100, modificationDate: .now + 10,
+                            textColor: "#8989FF")
         let json = try XCTUnwrap(item.json as? [String: Any])
         XCTAssertFalse(json.values.contains(where: { $0 as? String == item.importance.rawValue }))
     }
     
     func testEquivalencyOfJSONParsing() {
-        let item = TodoItem(text: "text", importance: .unimportant, deadline: .now + 100, modificationDate: .now + 10)
+        let item = TodoItem(text: "text", importance: .unimportant, deadline: .now + 100, modificationDate: .now + 10,
+                            textColor: "#8989FF")
         var dictionary: [String: Any] = [:]
         dictionary["id"] = item.id.uuidString
         dictionary["text"] = item.text
@@ -56,6 +63,7 @@ final class TodoItemTests: XCTestCase {
         dictionary["isDone"] = item.isDone
         dictionary["creationDate"] = item.creationDate.timeIntervalSince1970
         dictionary["modificationDate"] = item.modificationDate?.timeIntervalSince1970
+        dictionary["textColor"] = item.textColor
         
         let parsedItem = TodoItem.parse(json: dictionary)
         XCTAssertNotNil(parsedItem)
@@ -66,6 +74,7 @@ final class TodoItemTests: XCTestCase {
         XCTAssertEqual(parsedItem?.isDone, item.isDone)
         XCTAssertEqual(parsedItem?.creationDate.timeIntervalSince1970, item.creationDate.timeIntervalSince1970)
         XCTAssertEqual(parsedItem?.modificationDate?.timeIntervalSince1970, item.modificationDate?.timeIntervalSince1970)
+        XCTAssertEqual(parsedItem?.textColor, item.textColor)
     }
     
     func testJSONParsingWithInvalidJSONArgument() {
@@ -82,6 +91,7 @@ final class TodoItemTests: XCTestCase {
         dictionary["isDone"] = true
         dictionary["creationDate"] = Date().timeIntervalSince1970
         dictionary["modificationDate"] = Date().timeIntervalSince1970
+        dictionary["textColor"] = "#000000"
         let parsedItem = TodoItem.parse(json: dictionary)
         XCTAssertNotNil(parsedItem)
         XCTAssertEqual(parsedItem?.importance, Importance.regular)
@@ -95,6 +105,7 @@ final class TodoItemTests: XCTestCase {
         dictionary["isDone"] = true
         dictionary["creationDate"] = Date().timeIntervalSince1970
         dictionary["modificationDate"] = Date().timeIntervalSince1970
+        dictionary["textColor"] = "#000000"
         let parsedItem = TodoItem.parse(json: dictionary)
         XCTAssertNotNil(parsedItem)
         XCTAssertNil(parsedItem?.deadline)
@@ -108,6 +119,7 @@ final class TodoItemTests: XCTestCase {
         dictionary["deadline"] = Date().timeIntervalSince1970
         dictionary["isDone"] = true
         dictionary["creationDate"] = Date().timeIntervalSince1970
+        dictionary["textColor"] = "#000000"
         let parsedItem = TodoItem.parse(json: dictionary)
         XCTAssertNotNil(parsedItem)
         XCTAssertNil(parsedItem?.modificationDate)
@@ -122,6 +134,7 @@ final class TodoItemTests: XCTestCase {
         dictionary["isDone"] = true
         dictionary["creationDate"] = Date().timeIntervalSince1970
         dictionary["modificationDate"] = Date().timeIntervalSince1970
+        dictionary["textColor"] = "#000000"
         let parsedItem = TodoItem.parse(json: dictionary)
         XCTAssertNil(parsedItem)
     }
@@ -134,6 +147,7 @@ final class TodoItemTests: XCTestCase {
         dictionary["isDone"] = true
         dictionary["creationDate"] = Date().timeIntervalSince1970
         dictionary["modificationDate"] = Date().timeIntervalSince1970
+        dictionary["textColor"] = "#000000"
         let parsedItem = TodoItem.parse(json: dictionary)
         XCTAssertNil(parsedItem)
     }
@@ -147,6 +161,7 @@ final class TodoItemTests: XCTestCase {
         dictionary["isDone"] = true
         dictionary["creationDate"] = Date().timeIntervalSince1970
         dictionary["modificationDate"] = Date().timeIntervalSince1970
+        dictionary["textColor"] = "#000000"
         let parsedItem = TodoItem.parse(json: dictionary)
         XCTAssertNil(parsedItem)
     }
@@ -159,6 +174,7 @@ final class TodoItemTests: XCTestCase {
         dictionary["isDone"] = true
         dictionary["creationDate"] = Date().timeIntervalSince1970
         dictionary["modificationDate"] = Date().timeIntervalSince1970
+        dictionary["textColor"] = "#000000"
         let parsedItem = TodoItem.parse(json: dictionary)
         XCTAssertNil(parsedItem)
     }
@@ -172,6 +188,7 @@ final class TodoItemTests: XCTestCase {
         dictionary["isDone"] = true
         dictionary["creationDate"] = "123"
         dictionary["modificationDate"] = Date().timeIntervalSince1970
+        dictionary["textColor"] = "#000000"
         let parsedItem = TodoItem.parse(json: dictionary)
         XCTAssertNil(parsedItem)
     }
@@ -184,6 +201,7 @@ final class TodoItemTests: XCTestCase {
         dictionary["deadline"] = Date().timeIntervalSince1970
         dictionary["creationDate"] = Date().timeIntervalSince1970
         dictionary["modificationDate"] = Date().timeIntervalSince1970
+        dictionary["textColor"] = "#000000"
         let parsedItem = TodoItem.parse(json: dictionary)
         XCTAssertNil(parsedItem)
     }
@@ -197,15 +215,17 @@ final class TodoItemTests: XCTestCase {
         dictionary["isDone"] = "123"
         dictionary["creationDate"] = Date().timeIntervalSince1970
         dictionary["modificationDate"] = Date().timeIntervalSince1970
+        dictionary["textColor"] = "#000000"
         let parsedItem = TodoItem.parse(json: dictionary)
         XCTAssertNil(parsedItem)
     }
     
     func testEquivalencyOfCSVValue() {
-        let item = TodoItem(text: "text", importance: .unimportant, deadline: .now + 100, modificationDate: .now + 10)
+        let item = TodoItem(text: "text", importance: .unimportant, deadline: .now + 100, modificationDate: .now + 10,
+                            textColor: "#8989FF")
         let csvString = item.csv
         let columns = csvString.components(separatedBy: TodoItem.csvColumnsDelimiter)
-        XCTAssertEqual(columns.count, 7)
+        XCTAssertEqual(columns.count, 8)
         XCTAssertEqual(columns[0], item.id.uuidString)
         XCTAssertEqual(columns[1], item.text)
         XCTAssertEqual(columns[2], item.importance.rawValue)
@@ -213,34 +233,39 @@ final class TodoItemTests: XCTestCase {
         XCTAssertEqual(Int(columns[4]) != 0, item.isDone)
         XCTAssertEqual(Double(columns[5]), item.creationDate.timeIntervalSince1970)
         XCTAssertEqual(Double(columns[6]), item.modificationDate?.timeIntervalSince1970)
+        XCTAssertEqual(columns[7], item.textColor)
     }
     
     func testCSVValueWithAllPropertiesExceptDeadline() {
-        let item = TodoItem(text: "text", importance: .unimportant, deadline: nil, modificationDate: .now + 10)
+        let item = TodoItem(text: "text", importance: .unimportant, deadline: nil, modificationDate: .now + 10,
+                            textColor: "#8989FF")
         let csvString = item.csv
         let columns = csvString.components(separatedBy: TodoItem.csvColumnsDelimiter)
-        XCTAssertEqual(columns.count, 7)
+        XCTAssertEqual(columns.count, 8)
         XCTAssertTrue(columns[3].isEmpty)
     }
 
     func testCSVValueWithAllPropertiesExceptModificationDate() {
-        let item = TodoItem(text: "text", importance: .unimportant, deadline: .now + 100, modificationDate: nil)
+        let item = TodoItem(text: "text", importance: .unimportant, deadline: .now + 100, modificationDate: nil,
+                            textColor: "#8989FF")
         let csvString = item.csv
         let columns = csvString.components(separatedBy: TodoItem.csvColumnsDelimiter)
-        XCTAssertEqual(columns.count, 7)
+        XCTAssertEqual(columns.count, 8)
         XCTAssertTrue(columns[6].isEmpty)
     }
 
     func testCSVValueWithRegularImportance() {
-        let item = TodoItem(text: "text", importance: .regular, deadline: .now + 100, modificationDate: .now + 10)
+        let item = TodoItem(text: "text", importance: .regular, deadline: .now + 100, modificationDate: .now + 10,
+                            textColor: "#8989FF")
         let csvString = item.csv
         let columns = csvString.components(separatedBy: TodoItem.csvColumnsDelimiter)
-        XCTAssertEqual(columns.count, 7)
+        XCTAssertEqual(columns.count, 8)
         XCTAssertTrue(columns[2].isEmpty)
     }
     
     func testEquivalencyOfCSVParsing() throws {
-        let item = TodoItem(text: "text", importance: .unimportant, deadline: .now + 100, modificationDate: .now + 10)
+        let item = TodoItem(text: "text", importance: .unimportant, deadline: .now + 100, modificationDate: .now + 10,
+                            textColor: "#8989FF")
         var csv: String = String()
         csv.append(item.id.uuidString)
         csv.append(TodoItem.csvColumnsDelimiter)
@@ -255,6 +280,8 @@ final class TodoItemTests: XCTestCase {
         csv.append(item.creationDate.timeIntervalSince1970.description)
         csv.append(TodoItem.csvColumnsDelimiter)
         csv.append(try XCTUnwrap(item.modificationDate?.timeIntervalSince1970.description))
+        csv.append(TodoItem.csvColumnsDelimiter)
+        csv.append(item.textColor)
         
         let parsedItem = TodoItem.parse(csv: csv)
         XCTAssertNotNil(parsedItem)
@@ -265,6 +292,7 @@ final class TodoItemTests: XCTestCase {
         XCTAssertEqual(parsedItem?.isDone, item.isDone)
         XCTAssertEqual(parsedItem?.creationDate.timeIntervalSince1970, item.creationDate.timeIntervalSince1970)
         XCTAssertEqual(parsedItem?.modificationDate?.timeIntervalSince1970, item.modificationDate?.timeIntervalSince1970)
+        XCTAssertEqual(parsedItem?.textColor, item.textColor)
     }
 
     func testCSVParsingWithInvalidCSVArgument() {
@@ -299,6 +327,8 @@ final class TodoItemTests: XCTestCase {
         csv.append(Date().timeIntervalSince1970.description)
         csv.append(TodoItem.csvColumnsDelimiter)
         csv.append(Date().timeIntervalSince1970.description)
+        csv.append(TodoItem.csvColumnsDelimiter)
+        csv.append("#8989FF")
         
         let parsedItem = TodoItem.parse(csv: csv)
         XCTAssertNotNil(parsedItem)
@@ -319,6 +349,8 @@ final class TodoItemTests: XCTestCase {
         csv.append(Date().timeIntervalSince1970.description)
         csv.append(TodoItem.csvColumnsDelimiter)
         csv.append(Date().timeIntervalSince1970.description)
+        csv.append(TodoItem.csvColumnsDelimiter)
+        csv.append("#8989FF")
         
         let parsedItem = TodoItem.parse(csv: csv)
         XCTAssertNotNil(parsedItem)
@@ -339,6 +371,8 @@ final class TodoItemTests: XCTestCase {
         csv.append(TodoItem.csvColumnsDelimiter)
         csv.append(Date().timeIntervalSince1970.description)
         csv.append(TodoItem.csvColumnsDelimiter)
+        csv.append(TodoItem.csvColumnsDelimiter)
+        csv.append("#8989FF")
         
         let parsedItem = TodoItem.parse(csv: csv)
         XCTAssertNotNil(parsedItem)
@@ -360,6 +394,8 @@ final class TodoItemTests: XCTestCase {
         csv.append(Date().timeIntervalSince1970.description)
         csv.append(TodoItem.csvColumnsDelimiter)
         csv.append(Date().timeIntervalSince1970.description)
+        csv.append(TodoItem.csvColumnsDelimiter)
+        csv.append("#8989FF")
         
         let parsedItem = TodoItem.parse(csv: csv)
         XCTAssertNil(parsedItem)
@@ -379,6 +415,8 @@ final class TodoItemTests: XCTestCase {
         csv.append(Date().timeIntervalSince1970.description)
         csv.append(TodoItem.csvColumnsDelimiter)
         csv.append(Date().timeIntervalSince1970.description)
+        csv.append(TodoItem.csvColumnsDelimiter)
+        csv.append("#8989FF")
         
         let parsedItem = TodoItem.parse(csv: csv)
         XCTAssertNil(parsedItem)
@@ -399,6 +437,8 @@ final class TodoItemTests: XCTestCase {
         csv.append(Date().timeIntervalSince1970.description)
         csv.append(TodoItem.csvColumnsDelimiter)
         csv.append(Date().timeIntervalSince1970.description)
+        csv.append(TodoItem.csvColumnsDelimiter)
+        csv.append("#8989FF")
         
         let parsedItem = TodoItem.parse(csv: csv)
         XCTAssertNil(parsedItem)
@@ -419,6 +459,8 @@ final class TodoItemTests: XCTestCase {
         csv.append("")
         csv.append(TodoItem.csvColumnsDelimiter)
         csv.append(Date().timeIntervalSince1970.description)
+        csv.append(TodoItem.csvColumnsDelimiter)
+        csv.append("#8989FF")
         
         let parsedItem = TodoItem.parse(csv: csv)
         XCTAssertNil(parsedItem)
@@ -438,6 +480,8 @@ final class TodoItemTests: XCTestCase {
         csv.append(Date().timeIntervalSince1970.description)
         csv.append(TodoItem.csvColumnsDelimiter)
         csv.append(Date().timeIntervalSince1970.description)
+        csv.append(TodoItem.csvColumnsDelimiter)
+        csv.append("#8989FF")
         
         let parsedItem = TodoItem.parse(csv: csv)
         XCTAssertNil(parsedItem)
@@ -458,6 +502,8 @@ final class TodoItemTests: XCTestCase {
         csv.append(Date().timeIntervalSince1970.description)
         csv.append(TodoItem.csvColumnsDelimiter)
         csv.append(Date().timeIntervalSince1970.description)
+        csv.append(TodoItem.csvColumnsDelimiter)
+        csv.append("#8989FF")
         
         let parsedItem = TodoItem.parse(csv: csv)
         XCTAssertNil(parsedItem)
