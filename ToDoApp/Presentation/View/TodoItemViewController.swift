@@ -43,7 +43,7 @@ final class TodoItemViewController: UIViewController {
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor(named: "BackPrimary")
@@ -89,10 +89,10 @@ final class TodoItemViewController: UIViewController {
         view.addSubview(scrollView)
         
         NSLayoutConstraint.activate([
-            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            scrollView.topAnchor.constraint(equalTo: view.topAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            scrollView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         ])
     }
     
@@ -107,15 +107,16 @@ final class TodoItemViewController: UIViewController {
         textView.textContainerInset = UIEdgeInsets(
             top: Constants.margin,
             left: Constants.margin,
-            bottom: Constants.smallMargin,
+            bottom: Constants.mediumMargin,
             right: Constants.margin
         )
         textView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.addSubview(textView)
         
+        let safeArea = view.safeAreaLayoutGuide
         NSLayoutConstraint.activate([
-            textView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.margin),
-            textView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.margin),
+            textView.leadingAnchor.constraint(equalTo: safeArea.leadingAnchor, constant: Constants.margin),
+            textView.trailingAnchor.constraint(equalTo: safeArea.trailingAnchor, constant: -Constants.margin),
             textView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: Constants.margin),
             textView.heightAnchor.constraint(greaterThanOrEqualToConstant: Constants.textDefaultHeight)
         ])
@@ -128,10 +129,7 @@ final class TodoItemViewController: UIViewController {
         importanceView.addSubview(importanceLabel)
         
         NSLayoutConstraint.activate([
-            importanceLabel.leadingAnchor.constraint(
-                equalTo: importanceView.leadingAnchor,
-                constant: Constants.margin
-            ),
+            importanceLabel.leadingAnchor.constraint(equalTo: importanceView.leadingAnchor, constant: Constants.margin),
             importanceLabel.centerYAnchor.constraint(equalTo: importanceView.centerYAnchor)
         ])
     }
@@ -152,13 +150,14 @@ final class TodoItemViewController: UIViewController {
         importanceControl.insertSegment(withTitle: L10n.regularImportanceChoice, at: 1, animated: true)
         importanceControl.insertSegment(with: exclamationmarkImage, at: 2, animated: true)
         importanceControl.selectedSegmentIndex = 1
+        
         importanceControl.translatesAutoresizingMaskIntoConstraints = false
         importanceView.addSubview(importanceControl)
         
         NSLayoutConstraint.activate([
             importanceControl.trailingAnchor.constraint(
                 equalTo: importanceView.trailingAnchor,
-                constant: -Constants.smallMargin
+                constant: -Constants.mediumMargin
             ),
             importanceControl.centerYAnchor.constraint(equalTo: importanceView.centerYAnchor)
         ])
@@ -172,7 +171,7 @@ final class TodoItemViewController: UIViewController {
         separator.backgroundColor = UIColor(named: "Separator")
         separator.translatesAutoresizingMaskIntoConstraints = false
         importanceView.addSubview(separator)
-    
+        
         NSLayoutConstraint.activate([
             separator.heightAnchor.constraint(equalToConstant: Constants.separatorHeight),
             separator.bottomAnchor.constraint(equalTo: importanceView.bottomAnchor),
@@ -190,8 +189,7 @@ final class TodoItemViewController: UIViewController {
         
         NSLayoutConstraint.activate([
             deadlineLabel.leadingAnchor.constraint(equalTo: deadlineView.leadingAnchor, constant: Constants.margin),
-            deadlineLabel.topAnchor.constraint(lessThanOrEqualTo: deadlineView.topAnchor, constant: 17),
-            deadlineLabel.bottomAnchor.constraint(lessThanOrEqualTo: deadlineView.bottomAnchor, constant: -17)
+            deadlineLabel.centerYAnchor.constraint(lessThanOrEqualTo: deadlineView.centerYAnchor)
         ])
     }
     
@@ -204,7 +202,7 @@ final class TodoItemViewController: UIViewController {
         NSLayoutConstraint.activate([
             dateLabel.leadingAnchor.constraint(equalTo: deadlineView.leadingAnchor, constant: Constants.margin),
             dateLabel.topAnchor.constraint(equalTo: deadlineLabel.bottomAnchor),
-            dateLabel.bottomAnchor.constraint(equalTo: deadlineView.bottomAnchor, constant: -9)
+            dateLabel.bottomAnchor.constraint(equalTo: deadlineView.bottomAnchor, constant: -Constants.smallMargin)
         ])
     }
     
@@ -216,7 +214,7 @@ final class TodoItemViewController: UIViewController {
         NSLayoutConstraint.activate([
             deadlineSwitch.trailingAnchor.constraint(
                 equalTo: deadlineView.trailingAnchor,
-                constant: -Constants.smallMargin
+                constant: -Constants.mediumMargin
             ),
             deadlineSwitch.centerYAnchor.constraint(equalTo: deadlineView.centerYAnchor)
         ])
@@ -226,20 +224,22 @@ final class TodoItemViewController: UIViewController {
         setupDeadlineLabel()
         setupDateLabel()
         setupDeadlineSwitch()
-    
+        
         deadlineView.heightAnchor.constraint(equalToConstant: Constants.defaultHeight).isActive = true
     }
     
     private func setupDatePicker() {
+        datePicker.locale = Locale(identifier: "ru")
         datePicker.datePickerMode = .date
         datePicker.preferredDatePickerStyle = .inline
         datePicker.translatesAutoresizingMaskIntoConstraints = false
         dateView.addSubview(datePicker)
         
         NSLayoutConstraint.activate([
-            datePicker.leadingAnchor.constraint(equalTo: dateView.leadingAnchor, constant: 8),
-            datePicker.trailingAnchor.constraint(equalTo: dateView.trailingAnchor, constant: -8),
-            datePicker.centerYAnchor.constraint(equalTo: dateView.centerYAnchor)
+            datePicker.leadingAnchor.constraint(equalTo: dateView.leadingAnchor, constant: Constants.smallMargin),
+            datePicker.trailingAnchor.constraint(equalTo: dateView.trailingAnchor, constant: -Constants.smallMargin),
+            datePicker.centerYAnchor.constraint(equalTo: dateView.centerYAnchor),
+            datePicker.centerXAnchor.constraint(equalTo: dateView.centerXAnchor)
         ])
         
         datePicker.addTarget(self, action: #selector(handleDatePicker), for: .valueChanged)
@@ -258,7 +258,7 @@ final class TodoItemViewController: UIViewController {
             separator.topAnchor.constraint(equalTo: dateView.topAnchor),
             separator.leadingAnchor.constraint(equalTo: dateView.leadingAnchor, constant: Constants.margin),
             separator.trailingAnchor.constraint(equalTo: dateView.trailingAnchor, constant: -Constants.margin),
-            dateView.heightAnchor.constraint(equalToConstant: 332)
+            dateView.heightAnchor.constraint(equalTo: datePicker.heightAnchor)
         ])
     }
     
@@ -268,12 +268,13 @@ final class TodoItemViewController: UIViewController {
         detailsStackView.layer.cornerRadius = Constants.cornerRadius
         detailsStackView.addArrangedSubview(importanceView)
         detailsStackView.addArrangedSubview(deadlineView)
+        detailsStackView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.addSubview(detailsStackView)
         
-        detailsStackView.translatesAutoresizingMaskIntoConstraints = false
+        let safeArea = view.safeAreaLayoutGuide
         NSLayoutConstraint.activate([
-            detailsStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.margin),
-            detailsStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.margin),
+            detailsStackView.leadingAnchor.constraint(equalTo: safeArea.leadingAnchor, constant: Constants.margin),
+            detailsStackView.trailingAnchor.constraint(equalTo: safeArea.trailingAnchor, constant: -Constants.margin),
             detailsStackView.topAnchor.constraint(equalTo: textView.bottomAnchor, constant: Constants.margin)
         ])
     }
@@ -287,13 +288,14 @@ final class TodoItemViewController: UIViewController {
         deleteButton.setTitleColor(UIColor(named: "LabelTertiary"), for: .disabled)
         deleteButton.translatesAutoresizingMaskIntoConstraints = false
         scrollView.addSubview(deleteButton)
-
+        
+        let safeArea = view.safeAreaLayoutGuide
         NSLayoutConstraint.activate([
-            deleteButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.margin),
-            deleteButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.margin),
+            deleteButton.leadingAnchor.constraint(equalTo: safeArea.leadingAnchor, constant: Constants.margin),
+            deleteButton.trailingAnchor.constraint(equalTo: safeArea.trailingAnchor, constant: -Constants.margin),
             deleteButton.topAnchor.constraint(equalTo: detailsStackView.bottomAnchor, constant: Constants.margin),
             deleteButton.heightAnchor.constraint(equalToConstant: Constants.defaultHeight),
-            deleteButton.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor)
+            deleteButton.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: -Constants.margin)
         ])
     }
     
@@ -320,9 +322,9 @@ final class TodoItemViewController: UIViewController {
     @objc private func switchChanged() {
         if deadlineSwitch.isOn {
             guard let nextDay = dateService.getNextDay() else { return }
-            dateLabel.text = dateService.getString(from: nextDay)
+            showDateInDateLabel(nextDay)
         } else {
-            dateLabel.text = nil
+            hideDateInDateLabel()
             if detailsStackView.arrangedSubviews.count == 3 {
                 hideDateView()
             }
@@ -460,7 +462,21 @@ final class TodoItemViewController: UIViewController {
             self.view.layoutIfNeeded()
         }
     }
-
+    
+    private func hideDateInDateLabel() {
+        UIView.animate(withDuration: 0.25) {
+            self.dateLabel.text = nil
+            self.view.layoutIfNeeded()
+        }
+    }
+    
+    private func showDateInDateLabel(_ date: Date) {
+        UIView.animate(withDuration: 0.25) {
+            self.dateLabel.text = self.dateService.getString(from: date)
+            self.view.layoutIfNeeded()
+        }
+    }
+    
 }
 
 // MARK: - UITextViewDelegate
@@ -475,7 +491,7 @@ extension TodoItemViewController: UITextViewDelegate {
     }
     
     func textViewDidEndEditing(_ textView: UITextView) {
-        if !textView.hasText {
+        if textView.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             textView.text = L10n.todoTextPlaceholder
             textView.textColor = UIColor(named: "LabelTertiary")
         }
@@ -489,12 +505,13 @@ extension TodoItemViewController {
     
     private struct Constants {
         static let margin: CGFloat = 16
-        static let smallMargin: CGFloat = 12
+        static let mediumMargin: CGFloat = 12
+        static let smallMargin: CGFloat = 9
+        static let defaultHeight: CGFloat = 56
         static let textDefaultHeight: CGFloat = 120
         static let fontSize: CGFloat = 17
         static let smallFontSize: CGFloat = 13
         static let cornerRadius: CGFloat = 16
-        static let defaultHeight: CGFloat = 56
         static let separatorHeight: CGFloat = 1 / UIScreen.main.scale
     }
     

@@ -11,6 +11,7 @@ final class DateServiceImpl: DateService {
     
     private var dateFormatter: DateFormatter {
         let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "ru")
         dateFormatter.setLocalizedDateFormatFromTemplate("d MMMM yyyy")
         return dateFormatter
     }

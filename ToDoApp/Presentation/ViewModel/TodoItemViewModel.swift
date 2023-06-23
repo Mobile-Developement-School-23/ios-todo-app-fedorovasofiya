@@ -60,17 +60,20 @@ final class TodoItemViewModel: TodoItemViewOutput {
     // MARK: - Private Methods
     
     private func updateTodoItem(text: String, importance: Importance, deadline: Date?) {
-        guard let todoItem = todoItem else { return }
-        let newItem = TodoItem(
-            id: todoItem.id,
-            text: text,
-            importance: importance,
-            deadline: deadline,
-            isDone: todoItem.isDone,
-            creationDate: todoItem.creationDate,
-            modificationDate: todoItem.modificationDate
-        )
-        self.todoItem = newItem
+        if let currentTodoItem = todoItem {
+            let newItem = TodoItem(
+                id: currentTodoItem.id,
+                text: text,
+                importance: importance,
+                deadline: deadline,
+                isDone: currentTodoItem.isDone,
+                creationDate: currentTodoItem.creationDate,
+                modificationDate: currentTodoItem.modificationDate
+            )
+            self.todoItem = newItem
+        } else {
+            self.todoItem = TodoItem(text: text, importance: importance, deadline: deadline)
+        }
     }
     
 }

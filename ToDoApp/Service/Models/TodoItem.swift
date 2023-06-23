@@ -28,7 +28,7 @@ struct TodoItem: Hashable {
         deadline: Date?,
         isDone: Bool = false,
         creationDate: Date = Date(),
-        modificationDate: Date?
+        modificationDate: Date? = nil
     ) {
         self.id = id
         self.text = text
@@ -70,7 +70,7 @@ extension TodoItem {
             let isDone = dictionary[Properties.isDone.stringValue] as? Bool,
             let creationDateTimeInterval = dictionary[Properties.creationDate.stringValue] as? TimeInterval
         else { return nil }
-    
+        
         let creationDate = Date(timeIntervalSince1970: creationDateTimeInterval)
         let deadline = (dictionary[Properties.deadline.stringValue] as? TimeInterval)
             .map { interval in Date(timeIntervalSince1970: interval) }
