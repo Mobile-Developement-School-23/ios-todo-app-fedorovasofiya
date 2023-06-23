@@ -17,6 +17,7 @@ final class TodoItemViewController: UIViewController {
     private lazy var importanceControl = UISegmentedControl()
     private lazy var importanceView = UIView()
     private lazy var colorLabel = UILabel()
+    private lazy var selectedColorLabel = UILabel()
     private lazy var paletteButton = UIButton()
     private lazy var colorView = UIView()
     private lazy var colorSlider = ColorSelectionSlider()
@@ -190,7 +191,7 @@ final class TodoItemViewController: UIViewController {
     }
     
     private func setupColorLabel() {
-        addColorTextToColorLabel(text: getTextColor().hex)
+        colorLabel.text = L10n.colorLabelText
         colorLabel.font = .systemFont(ofSize: Constants.fontSize, weight: .regular)
         colorLabel.translatesAutoresizingMaskIntoConstraints = false
         colorView.addSubview(colorLabel)
@@ -198,6 +199,20 @@ final class TodoItemViewController: UIViewController {
         NSLayoutConstraint.activate([
             colorLabel.leadingAnchor.constraint(equalTo: colorView.leadingAnchor, constant: Constants.margin),
             colorLabel.centerYAnchor.constraint(equalTo: colorView.centerYAnchor)
+        ])
+    }
+    
+    private func setupSelectedColorLabel() {
+        let textColor = getTextColor()
+        selectedColorLabel.text = textColor.hex
+        selectedColorLabel.textColor = textColor
+        selectedColorLabel.font = .systemFont(ofSize: Constants.fontSize, weight: .regular)
+        selectedColorLabel.translatesAutoresizingMaskIntoConstraints = false
+        colorView.addSubview(selectedColorLabel)
+        
+        NSLayoutConstraint.activate([
+            selectedColorLabel.leadingAnchor.constraint(equalTo: colorLabel.trailingAnchor),
+            selectedColorLabel.centerYAnchor.constraint(equalTo: colorView.centerYAnchor)
         ])
     }
     
@@ -223,6 +238,7 @@ final class TodoItemViewController: UIViewController {
     
     private func setupColorView() {
         setupColorLabel()
+        setupSelectedColorLabel()
         setupPaletteButton()
         
         let separator = UIView()
@@ -264,8 +280,14 @@ final class TodoItemViewController: UIViewController {
         colorPickerView.addSubview(lightnessSlider)
         
         NSLayoutConstraint.activate([
-            lightnessSlider.leadingAnchor.constraint(equalTo: colorPickerView.leadingAnchor, constant: Constants.margin),
-            lightnessSlider.trailingAnchor.constraint(equalTo: colorPickerView.trailingAnchor, constant: -Constants.margin),
+            lightnessSlider.leadingAnchor.constraint(
+                equalTo: colorPickerView.leadingAnchor,
+                constant: Constants.margin
+            ),
+            lightnessSlider.trailingAnchor.constraint(
+                equalTo: colorPickerView.trailingAnchor,
+                constant: -Constants.margin
+            ),
             lightnessSlider.topAnchor.constraint(equalTo: colorPickerView.centerYAnchor, constant: Constants.margin),
             lightnessSlider.heightAnchor.constraint(equalToConstant: Constants.sliderHeight)
         ])
@@ -310,7 +332,10 @@ final class TodoItemViewController: UIViewController {
         NSLayoutConstraint.activate([
             selectedDateLabel.leadingAnchor.constraint(equalTo: deadlineView.leadingAnchor, constant: Constants.margin),
             selectedDateLabel.topAnchor.constraint(equalTo: deadlineLabel.bottomAnchor),
-            selectedDateLabel.bottomAnchor.constraint(equalTo: deadlineView.bottomAnchor, constant: -Constants.smallMargin)
+            selectedDateLabel.bottomAnchor.constraint(
+                equalTo: deadlineView.bottomAnchor,
+                constant: -Constants.smallMargin
+            )
         ])
     }
     
@@ -424,7 +449,7 @@ final class TodoItemViewController: UIViewController {
         }
         let importance = Importance.getValue(index: importanceControl.selectedSegmentIndex)
         let deadline = deadlineSwitch.isOn ? dateService.getDate(from: selectedDateLabel.text ?? "") : nil
-        let textColor = getTextColor().hex
+        let textColor = selectedColorLabel.text ?? getTextColor().hex
         viewOutput.saveItem(text: text, importance: importance, deadline: deadline, textColor: textColor)
     }
     
@@ -528,8 +553,8 @@ final class TodoItemViewController: UIViewController {
                 self?.updateDeadline(deadline: deadline)
             }
             let color = UIColor.convertHexToUIColor(hex: todoItem.textColor)
-            self?.changeColorOfTextView(color: color)
-            self?.addColorTextToColorLabel(text: todoItem.textColor)
+            self?.changeColorOfText(color: color)
+            self?.changeTextOfSelectedColorLabel(text: todoItem.textColor)
         }
         
         viewOutput.successfullySaved = { [weak self] in
@@ -613,16 +638,17 @@ final class TodoItemViewController: UIViewController {
     
     private func applySelectedColor() {
         let newColor = getTextColor()
-        changeColorOfTextView(color: newColor)
-        addColorTextToColorLabel(text: newColor.hex)
+        changeColorOfText(color: newColor)
+        changeTextOfSelectedColorLabel(text: newColor.hex)
     }
     
-    private func changeColorOfTextView(color: UIColor) {
+    private func changeColorOfText(color: UIColor) {
         textView.textColor = color
+        selectedColorLabel.textColor = color
     }
     
-    private func addColorTextToColorLabel(text: String) {
-        colorLabel.text = L10n.colorLabelText + ": " + text
+    private func changeTextOfSelectedColorLabel(text: String) {
+        selectedColorLabel.text = text
     }
     
     private func getTextColor() -> UIColor {

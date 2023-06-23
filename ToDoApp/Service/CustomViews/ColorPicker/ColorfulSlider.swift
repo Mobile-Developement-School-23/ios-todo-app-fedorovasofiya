@@ -41,7 +41,6 @@ class ColorfulSlider: UIView {
     }
     
     override func draw(_ rect: CGRect) {
-        print("draw")
         setupColorImageView()
         setupColorSlider()
         setupColorGradientLayer(cornerRadius: rect.height / 2)
