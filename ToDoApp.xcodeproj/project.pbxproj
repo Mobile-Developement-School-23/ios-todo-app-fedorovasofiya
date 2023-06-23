@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		EB6B61E72A4235020011F01F /* L10n.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB6B61E62A4235020011F01F /* L10n.swift */; };
+		EB7978A12A45F63300CEB75F /* UIColor+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB7978A02A45F63300CEB75F /* UIColor+Extensions.swift */; };
+		EB7978A92A460DED00CEB75F /* ColorSelectionSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB7978A82A460DED00CEB75F /* ColorSelectionSlider.swift */; };
+		EB7978AB2A460DFB00CEB75F /* LightnessSelectionSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB7978AA2A460DFB00CEB75F /* LightnessSelectionSlider.swift */; };
+		EB7978B12A462CE600CEB75F /* ColorfulSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB7978B02A462CE600CEB75F /* ColorfulSlider.swift */; };
 		EB8D428C2A3CABC7002180BC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB8D428B2A3CABC7002180BC /* AppDelegate.swift */; };
 		EB8D42902A3CABC7002180BC /* TodoItemViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB8D428F2A3CABC7002180BC /* TodoItemViewController.swift */; };
 		EB8D42952A3CABC8002180BC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EB8D42942A3CABC8002180BC /* Assets.xcassets */; };
@@ -36,6 +40,10 @@
 
 /* Begin PBXFileReference section */
 		EB6B61E62A4235020011F01F /* L10n.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = L10n.swift; sourceTree = "<group>"; };
+		EB7978A02A45F63300CEB75F /* UIColor+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extensions.swift"; sourceTree = "<group>"; };
+		EB7978A82A460DED00CEB75F /* ColorSelectionSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorSelectionSlider.swift; sourceTree = "<group>"; };
+		EB7978AA2A460DFB00CEB75F /* LightnessSelectionSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightnessSelectionSlider.swift; sourceTree = "<group>"; };
+		EB7978B02A462CE600CEB75F /* ColorfulSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorfulSlider.swift; sourceTree = "<group>"; };
 		EB8D42882A3CABC7002180BC /* ToDoApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ToDoApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EB8D428B2A3CABC7002180BC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		EB8D428F2A3CABC7002180BC /* TodoItemViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoItemViewController.swift; sourceTree = "<group>"; };
@@ -109,6 +117,24 @@
 			path = Common;
 			sourceTree = "<group>";
 		};
+		EB7978A22A45F7B600CEB75F /* CustomViews */ = {
+			isa = PBXGroup;
+			children = (
+				EB7978A72A45F83100CEB75F /* ColorPicker */,
+			);
+			path = CustomViews;
+			sourceTree = "<group>";
+		};
+		EB7978A72A45F83100CEB75F /* ColorPicker */ = {
+			isa = PBXGroup;
+			children = (
+				EB7978A82A460DED00CEB75F /* ColorSelectionSlider.swift */,
+				EB7978AA2A460DFB00CEB75F /* LightnessSelectionSlider.swift */,
+				EB7978B02A462CE600CEB75F /* ColorfulSlider.swift */,
+			);
+			path = ColorPicker;
+			sourceTree = "<group>";
+		};
 		EB8D427F2A3CABC7002180BC = {
 			isa = PBXGroup;
 			children = (
@@ -160,6 +186,7 @@
 		EB8D42A52A3CAD3D002180BC /* Service */ = {
 			isa = PBXGroup;
 			children = (
+				EB7978A22A45F7B600CEB75F /* CustomViews */,
 				EBD34FF72A44EB9B00129695 /* Extensions */,
 				EB6B61E52A4234670011F01F /* Common */,
 				EB6B61E32A4226F20011F01F /* Models */,
@@ -239,6 +266,7 @@
 			isa = PBXGroup;
 			children = (
 				EBD34FF92A44EBB700129695 /* UIViewController+Extensions.swift */,
+				EB7978A02A45F63300CEB75F /* UIColor+Extensions.swift */,
 			);
 			path = UIKit;
 			sourceTree = "<group>";
@@ -344,12 +372,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				EBD34FF12A44D2B400129695 /* DateService.swift in Sources */,
+				EB7978A92A460DED00CEB75F /* ColorSelectionSlider.swift in Sources */,
 				EBD34FF42A44D2D400129695 /* DateServiceImpl.swift in Sources */,
 				EBD34FE82A4461C300129695 /* TodoItemViewOutput.swift in Sources */,
+				EB7978AB2A460DFB00CEB75F /* LightnessSelectionSlider.swift in Sources */,
+				EB7978A12A45F63300CEB75F /* UIColor+Extensions.swift in Sources */,
 				EB8D42902A3CABC7002180BC /* TodoItemViewController.swift in Sources */,
 				EBD34FFA2A44EBB700129695 /* UIViewController+Extensions.swift in Sources */,
 				EBD34FF62A44E0D800129695 /* Importance.swift in Sources */,
 				EB8D428C2A3CABC7002180BC /* AppDelegate.swift in Sources */,
+				EB7978B12A462CE600CEB75F /* ColorfulSlider.swift in Sources */,
 				EB8D42A22A3CAD1B002180BC /* TodoItem.swift in Sources */,
 				EBD34FE62A44612E00129695 /* TodoItemViewModel.swift in Sources */,
 				EB8D42A42A3CAD37002180BC /* FileCacheImpl.swift in Sources */,

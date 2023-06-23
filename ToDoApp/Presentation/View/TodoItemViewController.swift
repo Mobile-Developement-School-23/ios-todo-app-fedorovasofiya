@@ -16,8 +16,14 @@ final class TodoItemViewController: UIViewController {
     private lazy var importanceLabel = UILabel()
     private lazy var importanceControl = UISegmentedControl()
     private lazy var importanceView = UIView()
+    private lazy var colorLabel = UILabel()
+    private lazy var paletteButton = UIButton()
+    private lazy var colorView = UIView()
+    private lazy var colorSlider = ColorSelectionSlider()
+    private lazy var lightnessSlider = LightnessSelectionSlider()
+    private lazy var colorPickerView = UIView()
     private lazy var deadlineLabel = UILabel()
-    private lazy var dateLabel = UILabel()
+    private lazy var selectedDateLabel = UILabel()
     private lazy var deadlineSwitch = UISwitch()
     private lazy var deadlineView = UIView()
     private lazy var datePicker = UIDatePicker()
@@ -52,10 +58,13 @@ final class TodoItemViewController: UIViewController {
         setupScrollView()
         setupTextView()
         setupImportanceView()
+        setupColorView()
+        setupColorPickerView()
         setupDeadlineView()
         setupDateView()
         setupDetailsStackView()
         setupDeleteButton()
+        applySelectedColor()
         
         registerKeyboardNotifications()
         addDateLabelTapGestureRecognizer()
@@ -118,7 +127,7 @@ final class TodoItemViewController: UIViewController {
             textView.leadingAnchor.constraint(equalTo: safeArea.leadingAnchor, constant: Constants.margin),
             textView.trailingAnchor.constraint(equalTo: safeArea.trailingAnchor, constant: -Constants.margin),
             textView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: Constants.margin),
-            textView.heightAnchor.constraint(greaterThanOrEqualToConstant: Constants.textDefaultHeight)
+            textView.heightAnchor.constraint(greaterThanOrEqualToConstant: Constants.bigHeight)
         ])
     }
     
@@ -181,6 +190,106 @@ final class TodoItemViewController: UIViewController {
         ])
     }
     
+    private func setupColorLabel() {
+        colorLabel.text = L10n.colorLabelText
+        colorLabel.font = .systemFont(ofSize: Constants.fontSize, weight: .regular)
+        colorLabel.translatesAutoresizingMaskIntoConstraints = false
+        colorView.addSubview(colorLabel)
+        
+        NSLayoutConstraint.activate([
+            colorLabel.leadingAnchor.constraint(equalTo: colorView.leadingAnchor, constant: Constants.margin),
+            colorLabel.centerYAnchor.constraint(equalTo: colorView.centerYAnchor)
+        ])
+    }
+    
+    private func setupPaletteButton() {
+        let scaleConfig = UIImage.SymbolConfiguration(scale: .large)
+        let weightConfig = UIImage.SymbolConfiguration(weight: .medium)
+        paletteButton.setImage(
+            UIImage(systemName: "paintpalette", withConfiguration: scaleConfig.applying(weightConfig)),
+            for: .normal
+        )
+        paletteButton.translatesAutoresizingMaskIntoConstraints = false
+        paletteButton.addTarget(self, action: #selector(toggleColorPickerVisibility), for: .touchUpInside)
+        colorView.addSubview(paletteButton)
+        
+        NSLayoutConstraint.activate([
+            paletteButton.trailingAnchor.constraint(
+                equalTo: colorView.trailingAnchor,
+                constant: -Constants.mediumMargin
+            ),
+            paletteButton.centerYAnchor.constraint(equalTo: colorView.centerYAnchor)
+        ])
+    }
+    
+    private func setupColorView() {
+        setupColorLabel()
+        setupPaletteButton()
+        
+        let separator = UIView()
+        separator.backgroundColor = UIColor(named: "Separator")
+        separator.translatesAutoresizingMaskIntoConstraints = false
+        colorView.addSubview(separator)
+        
+        NSLayoutConstraint.activate([
+            separator.heightAnchor.constraint(equalToConstant: Constants.separatorHeight),
+            separator.bottomAnchor.constraint(equalTo: colorView.bottomAnchor),
+            separator.leadingAnchor.constraint(equalTo: colorView.leadingAnchor, constant: Constants.margin),
+            separator.trailingAnchor.constraint(equalTo: colorView.trailingAnchor, constant: -Constants.margin),
+            colorView.heightAnchor.constraint(equalToConstant: Constants.defaultHeight + Constants.separatorHeight)
+        ])
+    }
+    
+    private func setupColorSlider() {
+        colorSlider.colorChanged = { [weak self] color in
+            self?.lightnessSlider.mainColor = color
+            self?.applySelectedColor()
+        }
+        colorSlider.translatesAutoresizingMaskIntoConstraints = false
+        colorPickerView.addSubview(colorSlider)
+        
+        NSLayoutConstraint.activate([
+            colorSlider.leadingAnchor.constraint(equalTo: colorPickerView.leadingAnchor, constant: Constants.margin),
+            colorSlider.trailingAnchor.constraint(equalTo: colorPickerView.trailingAnchor, constant: -Constants.margin),
+            colorSlider.bottomAnchor.constraint(equalTo: colorPickerView.centerYAnchor, constant: -Constants.margin),
+            colorSlider.heightAnchor.constraint(equalToConstant: Constants.sliderHeight)
+        ])
+    }
+    
+    private func setupLightnessSlider() {
+        lightnessSlider.lightnessChanged = { [weak self] _ in
+            self?.applySelectedColor()
+        }
+        lightnessSlider.mainColor = colorSlider.color
+        lightnessSlider.translatesAutoresizingMaskIntoConstraints = false
+        colorPickerView.addSubview(lightnessSlider)
+        
+        NSLayoutConstraint.activate([
+            lightnessSlider.leadingAnchor.constraint(equalTo: colorPickerView.leadingAnchor, constant: Constants.margin),
+            lightnessSlider.trailingAnchor.constraint(equalTo: colorPickerView.trailingAnchor, constant: -Constants.margin),
+            lightnessSlider.topAnchor.constraint(equalTo: colorPickerView.centerYAnchor, constant: Constants.margin),
+            lightnessSlider.heightAnchor.constraint(equalToConstant: Constants.sliderHeight)
+        ])
+    }
+    
+    private func setupColorPickerView() {
+        setupColorSlider()
+        setupLightnessSlider()
+        
+        let separator = UIView()
+        separator.backgroundColor = UIColor(named: "Separator")
+        separator.translatesAutoresizingMaskIntoConstraints = false
+        colorPickerView.addSubview(separator)
+        
+        NSLayoutConstraint.activate([
+            separator.heightAnchor.constraint(equalToConstant: Constants.separatorHeight),
+            separator.bottomAnchor.constraint(equalTo: colorPickerView.bottomAnchor),
+            separator.leadingAnchor.constraint(equalTo: colorPickerView.leadingAnchor, constant: Constants.margin),
+            separator.trailingAnchor.constraint(equalTo: colorPickerView.trailingAnchor, constant: -Constants.margin),
+            colorPickerView.heightAnchor.constraint(equalToConstant: Constants.bigHeight + Constants.separatorHeight)
+        ])
+    }
+    
     private func setupDeadlineLabel() {
         deadlineLabel.text = L10n.toDoByLabelText
         deadlineLabel.font = .systemFont(ofSize: Constants.fontSize, weight: .regular)
@@ -194,21 +303,21 @@ final class TodoItemViewController: UIViewController {
     }
     
     private func setupDateLabel() {
-        dateLabel.textColor = UIColor(named: "Blue")
-        dateLabel.font = .systemFont(ofSize: Constants.smallFontSize, weight: .semibold)
-        dateLabel.translatesAutoresizingMaskIntoConstraints = false
-        deadlineView.addSubview(dateLabel)
+        selectedDateLabel.textColor = UIColor(named: "Blue")
+        selectedDateLabel.font = .systemFont(ofSize: Constants.smallFontSize, weight: .semibold)
+        selectedDateLabel.translatesAutoresizingMaskIntoConstraints = false
+        deadlineView.addSubview(selectedDateLabel)
         
         NSLayoutConstraint.activate([
-            dateLabel.leadingAnchor.constraint(equalTo: deadlineView.leadingAnchor, constant: Constants.margin),
-            dateLabel.topAnchor.constraint(equalTo: deadlineLabel.bottomAnchor),
-            dateLabel.bottomAnchor.constraint(equalTo: deadlineView.bottomAnchor, constant: -Constants.smallMargin)
+            selectedDateLabel.leadingAnchor.constraint(equalTo: deadlineView.leadingAnchor, constant: Constants.margin),
+            selectedDateLabel.topAnchor.constraint(equalTo: deadlineLabel.bottomAnchor),
+            selectedDateLabel.bottomAnchor.constraint(equalTo: deadlineView.bottomAnchor, constant: -Constants.smallMargin)
         ])
     }
     
     private func setupDeadlineSwitch() {
         deadlineSwitch.translatesAutoresizingMaskIntoConstraints = false
-        deadlineSwitch.addTarget(self, action: #selector(switchChanged), for: .valueChanged)
+        deadlineSwitch.addTarget(self, action: #selector(deadlineSwitchChanged), for: .valueChanged)
         deadlineView.addSubview(deadlineSwitch)
         
         NSLayoutConstraint.activate([
@@ -238,8 +347,7 @@ final class TodoItemViewController: UIViewController {
         NSLayoutConstraint.activate([
             datePicker.leadingAnchor.constraint(equalTo: dateView.leadingAnchor, constant: Constants.smallMargin),
             datePicker.trailingAnchor.constraint(equalTo: dateView.trailingAnchor, constant: -Constants.smallMargin),
-            datePicker.centerYAnchor.constraint(equalTo: dateView.centerYAnchor),
-            datePicker.centerXAnchor.constraint(equalTo: dateView.centerXAnchor)
+            datePicker.centerYAnchor.constraint(equalTo: dateView.centerYAnchor)
         ])
         
         datePicker.addTarget(self, action: #selector(handleDatePicker), for: .valueChanged)
@@ -267,6 +375,7 @@ final class TodoItemViewController: UIViewController {
         detailsStackView.backgroundColor = UIColor(named: "BackSecondary")
         detailsStackView.layer.cornerRadius = Constants.cornerRadius
         detailsStackView.addArrangedSubview(importanceView)
+        detailsStackView.addArrangedSubview(colorView)
         detailsStackView.addArrangedSubview(deadlineView)
         detailsStackView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.addSubview(detailsStackView)
@@ -315,29 +424,37 @@ final class TodoItemViewController: UIViewController {
             return
         }
         let importance = Importance.getValue(index: importanceControl.selectedSegmentIndex)
-        let deadline = deadlineSwitch.isOn ? dateService.getDate(from: dateLabel.text ?? "") : nil
+        let deadline = deadlineSwitch.isOn ? dateService.getDate(from: selectedDateLabel.text ?? "") : nil
         viewOutput.saveItem(text: text, importance: importance, deadline: deadline)
     }
     
-    @objc private func switchChanged() {
+    @objc private func toggleColorPickerVisibility() {
+        if colorPickerView.superview != nil {
+            hideColorPickerView()
+        } else {
+            showColorPickerView()
+        }
+    }
+    
+    @objc private func deadlineSwitchChanged() {
         if deadlineSwitch.isOn {
             guard let nextDay = dateService.getNextDay() else { return }
             showDateInDateLabel(nextDay)
         } else {
             hideDateInDateLabel()
-            if detailsStackView.arrangedSubviews.count == 3 {
+            if dateView.superview != nil {
                 hideDateView()
             }
         }
     }
     
     @objc private func handleDatePicker() {
-        dateLabel.text = dateService.getString(from: datePicker.date)
+        selectedDateLabel.text = dateService.getString(from: datePicker.date)
     }
     
     @objc private func dateLabelTapped() {
         guard
-            let selectedDateString = dateLabel.text,
+            let selectedDateString = selectedDateLabel.text,
             let selectedDate = dateService.getDate(from: selectedDateString)
         else {
             return
@@ -397,8 +514,8 @@ final class TodoItemViewController: UIViewController {
     
     private func addDateLabelTapGestureRecognizer() {
         let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(dateLabelTapped))
-        dateLabel.isUserInteractionEnabled = true
-        dateLabel.addGestureRecognizer(tapGestureRecognizer)
+        selectedDateLabel.isUserInteractionEnabled = true
+        selectedDateLabel.addGestureRecognizer(tapGestureRecognizer)
     }
     
     // MARK: - Tools
@@ -424,7 +541,7 @@ final class TodoItemViewController: UIViewController {
     private func updateText(text: String) {
         if !text.isEmpty {
             textView.text = text
-            textView.textColor = .label
+            textView.textColor = getTextColor()
         } else {
             textView.text = L10n.todoTextPlaceholder
             textView.textColor = UIColor(named: "LabelTertiary")
@@ -436,15 +553,15 @@ final class TodoItemViewController: UIViewController {
     }
     
     private func updateDeadline(deadline: Date) {
-        dateLabel.text = dateService.getString(from: deadline)
+        selectedDateLabel.text = dateService.getString(from: deadline)
         deadlineSwitch.isOn = true
         datePicker.date = deadline
     }
     
     private func toggleDateViewVisibility() {
-        if detailsStackView.arrangedSubviews.count == 2 {
+        if dateView.superview == nil {
             showDateView()
-        } else if detailsStackView.arrangedSubviews.count == 3 {
+        } else {
             hideDateView()
         }
     }
@@ -463,18 +580,52 @@ final class TodoItemViewController: UIViewController {
         }
     }
     
-    private func hideDateInDateLabel() {
-        UIView.animate(withDuration: 0.25) {
-            self.dateLabel.text = nil
+    private func showColorPickerView() {
+        UIView.animate(withDuration: 0.5) {
+            self.detailsStackView.insertArrangedSubview(self.colorPickerView, at: 2)
+            self.view.layoutIfNeeded()
+        }
+    }
+    
+    private func hideColorPickerView() {
+        UIView.animate(withDuration: 0.5) {
+            self.colorPickerView.removeFromSuperview()
             self.view.layoutIfNeeded()
         }
     }
     
     private func showDateInDateLabel(_ date: Date) {
         UIView.animate(withDuration: 0.25) {
-            self.dateLabel.text = self.dateService.getString(from: date)
+            self.selectedDateLabel.text = self.dateService.getString(from: date)
             self.view.layoutIfNeeded()
         }
+    }
+    
+    private func hideDateInDateLabel() {
+        UIView.animate(withDuration: 0.25) {
+            self.selectedDateLabel.text = nil
+            self.view.layoutIfNeeded()
+        }
+    }
+    
+    private func applySelectedColor() {
+        let newColor = getTextColor()
+        changeColorOfTextView(color: newColor)
+        if let hexString = newColor.hex {
+            changeTextOfColorLabel(text: L10n.colorLabelText + ": " + hexString)
+        }
+    }
+    
+    private func changeColorOfTextView(color: UIColor) {
+        textView.textColor = color
+    }
+    
+    private func changeTextOfColorLabel(text: String) {
+        colorLabel.text = text
+    }
+    
+    private func getTextColor() -> UIColor {
+        return colorSlider.color.adjustLightness(by: lightnessSlider.lightness)
     }
     
 }
@@ -486,7 +637,7 @@ extension TodoItemViewController: UITextViewDelegate {
     func textViewDidBeginEditing(_ textView: UITextView) {
         if textView.textColor == UIColor(named: "LabelTertiary") {
             textView.text = nil
-            textView.textColor = .label
+            textView.textColor = getTextColor()
         }
     }
     
@@ -507,8 +658,9 @@ extension TodoItemViewController {
         static let margin: CGFloat = 16
         static let mediumMargin: CGFloat = 12
         static let smallMargin: CGFloat = 9
+        static let sliderHeight: CGFloat = 12
         static let defaultHeight: CGFloat = 56
-        static let textDefaultHeight: CGFloat = 120
+        static let bigHeight: CGFloat = 120
         static let fontSize: CGFloat = 17
         static let smallFontSize: CGFloat = 13
         static let cornerRadius: CGFloat = 16

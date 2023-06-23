@@ -21,5 +21,6 @@ struct L10n {
     static let successAlertTitle = "Успешно"
     static let successfullSavingMessage = "Дело сохранено!"
     static let textIsEmpty = "Добавьте текст!"
+    static let colorLabelText = "Цвет"
     
 }
