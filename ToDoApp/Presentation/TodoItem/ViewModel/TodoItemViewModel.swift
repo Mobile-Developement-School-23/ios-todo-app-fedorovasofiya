@@ -41,13 +41,7 @@ final class TodoItemViewModel: TodoItemViewOutput {
         
         guard let todoItem = todoItem else { return }
         fileCache.addItem(todoItem)
-        do {
-            try fileCache.saveItemsToJSON(fileName: cacheFileName)
-        } catch {
-            if let errorOccurred = errorOccurred {
-                errorOccurred(error.localizedDescription)
-            }
-        }
+        saveChanges()
         
         if let successfullySaved = successfullySaved {
             successfullySaved()
@@ -60,13 +54,7 @@ final class TodoItemViewModel: TodoItemViewOutput {
     func deleteItem() {
         guard let id = todoItem?.id else { return }
         fileCache.deleteItem(with: id)
-        do {
-            try fileCache.saveItemsToJSON(fileName: cacheFileName)
-        } catch {
-            if let errorOccurred = errorOccurred {
-                errorOccurred(error.localizedDescription)
-            }
-        }
+        saveChanges()
         
         if let successfullyDeleted = successfullyDeleted {
             successfullyDeleted()
@@ -81,6 +69,16 @@ final class TodoItemViewModel: TodoItemViewOutput {
     }
     
     // MARK: - Private Methods
+    
+    private func saveChanges() {
+        do {
+            try fileCache.saveItemsToJSON(fileName: cacheFileName)
+        } catch {
+            if let errorOccurred = errorOccurred {
+                errorOccurred(error.localizedDescription)
+            }
+        }
+    }
     
     private func updateTodoItem(text: String, importance: Importance, deadline: Date?, textColor: String) {
         if let currentTodoItem = todoItem {

@@ -12,5 +12,7 @@ protocol TodoListViewOutput {
     var errorOccurred: ((String) -> ())? { get set }
     func loadItems()
     func didTapAdd()
+    func deleteItem(at: Int)
     func didSelectItem(at: Int)
+    func toggleIsDoneValue(for index: Int)
 }

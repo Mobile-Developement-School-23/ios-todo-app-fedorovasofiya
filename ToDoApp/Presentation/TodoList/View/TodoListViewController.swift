@@ -16,7 +16,7 @@ final class TodoListViewController: UIViewController {
     // MARK: - Private Properties
     
     private lazy var tableView = UITableView(frame: .zero, style: .insetGrouped)
-    private lazy var dataSource = TodoListDataSource(tableView)
+    private lazy var dataSource = TodoListDataSource(tableView, viewOutput: viewOutput)
     private lazy var plusButton = UIButton()
     
     private var viewOutput: TodoListViewOutput
@@ -126,6 +126,39 @@ extension TodoListViewController: UITableViewDelegate {
         viewOutput.didSelectItem(at: indexPath.row)
     }
     
+    func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let doneAction = UIContextualAction(style: .normal, title: nil) { [weak self] _, _, completion in
+            self?.viewOutput.toggleIsDoneValue(for: indexPath.row)
+            completion(true)
+        }
+        doneAction.image = UIImage(
+            systemName: "checkmark.circle.fill",
+            withConfiguration: UIImage.SymbolConfiguration(weight: .bold)
+        )
+        doneAction.backgroundColor = UIColor(named: "Green")
+        return UISwipeActionsConfiguration(actions: [doneAction])
+    }
+    
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let deleteAction = UIContextualAction(style: .destructive, title: nil) { [weak self] _, _, completion in
+            self?.viewOutput.deleteItem(at: indexPath.row)
+            completion(true)
+        }
+        deleteAction.image = UIImage(
+            systemName: "trash.fill",
+            withConfiguration: UIImage.SymbolConfiguration(weight: .bold)
+        )
+        let infoAction = UIContextualAction(style: .normal, title: nil) { [weak self] _, _, completion in
+            self?.viewOutput.didSelectItem(at: indexPath.row)
+            completion(true)
+        }
+        infoAction.image = UIImage(
+            systemName: "info.circle.fill",
+            withConfiguration: UIImage.SymbolConfiguration(weight: .bold)
+        )
+        return UISwipeActionsConfiguration(actions: [deleteAction, infoAction])
+    }
+    
 }
 
 // MARK: - Constants
@@ -149,7 +182,7 @@ extension TodoListViewController {
 final class TodoListDataSource:
     UITableViewDiffableDataSource<TodoListViewController.Section, TodoItemTableViewCell.DisplayData> {
     
-    init(_ tableView: UITableView) {
+    init(_ tableView: UITableView, viewOutput: TodoListViewOutput) {
         super.init(tableView: tableView) { tableView, indexPath, itemIdentifier in
             guard let cell = tableView.dequeueReusableCell(
                 withIdentifier: TodoItemTableViewCell.reuseIdentifier,
@@ -159,6 +192,9 @@ final class TodoListDataSource:
                 return UITableViewCell()
             }
             cell.accessoryType = .disclosureIndicator
+            cell.checkmarkCallback = {
+                viewOutput.toggleIsDoneValue(for: indexPath.row)
+            }
             cell.configure(with: itemIdentifier)
             return cell
         }

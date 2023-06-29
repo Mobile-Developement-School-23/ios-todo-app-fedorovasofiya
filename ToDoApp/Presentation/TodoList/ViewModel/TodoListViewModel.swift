@@ -32,27 +32,39 @@ final class TodoListViewModel: TodoListViewOutput {
     func loadItems() {
         do {
             try fileCache.loadItemsFromJSON(fileName: cacheFileName)
-            
-            todoList = Array(fileCache.todoItems.values)
-            todoList.sort(by: { $0.creationDate > $1.creationDate })
-            
-            if let todoListLoaded = todoListLoaded {
-                let displayData: [TodoItemTableViewCell.DisplayData] = todoList.map { item in
-                    TodoItemTableViewCell.DisplayData(
-                        id: item.id,
-                        text: item.text,
-                        importance: item.importance,
-                        deadline: dateService.getString(from: item.deadline),
-                        isDone: item.isDone
-                    )
-                }
-                todoListLoaded(displayData)
-            }
+            getData()
         } catch {
             if let errorOccurred = errorOccurred {
                 errorOccurred(error.localizedDescription)
             }
         }
+    }
+    
+    func toggleIsDoneValue(for index: Int) {
+        guard todoList.indices.contains(index) else { return }
+        let item = todoList[index]
+        let newIsDoneValue = item.isDone ? false : true
+        let newItem = TodoItem(
+            id: item.id,
+            text: item.text,
+            importance: item.importance,
+            deadline: item.deadline,
+            isDone: newIsDoneValue,
+            creationDate: item.creationDate,
+            modificationDate: item.modificationDate,
+            textColor: item.textColor
+        )
+        fileCache.addItem(newItem)
+        saveChanges()
+        getData()
+    }
+    
+    func deleteItem(at index: Int) {
+        guard todoList.indices.contains(index) else { return }
+        let id = todoList[index].id
+        fileCache.deleteItem(with: id)
+        saveChanges()
+        loadItems()
     }
     
     func didSelectItem(at index: Int) {
@@ -62,6 +74,40 @@ final class TodoListViewModel: TodoListViewOutput {
     
     func didTapAdd() {
         coordinator?.openCreationOfTodoItem(itemStateChangedCallback: itemStateChangedCallback)
+    }
+    
+    // MARK: - Private Methods
+    
+    private func saveChanges() {
+        do {
+            try fileCache.saveItemsToJSON(fileName: cacheFileName)
+        } catch {
+            if let errorOccurred = errorOccurred {
+                errorOccurred(error.localizedDescription)
+            }
+        }
+    }
+    
+    private func getData() {
+        todoList = Array(fileCache.todoItems.values)
+        todoList.sort(by: { $0.creationDate > $1.creationDate })
+        
+        if let todoListLoaded = todoListLoaded {
+            let displayData: [TodoItemTableViewCell.DisplayData] = mapData()
+            todoListLoaded(displayData)
+        }
+    }
+    
+    private func mapData() -> [TodoItemTableViewCell.DisplayData] {
+        todoList.map { item in
+            TodoItemTableViewCell.DisplayData(
+                id: item.id,
+                text: item.text,
+                importance: item.importance,
+                deadline: dateService.getString(from: item.deadline),
+                isDone: item.isDone
+            )
+        }
     }
     
 }

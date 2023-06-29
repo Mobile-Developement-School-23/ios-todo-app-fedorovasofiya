@@ -17,6 +17,8 @@ final class TodoItemTableViewCell: UITableViewCell {
         let isDone: Bool
     }
     
+    var checkmarkCallback: (() -> ())?
+    
     // MARK: - Private Properties
     
     private lazy var nameLabel = UILabel()
@@ -61,6 +63,14 @@ final class TodoItemTableViewCell: UITableViewCell {
     // MARK: - UI Setup
     
     private func setupCheckmarkButton() {
+        checkmarkButton.addAction(
+            UIAction(handler: { [weak self] _ in
+                if let checkmarkCallback = self?.checkmarkCallback {
+                    checkmarkCallback()
+                }
+            }),
+            for: .touchUpInside
+        )
         checkmarkButton.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(checkmarkButton)
         
