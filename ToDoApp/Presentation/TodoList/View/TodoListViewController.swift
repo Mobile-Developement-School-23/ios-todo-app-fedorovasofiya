@@ -62,7 +62,7 @@ final class TodoListViewController: UIViewController {
         
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)
         ])
@@ -89,6 +89,11 @@ final class TodoListViewController: UIViewController {
             plusButton.widthAnchor.constraint(equalToConstant: Constants.buttonSize),
             plusButton.heightAnchor.constraint(equalToConstant: Constants.buttonSize)
         ])
+        
+        plusButton.addAction(
+            UIAction(handler: { [weak self] _ in self?.viewOutput.didTapAdd() }),
+            for: .touchUpInside
+        )
     }
     
     // MARK: - Tools
@@ -115,6 +120,11 @@ final class TodoListViewController: UIViewController {
 // MARK: - UITableViewDelegate
 
 extension TodoListViewController: UITableViewDelegate {
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        viewOutput.didSelectItem(at: indexPath.row)
+    }
     
 }
 

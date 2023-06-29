@@ -15,7 +15,6 @@ final class TodoItemTableViewCell: UITableViewCell {
         let importance: Importance
         let deadline: String?
         let isDone: Bool
-        let textColor: String
     }
     
     // MARK: - Private Properties
@@ -34,7 +33,7 @@ final class TodoItemTableViewCell: UITableViewCell {
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        contentView.backgroundColor = UIColor(named: "BackSecondary")
+        self.backgroundColor = UIColor(named: "BackSecondary")
         
         setupCheckmarkButton()
         setupNameLabel()
@@ -177,7 +176,12 @@ extension TodoItemTableViewCell: Configurable {
         } else if importance == .important {
             return UIImage(named: "RedCircle")
         } else {
-            return UIImage(named: "GrayCircle")
+            let image = UIImage(named: "GrayCircle")?
+                .withTintColor(
+                    UIColor(named: "Separator")?.withAlphaComponent(1) ?? .gray,
+                    renderingMode: .alwaysOriginal
+                )
+            return image
         }
     }
     

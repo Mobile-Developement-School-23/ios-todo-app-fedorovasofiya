@@ -11,18 +11,17 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var window: UIWindow?
+    var coordinator: RootCoordinator?
 
     func application(
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
         
-        let viewModel = TodoListViewModel(fileCache: FileCacheImpl(), dateService: DateServiceImpl())
-        let viewController = TodoListViewController(viewOutput: viewModel)
-        let navigationController = UINavigationController(rootViewController: viewController)
-        window = UIWindow()
-        window?.rootViewController = navigationController
-        window?.makeKeyAndVisible()
+        let window = UIWindow()
+        self.window = window
+        coordinator = RootCoordinatorImpl()
+        coordinator?.start(in: window)
 
         return true
     }

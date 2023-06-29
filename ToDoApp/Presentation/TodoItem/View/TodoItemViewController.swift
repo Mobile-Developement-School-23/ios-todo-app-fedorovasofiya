@@ -71,7 +71,7 @@ final class TodoItemViewController: UIViewController {
         addTapGestureRecognizerToDismissKeyboard()
         
         bindViewModel()
-        viewOutput.loadItem()
+        viewOutput.loadItemIfExist()
     }
     
     // MARK: - UI Setup
@@ -363,6 +363,8 @@ final class TodoItemViewController: UIViewController {
     
     private func setupDatePicker() {
         datePicker.locale = Locale(identifier: "ru")
+        datePicker.date = dateService.getNextDay() ?? Date()
+        datePicker.minimumDate = Date()
         datePicker.datePickerMode = .date
         datePicker.preferredDatePickerStyle = .inline
         datePicker.translatesAutoresizingMaskIntoConstraints = false
@@ -413,6 +415,7 @@ final class TodoItemViewController: UIViewController {
     }
     
     private func setupDeleteButton() {
+        deleteButton.isEnabled = false
         deleteButton.backgroundColor = UIColor(named: "BackSecondary")
         deleteButton.layer.cornerRadius = Constants.cornerRadius
         deleteButton.titleLabel?.font = .systemFont(ofSize: Constants.fontSize, weight: .regular)
@@ -430,12 +433,19 @@ final class TodoItemViewController: UIViewController {
             deleteButton.heightAnchor.constraint(equalToConstant: Constants.defaultHeight),
             deleteButton.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: -Constants.margin)
         ])
+        
+        deleteButton.addAction(
+            UIAction(handler: { [weak self] _ in
+                self?.viewOutput.deleteItem()
+            }),
+            for: .touchUpInside
+        )
     }
     
     // MARK: - Actions
     
     @objc private func didTapCancelButton() {
-        
+        viewOutput.close()
     }
     
     @objc private func didTapSaveButton() {
@@ -448,7 +458,7 @@ final class TodoItemViewController: UIViewController {
             return
         }
         let importance = Importance.getValue(index: importanceControl.selectedSegmentIndex)
-        let deadline = deadlineSwitch.isOn ? dateService.getDate(from: selectedDateLabel.text ?? "") : nil
+        let deadline = deadlineSwitch.isOn ? datePicker.date : nil
         let textColor = selectedColorLabel.text ?? getTextColor().hex
         viewOutput.saveItem(text: text, importance: importance, deadline: deadline, textColor: textColor)
     }
@@ -463,8 +473,7 @@ final class TodoItemViewController: UIViewController {
     
     @objc private func deadlineSwitchChanged() {
         if deadlineSwitch.isOn {
-            guard let nextDay = dateService.getNextDay() else { return }
-            showDateInDateLabel(nextDay)
+            showDateInDateLabel()
         } else {
             hideDateInDateLabel()
             if dateView.superview != nil {
@@ -478,15 +487,6 @@ final class TodoItemViewController: UIViewController {
     }
     
     @objc private func dateLabelTapped() {
-        guard
-            let selectedDateString = selectedDateLabel.text,
-            let selectedDate = dateService.getDate(from: selectedDateString)
-        else {
-            return
-        }
-        datePicker.date = selectedDate
-        let currentDate = Date()
-        datePicker.minimumDate = selectedDate < currentDate ? selectedDate : currentDate
         toggleDateViewVisibility()
     }
     
@@ -555,10 +555,26 @@ final class TodoItemViewController: UIViewController {
             let color = UIColor.convertHexToUIColor(hex: todoItem.textColor)
             self?.changeColorOfText(color: color)
             self?.changeTextOfSelectedColorLabel(text: todoItem.textColor)
+            
+            self?.deleteButton.isEnabled = true
         }
         
         viewOutput.successfullySaved = { [weak self] in
-            self?.presentAlert(title: L10n.successAlertTitle, message: L10n.successfullSavingMessage)
+            self?.presentAlert(
+                title: L10n.successAlertTitle,
+                message: L10n.successfullSavingMessage,
+                okActionHandler: { _ in
+                    self?.viewOutput.close()
+                })
+        }
+        
+        viewOutput.successfullyDeleted = { [weak self] in
+            self?.presentAlert(
+                title: L10n.successAlertTitle,
+                message: L10n.successfullDeletingMessage,
+                okActionHandler: { _ in
+                    self?.viewOutput.close()
+                })
         }
         
         viewOutput.errorOccurred = { [weak self] description in
@@ -584,6 +600,8 @@ final class TodoItemViewController: UIViewController {
         selectedDateLabel.text = dateService.getString(from: deadline)
         deadlineSwitch.isOn = true
         datePicker.date = deadline
+        let currentDate = Date()
+        datePicker.minimumDate = deadline < currentDate ? deadline : currentDate
     }
     
     private func toggleDateViewVisibility() {
@@ -622,9 +640,9 @@ final class TodoItemViewController: UIViewController {
         }
     }
     
-    private func showDateInDateLabel(_ date: Date) {
+    private func showDateInDateLabel() {
         UIView.animate(withDuration: 0.25) {
-            self.selectedDateLabel.text = self.dateService.getString(from: date)
+            self.selectedDateLabel.text = self.dateService.getString(from: self.datePicker.date)
             self.view.layoutIfNeeded()
         }
     }
@@ -643,7 +661,9 @@ final class TodoItemViewController: UIViewController {
     }
     
     private func changeColorOfText(color: UIColor) {
-        textView.textColor = color
+        if textView.textColor != UIColor(named: "LabelTertiary") {
+            textView.textColor = color
+        }
         selectedColorLabel.textColor = color
     }
     

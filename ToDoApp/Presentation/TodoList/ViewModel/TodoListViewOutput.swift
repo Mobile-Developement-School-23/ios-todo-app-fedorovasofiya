@@ -11,4 +11,6 @@ protocol TodoListViewOutput {
     var todoListLoaded: (([TodoItemTableViewCell.DisplayData]) -> ())? { get set }
     var errorOccurred: ((String) -> ())? { get set }
     func loadItems()
+    func didTapAdd()
+    func didSelectItem(at: Int)
 }
