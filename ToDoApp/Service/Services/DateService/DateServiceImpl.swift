@@ -20,8 +20,13 @@ final class DateServiceImpl: DateService {
         dateFormatter.date(from: string)
     }
     
-    func getString(from date: Date) -> String {
-        dateFormatter.string(from: date)
+    // TODO: -
+    func getString(from date: Date?) -> String? {
+        if let date = date {
+            return dateFormatter.string(from: date)
+        } else {
+            return nil
+        }
     }
     
     func getNextDay() -> Date? {

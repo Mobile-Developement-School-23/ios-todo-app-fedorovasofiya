@@ -10,6 +10,7 @@ import Foundation
 struct L10n {
     
     static let todoScreenTitle = "Дело"
+    static let listScreenTitle = "Мои дела"
     static let cancelButtonTitle = "Отменить"
     static let saveButtonTitle = "Сохранить"
     static let deleteButtonTitle = "Удалить"

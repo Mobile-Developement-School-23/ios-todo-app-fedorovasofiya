@@ -9,7 +9,6 @@ import Foundation
 import UIKit
 
 extension UIColor {
-    
     func adjustLightness(by value: Float) -> UIColor {
         let value = CGFloat(value)
         var red: CGFloat = 0
@@ -27,7 +26,6 @@ extension UIColor {
             return self
         }
     }
-    
 }
 
 //MARK: - HEX convertation

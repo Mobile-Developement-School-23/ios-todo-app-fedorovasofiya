@@ -17,9 +17,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
         
-        let dateService = DateServiceImpl()
-        let viewModel = TodoItemViewModel(fileCache: FileCacheImpl())
-        let viewController = TodoItemViewController(viewOutput: viewModel, dateService: dateService)
+        let viewModel = TodoListViewModel(fileCache: FileCacheImpl(), dateService: DateServiceImpl())
+        let viewController = TodoListViewController(viewOutput: viewModel)
         let navigationController = UINavigationController(rootViewController: viewController)
         window = UIWindow()
         window?.rootViewController = navigationController
