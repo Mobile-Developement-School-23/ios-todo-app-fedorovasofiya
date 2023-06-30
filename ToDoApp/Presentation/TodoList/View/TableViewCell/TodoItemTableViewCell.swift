@@ -22,15 +22,15 @@ final class TodoItemTableViewCell: UITableViewCell {
     
     // MARK: - Private Properties
     
-    private lazy var nameLabel = UILabel()
+    private lazy var titleLabel = UILabel()
     private lazy var checkmarkButton = UIButton()
     private lazy var importanceImageView = UIImageView()
     private lazy var calendarImageView = UIImageView()
     private lazy var dateLabel = UILabel()
     
-    private var nameLabelLeadingAnchorConstraint: NSLayoutConstraint?
-    private var nameLabelTopAnchorConstraint: NSLayoutConstraint?
-    private var nameLabelBottomAnchorConstraint: NSLayoutConstraint?
+    private var titleLabelLeadingAnchorConstraint: NSLayoutConstraint?
+    private var titleLabelTopAnchorConstraint: NSLayoutConstraint?
+    private var titleLabelBottomAnchorConstraint: NSLayoutConstraint?
     
     // MARK: - Life Cycle
     
@@ -39,7 +39,7 @@ final class TodoItemTableViewCell: UITableViewCell {
         self.backgroundColor = UIColor(named: "BackSecondary")
         
         setupCheckmarkButton()
-        setupNameLabel()
+        setupTitleLabel()
         setupImportanceImageView()
         setupCalendarImageView()
         setupDateLabel()
@@ -51,14 +51,14 @@ final class TodoItemTableViewCell: UITableViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        nameLabel.attributedText = nil
+        titleLabel.attributedText = nil
         importanceImageView.image = nil
         dateLabel.text = nil
         checkmarkButton.setImage(nil, for: .normal)
         calendarImageView.isHidden = true
-        nameLabelLeadingAnchorConstraint?.constant = Constants.leftMargin
-        nameLabelTopAnchorConstraint?.constant = Constants.margin
-        nameLabelBottomAnchorConstraint?.constant = -Constants.margin
+        titleLabelLeadingAnchorConstraint?.constant = Constants.leftMargin
+        titleLabelTopAnchorConstraint?.constant = Constants.margin
+        titleLabelBottomAnchorConstraint?.constant = -Constants.margin
     }
     
     // MARK: - UI Setup
@@ -84,34 +84,34 @@ final class TodoItemTableViewCell: UITableViewCell {
         ])
     }
     
-    private func setupNameLabel() {
-        nameLabel.numberOfLines = 3
-        nameLabel.font = .systemFont(ofSize: Constants.fontSize, weight: .regular)
-        nameLabel.translatesAutoresizingMaskIntoConstraints = false
-        contentView.addSubview(nameLabel)
+    private func setupTitleLabel() {
+        titleLabel.numberOfLines = 3
+        titleLabel.font = .systemFont(ofSize: Constants.fontSize, weight: .regular)
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(titleLabel)
         
-        nameLabelLeadingAnchorConstraint = NSLayoutConstraint(
-            item: nameLabel, attribute: .leading, relatedBy: .equal,
+        titleLabelLeadingAnchorConstraint = NSLayoutConstraint(
+            item: titleLabel, attribute: .leading, relatedBy: .equal,
             toItem: contentView, attribute: .leading, multiplier: 1, constant: Constants.leftMargin
         )
-        nameLabelTopAnchorConstraint = NSLayoutConstraint(
-            item: nameLabel, attribute: .top, relatedBy: .equal,
+        titleLabelTopAnchorConstraint = NSLayoutConstraint(
+            item: titleLabel, attribute: .top, relatedBy: .equal,
             toItem: contentView, attribute: .top, multiplier: 1, constant: Constants.margin
         )
-        nameLabelBottomAnchorConstraint = NSLayoutConstraint(
-            item: nameLabel, attribute: .bottom, relatedBy: .equal,
+        titleLabelBottomAnchorConstraint = NSLayoutConstraint(
+            item: titleLabel, attribute: .bottom, relatedBy: .equal,
             toItem: contentView, attribute: .bottom, multiplier: 1, constant: -Constants.margin
         )
-        nameLabel.trailingAnchor.constraint(
+        titleLabel.trailingAnchor.constraint(
             equalTo: contentView.trailingAnchor,
             constant: -Constants.margin
         ).isActive = true
         
-        nameLabelLeadingAnchorConstraint?.isActive = true
-        nameLabelTopAnchorConstraint?.isActive = true
-        nameLabelTopAnchorConstraint?.priority = UILayoutPriority(999)
-        nameLabelBottomAnchorConstraint?.isActive = true
-        nameLabelBottomAnchorConstraint?.priority = UILayoutPriority(999)
+        titleLabelLeadingAnchorConstraint?.isActive = true
+        titleLabelTopAnchorConstraint?.isActive = true
+        titleLabelTopAnchorConstraint?.priority = UILayoutPriority(999)
+        titleLabelBottomAnchorConstraint?.isActive = true
+        titleLabelBottomAnchorConstraint?.priority = UILayoutPriority(999)
     }
     
     private func setupImportanceImageView() {
@@ -120,7 +120,7 @@ final class TodoItemTableViewCell: UITableViewCell {
         contentView.addSubview(importanceImageView)
         
         NSLayoutConstraint.activate([
-            importanceImageView.centerYAnchor.constraint(equalTo: nameLabel.centerYAnchor),
+            importanceImageView.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor),
             importanceImageView.widthAnchor.constraint(equalToConstant: Constants.importanceImageWidth),
             importanceImageView.heightAnchor.constraint(equalToConstant: Constants.importanceImageHeight),
             importanceImageView.leadingAnchor.constraint(
@@ -138,7 +138,7 @@ final class TodoItemTableViewCell: UITableViewCell {
         contentView.addSubview(calendarImageView)
         
         NSLayoutConstraint.activate([
-            calendarImageView.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: Constants.smallMargin),
+            calendarImageView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: Constants.smallMargin),
             calendarImageView.widthAnchor.constraint(equalToConstant: Constants.calendarSize),
             calendarImageView.heightAnchor.constraint(equalToConstant: Constants.calendarSize),
             calendarImageView.leadingAnchor.constraint(
@@ -171,17 +171,17 @@ extension TodoItemTableViewCell: Configurable {
     
     func configure(with model: DisplayData) {
         displayedItemID = model.id
-        nameLabel.attributedText = getAttributedText(text: model.text, isDone: model.isDone)
+        titleLabel.attributedText = getAttributedText(text: model.text, isDone: model.isDone)
         if let importanceImage = getImportanceImage(importance: model.importance) {
             importanceImageView.image = importanceImage
-            offsetNameLabelLeadingAnchorConstraint()
+            offsetTitleLabelLeadingAnchorConstraint()
         }
         let checkmark = getCheckmarkImage(isDone: model.isDone, importance: model.importance)
         checkmarkButton.setImage(checkmark, for: .normal)
         if let deadline = model.deadline {
             dateLabel.text = deadline
             calendarImageView.isHidden = false
-            offsetNameLabelVerticalAnchorConstraints()
+            offsetTitleLabelVerticalAnchorConstraints()
         }
     }
     
@@ -240,13 +240,13 @@ extension TodoItemTableViewCell: Configurable {
         }
     }
     
-    private func offsetNameLabelLeadingAnchorConstraint() {
-        nameLabelLeadingAnchorConstraint?.constant = Constants.bigLeftMargin
+    private func offsetTitleLabelLeadingAnchorConstraint() {
+        titleLabelLeadingAnchorConstraint?.constant = Constants.bigLeftMargin
     }
     
-    private func offsetNameLabelVerticalAnchorConstraints() {
-        nameLabelTopAnchorConstraint?.constant = Constants.mediumMargin
-        nameLabelBottomAnchorConstraint?.constant = -32
+    private func offsetTitleLabelVerticalAnchorConstraints() {
+        titleLabelTopAnchorConstraint?.constant = Constants.mediumMargin
+        titleLabelBottomAnchorConstraint?.constant = -32
     }
     
 }

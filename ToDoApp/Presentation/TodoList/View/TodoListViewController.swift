@@ -13,6 +13,11 @@ final class TodoListViewController: UIViewController {
         case main
     }
     
+    enum Item: Hashable {
+        case todoItem(TodoItemTableViewCell.DisplayData)
+        case createNew
+    }
+    
     // MARK: - Private Properties
     
     private lazy var tableView = UITableView(frame: .zero, style: .insetGrouped)
@@ -21,7 +26,6 @@ final class TodoListViewController: UIViewController {
     private lazy var completedLabel = UILabel()
     private lazy var completedAreShownButton = UIButton(type: .system)
     private lazy var headerView = UIView()
-//    private lazy var footerView = UIView()
     
     private var viewOutput: TodoListViewOutput
     
@@ -42,7 +46,6 @@ final class TodoListViewController: UIViewController {
         
         setupNavigationBar()
         setupHeaderView()
-//        setupFooterView()
         setupTableView()
         setupPlusButton()
         
@@ -87,33 +90,13 @@ final class TodoListViewController: UIViewController {
         ])
     }
     
-//    private func setupFooterView() {
-//        footerView.backgroundColor = UIColor(named: "BackSecondary")
-//        footerView.layer.cornerRadius = Constants.cornerRadius
-//        footerView.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
-//
-//        let label = UILabel()
-//        label.text = L10n.new
-//        label.textColor = UIColor(named: "LabelTertiary")
-//        label.translatesAutoresizingMaskIntoConstraints = false
-//        footerView.addSubview(label)
-//
-//        NSLayoutConstraint.activate([
-//            label.centerYAnchor.constraint(equalTo: footerView.centerYAnchor),
-//            label.leadingAnchor.constraint(equalTo: footerView.leadingAnchor, constant: Constants.leftInset),
-//            footerView.heightAnchor.constraint(equalToConstant: Constants.footerHeight)
-//        ])
-//
-//        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(footerTapped))
-//        footerView.addGestureRecognizer(tapGestureRecognizer)
-//    }
-    
     private func setupTableView() {
         tableView.backgroundColor = nil
         tableView.estimatedRowHeight = Constants.estimatedRowHeight
         tableView.rowHeight = UITableView.automaticDimension
         tableView.separatorInset = UIEdgeInsets(top: 0, left: Constants.leftInset, bottom: 0, right: 0)
         tableView.register(TodoItemTableViewCell.self, forCellReuseIdentifier: TodoItemTableViewCell.reuseIdentifier)
+        tableView.register(CreateNewTableViewCell.self, forCellReuseIdentifier: CreateNewTableViewCell.reuseIdentifier)
         tableView.delegate = self
         tableView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(tableView)
@@ -155,12 +138,6 @@ final class TodoListViewController: UIViewController {
         )
     }
     
-    // MARK: - Tools
-//
-//    @objc private func footerTapped() {
-//        viewOutput.didTapAdd()
-//    }
-    
     private func bindViewModel() {
         viewOutput.todoListUpdated = { [weak self] todoList in
             self?.updateDataSource(data: todoList, animated: true)
@@ -180,9 +157,10 @@ final class TodoListViewController: UIViewController {
     }
     
     private func updateDataSource(data: [TodoItemTableViewCell.DisplayData], animated: Bool = false) {
-        var snapshot = NSDiffableDataSourceSnapshot<Section, TodoItemTableViewCell.DisplayData>()
+        var snapshot = NSDiffableDataSourceSnapshot<Section, Item>()
         snapshot.appendSections([.main])
-        snapshot.appendItems(data)
+        snapshot.appendItems(data.map({ Item.todoItem($0) }))
+        snapshot.appendItems([Item.createNew])
         dataSource.apply(snapshot, animatingDifferences: animated)
     }
     
@@ -204,6 +182,13 @@ extension TodoListViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        
+        if indexPath.row == tableView.numberOfRows(inSection: 0) - 1 {
+            guard tableView.cellForRow(at: indexPath) is CreateNewTableViewCell else { return }
+            viewOutput.didTapAdd()
+            return
+        }
+        
         guard
             let cell = tableView.cellForRow(at: indexPath) as? TodoItemTableViewCell,
             let displayedItemID = cell.displayedItemID
@@ -272,14 +257,6 @@ extension TodoListViewController: UITableViewDelegate {
         return headerView
     }
 
-//    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-//        return Constants.footerHeight
-//    }
-//
-//    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-//        return footerView
-//    }
-
 }
 
 // MARK: - Constants
@@ -295,11 +272,9 @@ extension TodoListViewController {
         static let shadowOffsetY: CGFloat = 8
         static let leftInset: CGFloat = 52
         static let cornerRadius: CGFloat = 16
-//        static let footerHeight: CGFloat = 56
         static let headerHeight: CGFloat = 40
         static let fontSize: CGFloat = 15
         static let estimatedRowHeight: CGFloat = 56
-//        static let separatorHeight: CGFloat = 1 / UIScreen.main.scale
     }
     
 }
@@ -307,23 +282,35 @@ extension TodoListViewController {
 // MARK: - Data Source
 
 final class TodoListDataSource:
-    UITableViewDiffableDataSource<TodoListViewController.Section, TodoItemTableViewCell.DisplayData> {
+    UITableViewDiffableDataSource<TodoListViewController.Section, TodoListViewController.Item> {
     
     init(_ tableView: UITableView, viewOutput: TodoListViewOutput) {
         super.init(tableView: tableView) { tableView, indexPath, itemIdentifier in
-            guard let cell = tableView.dequeueReusableCell(
-                withIdentifier: TodoItemTableViewCell.reuseIdentifier,
-                for: indexPath
-            ) as? TodoItemTableViewCell
-            else {
-                return UITableViewCell()
+            switch itemIdentifier {
+            case .todoItem(let displayData):
+                guard let cell = tableView.dequeueReusableCell(
+                    withIdentifier: TodoItemTableViewCell.reuseIdentifier,
+                    for: indexPath
+                ) as? TodoItemTableViewCell
+                else {
+                    return UITableViewCell()
+                }
+                cell.accessoryType = .disclosureIndicator
+                cell.checkmarkCallback = { displayedItemID in
+                    viewOutput.toggleIsDoneValue(for: displayedItemID)
+                }
+                cell.configure(with: displayData)
+                return cell
+            case .createNew:
+                guard let cell = tableView.dequeueReusableCell(
+                    withIdentifier: CreateNewTableViewCell.reuseIdentifier,
+                    for: indexPath
+                ) as? CreateNewTableViewCell
+                else {
+                    return UITableViewCell()
+                }
+                return cell
             }
-            cell.accessoryType = .disclosureIndicator
-            cell.checkmarkCallback = { displayedItemID in
-                viewOutput.toggleIsDoneValue(for: displayedItemID)
-            }
-            cell.configure(with: itemIdentifier)
-            return cell
         }
     }
     
