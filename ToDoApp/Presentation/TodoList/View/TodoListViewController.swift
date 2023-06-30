@@ -28,11 +28,13 @@ final class TodoListViewController: UIViewController {
     private lazy var headerView = UIView()
     
     private var viewOutput: TodoListViewOutput
+    private var animator: Animator
     
     // MARK: - Life Cycle
     
-    init(viewOutput: TodoListViewOutput) {
+    init(viewOutput: TodoListViewOutput, animator: Animator) {
         self.viewOutput = viewOutput
+        self.animator = animator
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -151,7 +153,7 @@ final class TodoListViewController: UIViewController {
             self?.presentAlert(title: L10n.errorAlertTitle, message: description)
         }
     }
-
+    
     private func updateCompletedItemsCount(newValue: Int) {
         completedLabel.text = L10n.completed + String(newValue)
     }
@@ -181,7 +183,6 @@ final class TodoListViewController: UIViewController {
 extension TodoListViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
         
         if indexPath.row == tableView.numberOfRows(inSection: 0) - 1 {
             guard tableView.cellForRow(at: indexPath) is CreateNewTableViewCell else { return }
@@ -198,7 +199,10 @@ extension TodoListViewController: UITableViewDelegate {
         viewOutput.didSelectItem(with: displayedItemID)
     }
     
-    func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+    func tableView(
+        _ tableView: UITableView,
+        leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath
+    ) -> UISwipeActionsConfiguration? {
         let doneAction = UIContextualAction(style: .normal, title: nil) { [weak self] _, _, completion in
             guard
                 let cell = tableView.cellForRow(at: indexPath) as? TodoItemTableViewCell,
@@ -217,7 +221,10 @@ extension TodoListViewController: UITableViewDelegate {
         return UISwipeActionsConfiguration(actions: [doneAction])
     }
     
-    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+    func tableView(
+        _ tableView: UITableView,
+        trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath
+    ) -> UISwipeActionsConfiguration? {
         let deleteAction = UIContextualAction(style: .destructive, title: nil) { [weak self] _, _, completion in
             guard
                 let cell = tableView.cellForRow(at: indexPath) as? TodoItemTableViewCell,
@@ -256,7 +263,43 @@ extension TodoListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         return headerView
     }
+    
+}
 
+// MARK: - UIViewControllerTransitioningDelegate
+
+extension TodoListViewController: UIViewControllerTransitioningDelegate {
+    
+    func animationController(
+        forPresented presented: UIViewController,
+        presenting: UIViewController,
+        source: UIViewController
+    ) -> UIViewControllerAnimatedTransitioning? {
+        
+        guard
+            let selectedIndexPathCell = tableView.indexPathForSelectedRow,
+            let selectedCell = tableView.cellForRow(at: selectedIndexPathCell) as? TodoItemTableViewCell
+                ?? tableView.cellForRow(at: selectedIndexPathCell) as? CreateNewTableViewCell,
+            let selectedCellSuperview = selectedCell.superview
+        else {
+            return nil
+        }
+        tableView.deselectRow(at: selectedIndexPathCell, animated: true)
+        animator.originFrame = selectedCellSuperview.convert(selectedCell.frame, to: nil)
+        animator.originFrame = CGRect(
+            x: animator.originFrame.origin.x + 20,
+            y: animator.originFrame.origin.y + 20,
+            width: animator.originFrame.size.width - 40,
+            height: animator.originFrame.size.height - 40
+        )
+        
+        return animator
+    }
+    
+    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        return nil
+    }
+    
 }
 
 // MARK: - Constants
