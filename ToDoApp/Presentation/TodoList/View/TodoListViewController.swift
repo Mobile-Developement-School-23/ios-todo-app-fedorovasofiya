@@ -140,6 +140,8 @@ final class TodoListViewController: UIViewController {
         )
     }
     
+    // MARK: - Tools
+    
     private func bindViewModel() {
         viewOutput.todoListUpdated = { [weak self] todoList in
             self?.updateDataSource(data: todoList, animated: true)
@@ -183,7 +185,6 @@ final class TodoListViewController: UIViewController {
 extension TodoListViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
         if indexPath.row == tableView.numberOfRows(inSection: 0) - 1 {
             guard tableView.cellForRow(at: indexPath) is CreateNewTableViewCell else { return }
             viewOutput.didTapAdd()
@@ -254,6 +255,83 @@ extension TodoListViewController: UITableViewDelegate {
             withConfiguration: UIImage.SymbolConfiguration(weight: .bold)
         )
         return UISwipeActionsConfiguration(actions: [deleteAction, infoAction])
+    }
+    
+    func tableView(
+        _ tableView: UITableView,
+        contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint
+    ) -> UIContextMenuConfiguration? {
+        guard indexPath.row != tableView.numberOfRows(inSection: 0) - 1
+        else {
+            return nil
+        }
+        
+        let doneAction = UIAction(title: L10n.done, image: UIImage(systemName: "checkmark")) { [weak self] _ in
+            guard
+                let cell = tableView.cellForRow(at: indexPath) as? TodoItemTableViewCell,
+                let displayedItemID = cell.displayedItemID
+            else {
+                return
+            }
+            self?.viewOutput.toggleIsDoneValue(for: displayedItemID)
+        }
+        doneAction.image = UIImage(
+            systemName: "checkmark",
+            withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)
+        )
+        
+        let infoAction = UIAction(title: L10n.info) { [weak self] _ in
+            guard
+                let cell = tableView.cellForRow(at: indexPath) as? TodoItemTableViewCell,
+                let displayedItemID = cell.displayedItemID
+            else {
+                return
+            }
+            tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
+            self?.viewOutput.didSelectItem(with: displayedItemID)
+        }
+        infoAction.image = UIImage(
+            systemName: "info",
+            withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)
+        )
+        
+        let deleteAction = UIAction(
+            title: L10n.delete,
+            image: UIImage(systemName: "trash"),
+            attributes: [.destructive]
+        ) { [weak self] _ in
+            guard
+                let cell = tableView.cellForRow(at: indexPath) as? TodoItemTableViewCell,
+                let displayedItemID = cell.displayedItemID
+            else {
+                return
+            }
+            self?.viewOutput.deleteItem(with: displayedItemID)
+        }
+        deleteAction.image = UIImage(
+            systemName: "trash",
+            withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)
+        )
+        
+        return UIContextMenuConfiguration(identifier: indexPath as NSIndexPath, previewProvider: nil) { _ in
+            UIMenu(title: L10n.actions, children: [doneAction, infoAction, deleteAction])
+        }
+    }
+    
+    func tableView(
+        _ tableView: UITableView,
+        willPerformPreviewActionForMenuWith configuration: UIContextMenuConfiguration,
+        animator: UIContextMenuInteractionCommitAnimating
+    ) {
+        guard let indexPath = configuration.identifier as? IndexPath else { return }
+        guard
+            let cell = tableView.cellForRow(at: indexPath) as? TodoItemTableViewCell,
+            let displayedItemID = cell.displayedItemID
+        else {
+            return
+        }
+        tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
+        viewOutput.didSelectItem(with: displayedItemID)
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {

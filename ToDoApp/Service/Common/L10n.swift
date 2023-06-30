@@ -29,5 +29,9 @@ struct L10n {
     static let completed = "Выполнено — "
     static let showButton = "Показать"
     static let hideButton = "Скрыть"
+    static let actions = "Действия"
+    static let done = "Выполнено"
+    static let info = "Информация"
+    static let delete = "Удалить"
     
 }

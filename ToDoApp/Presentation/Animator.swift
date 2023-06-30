@@ -9,8 +9,8 @@ import UIKit
 
 final class Animator: NSObject, UIViewControllerAnimatedTransitioning {
     
-    let duration = 0.8
     var originFrame = CGRect.zero
+    private let duration = 0.8
     
     func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
         return duration

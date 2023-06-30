@@ -42,6 +42,7 @@ final class RootCoordinatorImpl: RootCoordinator {
         let viewController = TodoItemViewController(viewOutput: viewModel, dateService: dateService)
         let navigationController = UINavigationController(rootViewController: viewController)
         navigationController.transitioningDelegate = transitioningDelegate
+        window?.rootViewController?.dismiss(animated: true)
         window?.rootViewController?.present(navigationController, animated: true)
     }
     
