@@ -9,17 +9,24 @@ import Foundation
 
 final class TodoListViewModel: TodoListViewOutput {
     
-    var todoListLoaded: (([TodoItemTableViewCell.DisplayData]) -> ())?
+    var completedItemsCountUpdated: ((Int) -> ())?
+    var todoListUpdated: (([TodoItemTableViewCell.DisplayData]) -> ())?
     var errorOccurred: ((String) -> ())?
     
+    // MARK: - Private Properties
+    
+    private var completedAreShown: Bool = false
+    private var completedItemsCount: Int = 0
     private var todoList: [TodoItem] = []
-    private let fileCache: FileCache
-    private let dateService: DateService
-    private weak var coordinator: TodoListCoordinator?
-    private let cacheFileName = "cache"
+    
+    private lazy var cacheFileName = "cache"
     private lazy var itemStateChangedCallback: (() -> ())? = { [weak self] in
         self?.loadItems
     }()
+    
+    private let fileCache: FileCache
+    private let dateService: DateService
+    private weak var coordinator: TodoListCoordinator?
     
     init(fileCache: FileCache, dateService: DateService, coordinator: TodoListCoordinator) {
         self.fileCache = fileCache
@@ -32,7 +39,8 @@ final class TodoListViewModel: TodoListViewOutput {
     func loadItems() {
         do {
             try fileCache.loadItemsFromJSON(fileName: cacheFileName)
-            getData()
+            updateDataFromFileCache()
+            sendData()
         } catch {
             if let errorOccurred = errorOccurred {
                 errorOccurred(error.localizedDescription)
@@ -40,30 +48,30 @@ final class TodoListViewModel: TodoListViewOutput {
         }
     }
     
-    func toggleIsDoneValue(index: Int) {
-        guard todoList.indices.contains(index) else { return }
-        let item = todoList[index]
-        let newIsDoneValue = item.isDone ? false : true
-        changeIsDoneValue(for: item, newIsDoneValue: newIsDoneValue)
+    func changedCompletedAreShownValue(newValue: Bool) {
+        completedAreShown = newValue
+        sendData()
     }
     
-    func toggleIsDoneValue(id: UUID) {
+    func toggleIsDoneValue(for id: UUID) {
         guard let item = fileCache.todoItems[id] else { return }
         let newIsDoneValue = item.isDone ? false : true
         changeIsDoneValue(for: item, newIsDoneValue: newIsDoneValue)
+        updateDataFromFileCache()
+        sendData()
     }
     
-    func deleteItem(at index: Int) {
-        guard todoList.indices.contains(index) else { return }
-        let id = todoList[index].id
-        fileCache.deleteItem(with: id)
+    func deleteItem(with id: UUID) {
+        guard let item = fileCache.todoItems[id] else { return }
+        fileCache.deleteItem(with: item.id)
         saveChanges()
-        loadItems()
+        updateDataFromFileCache()
+        sendData()
     }
     
-    func didSelectItem(at index: Int) {
-        guard todoList.indices.contains(index) else { return }
-        coordinator?.openDetails(of: todoList[index], itemStateChangedCallback: itemStateChangedCallback)
+    func didSelectItem(with id: UUID) {
+        guard let item = fileCache.todoItems[id] else { return }
+        coordinator?.openDetails(of: item, itemStateChangedCallback: itemStateChangedCallback)
     }
     
     func didTapAdd() {
@@ -71,6 +79,28 @@ final class TodoListViewModel: TodoListViewOutput {
     }
     
     // MARK: - Private Methods
+    
+    private func sendData() {
+        var itemsToDisplay: [TodoItem] = []
+        if completedAreShown {
+            itemsToDisplay = todoList
+        } else {
+            itemsToDisplay = todoList.filter({ $0.isDone == false })
+        }
+        if let todoListLoaded = todoListUpdated {
+            let displayData: [TodoItemTableViewCell.DisplayData] = mapData(items: itemsToDisplay)
+            todoListLoaded(displayData)
+        }
+        if let completedItemsCountChanged = completedItemsCountUpdated {
+            completedItemsCountChanged(completedItemsCount)
+        }
+    }
+    
+    private func updateDataFromFileCache() {
+        todoList = Array(fileCache.todoItems.values)
+        todoList.sort(by: { $0.creationDate > $1.creationDate })
+        completedItemsCount = todoList.filter({ $0.isDone == true }).count
+    }
     
     private func changeIsDoneValue(for item: TodoItem, newIsDoneValue: Bool) {
         let newItem = TodoItem(
@@ -85,7 +115,6 @@ final class TodoListViewModel: TodoListViewOutput {
         )
         fileCache.addItem(newItem)
         saveChanges()
-        getData()
     }
     
     private func saveChanges() {
@@ -98,18 +127,8 @@ final class TodoListViewModel: TodoListViewOutput {
         }
     }
     
-    private func getData() {
-        todoList = Array(fileCache.todoItems.values)
-        todoList.sort(by: { $0.creationDate > $1.creationDate })
-        
-        if let todoListLoaded = todoListLoaded {
-            let displayData: [TodoItemTableViewCell.DisplayData] = mapData()
-            todoListLoaded(displayData)
-        }
-    }
-    
-    private func mapData() -> [TodoItemTableViewCell.DisplayData] {
-        todoList.map { item in
+    private func mapData(items: [TodoItem]) -> [TodoItemTableViewCell.DisplayData] {
+        items.map { item in
             TodoItemTableViewCell.DisplayData(
                 id: item.id,
                 text: item.text,

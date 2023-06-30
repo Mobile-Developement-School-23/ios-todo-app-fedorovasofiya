@@ -8,12 +8,13 @@
 import Foundation
 
 protocol TodoListViewOutput {
-    var todoListLoaded: (([TodoItemTableViewCell.DisplayData]) -> ())? { get set }
+    var completedItemsCountUpdated: ((Int) -> ())? { get set }
+    var todoListUpdated: (([TodoItemTableViewCell.DisplayData]) -> ())? { get set }
     var errorOccurred: ((String) -> ())? { get set }
     func loadItems()
+    func changedCompletedAreShownValue(newValue: Bool)
     func didTapAdd()
-    func deleteItem(at: Int)
-    func didSelectItem(at: Int)
-    func toggleIsDoneValue(index: Int)
-    func toggleIsDoneValue(id: UUID)
+    func deleteItem(with: UUID)
+    func didSelectItem(with: UUID)
+    func toggleIsDoneValue(for: UUID)
 }

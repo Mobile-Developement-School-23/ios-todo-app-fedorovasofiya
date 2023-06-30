@@ -17,7 +17,8 @@ final class TodoItemTableViewCell: UITableViewCell {
         let isDone: Bool
     }
     
-    var checkmarkCallback: (() -> ())?
+    var checkmarkCallback: ((UUID) -> ())?
+    var displayedItemID: UUID?
     
     // MARK: - Private Properties
     
@@ -65,8 +66,9 @@ final class TodoItemTableViewCell: UITableViewCell {
     private func setupCheckmarkButton() {
         checkmarkButton.addAction(
             UIAction(handler: { [weak self] _ in
-                if let checkmarkCallback = self?.checkmarkCallback {
-                    checkmarkCallback()
+                if let checkmarkCallback = self?.checkmarkCallback,
+                   let displayedItemID = self?.displayedItemID {
+                    checkmarkCallback(displayedItemID)
                 }
             }),
             for: .touchUpInside
@@ -168,6 +170,7 @@ final class TodoItemTableViewCell: UITableViewCell {
 extension TodoItemTableViewCell: Configurable {
     
     func configure(with model: DisplayData) {
+        displayedItemID = model.id
         nameLabel.attributedText = getAttributedText(text: model.text, isDone: model.isDone)
         if let importanceImage = getImportanceImage(importance: model.importance) {
             importanceImageView.image = importanceImage

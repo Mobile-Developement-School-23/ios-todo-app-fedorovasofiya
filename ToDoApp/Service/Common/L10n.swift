@@ -25,5 +25,9 @@ struct L10n {
     static let textIsEmpty = "Добавьте текст!"
     static let colorLabelText = "Цвет: "
     static let today = "Сегодня"
+    static let new = "Новое"
+    static let completed = "Выполнено — "
+    static let showButton = "Показать"
+    static let hideButton = "Скрыть"
     
 }
