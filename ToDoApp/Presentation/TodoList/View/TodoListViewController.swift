@@ -204,6 +204,11 @@ extension TodoListViewController: UITableViewDelegate {
         _ tableView: UITableView,
         leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath
     ) -> UISwipeActionsConfiguration? {
+        guard indexPath.row != tableView.numberOfRows(inSection: 0) - 1
+        else {
+            return nil
+        }
+        
         let doneAction = UIContextualAction(style: .normal, title: nil) { [weak self] _, _, completion in
             guard
                 let cell = tableView.cellForRow(at: indexPath) as? TodoItemTableViewCell,
@@ -226,6 +231,11 @@ extension TodoListViewController: UITableViewDelegate {
         _ tableView: UITableView,
         trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath
     ) -> UISwipeActionsConfiguration? {
+        guard indexPath.row != tableView.numberOfRows(inSection: 0) - 1
+        else {
+            return nil
+        }
+        
         let deleteAction = UIContextualAction(style: .destructive, title: nil) { [weak self] _, _, completion in
             guard
                 let cell = tableView.cellForRow(at: indexPath) as? TodoItemTableViewCell,
