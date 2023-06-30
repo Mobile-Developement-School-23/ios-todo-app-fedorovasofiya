@@ -14,5 +14,6 @@ protocol TodoListViewOutput {
     func didTapAdd()
     func deleteItem(at: Int)
     func didSelectItem(at: Int)
-    func toggleIsDoneValue(for index: Int)
+    func toggleIsDoneValue(index: Int)
+    func toggleIsDoneValue(id: UUID)
 }

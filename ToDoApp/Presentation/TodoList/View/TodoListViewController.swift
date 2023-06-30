@@ -54,17 +54,21 @@ final class TodoListViewController: UIViewController {
     
     private func setupTableView() {
         tableView.backgroundColor = nil
-        tableView.separatorInset = UIEdgeInsets(top: 0, left: Constants.separatorInset, bottom: 0, right: 0)
+        tableView.estimatedRowHeight = Constants.estimatedRowHeight
+        tableView.rowHeight = UITableView.automaticDimension
+//        tableView.separatorStyle = .none
+        tableView.separatorInset = UIEdgeInsets(top: 0, left: Constants.leftInset, bottom: 0, right: 0)
         tableView.register(TodoItemTableViewCell.self, forCellReuseIdentifier: TodoItemTableViewCell.reuseIdentifier)
         tableView.delegate = self
         tableView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(tableView)
         
+        let safeArea = view.safeAreaLayoutGuide
         NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            tableView.topAnchor.constraint(equalTo: safeArea.topAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)
+            tableView.leadingAnchor.constraint(equalTo: safeArea.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: safeArea.trailingAnchor)
         ])
     }
     
@@ -128,7 +132,7 @@ extension TodoListViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let doneAction = UIContextualAction(style: .normal, title: nil) { [weak self] _, _, completion in
-            self?.viewOutput.toggleIsDoneValue(for: indexPath.row)
+            self?.viewOutput.toggleIsDoneValue(index: indexPath.row)
             completion(true)
         }
         doneAction.image = UIImage(
@@ -193,7 +197,7 @@ final class TodoListDataSource:
             }
             cell.accessoryType = .disclosureIndicator
             cell.checkmarkCallback = {
-                viewOutput.toggleIsDoneValue(for: indexPath.row)
+                viewOutput.toggleIsDoneValue(id: itemIdentifier.id)
             }
             cell.configure(with: itemIdentifier)
             return cell

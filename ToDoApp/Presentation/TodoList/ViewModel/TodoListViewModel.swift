@@ -40,23 +40,17 @@ final class TodoListViewModel: TodoListViewOutput {
         }
     }
     
-    func toggleIsDoneValue(for index: Int) {
+    func toggleIsDoneValue(index: Int) {
         guard todoList.indices.contains(index) else { return }
         let item = todoList[index]
         let newIsDoneValue = item.isDone ? false : true
-        let newItem = TodoItem(
-            id: item.id,
-            text: item.text,
-            importance: item.importance,
-            deadline: item.deadline,
-            isDone: newIsDoneValue,
-            creationDate: item.creationDate,
-            modificationDate: item.modificationDate,
-            textColor: item.textColor
-        )
-        fileCache.addItem(newItem)
-        saveChanges()
-        getData()
+        changeIsDoneValue(for: item, newIsDoneValue: newIsDoneValue)
+    }
+    
+    func toggleIsDoneValue(id: UUID) {
+        guard let item = fileCache.todoItems[id] else { return }
+        let newIsDoneValue = item.isDone ? false : true
+        changeIsDoneValue(for: item, newIsDoneValue: newIsDoneValue)
     }
     
     func deleteItem(at index: Int) {
@@ -77,6 +71,22 @@ final class TodoListViewModel: TodoListViewOutput {
     }
     
     // MARK: - Private Methods
+    
+    private func changeIsDoneValue(for item: TodoItem, newIsDoneValue: Bool) {
+        let newItem = TodoItem(
+            id: item.id,
+            text: item.text,
+            importance: item.importance,
+            deadline: item.deadline,
+            isDone: newIsDoneValue,
+            creationDate: item.creationDate,
+            modificationDate: item.modificationDate,
+            textColor: item.textColor
+        )
+        fileCache.addItem(newItem)
+        saveChanges()
+        getData()
+    }
     
     private func saveChanges() {
         do {
