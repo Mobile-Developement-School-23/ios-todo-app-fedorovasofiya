@@ -107,7 +107,9 @@ final class TodoItemTableViewCell: UITableViewCell {
         
         nameLabelLeadingAnchorConstraint?.isActive = true
         nameLabelTopAnchorConstraint?.isActive = true
+        nameLabelTopAnchorConstraint?.priority = UILayoutPriority(999)
         nameLabelBottomAnchorConstraint?.isActive = true
+        nameLabelBottomAnchorConstraint?.priority = UILayoutPriority(999)
     }
     
     private func setupImportanceImageView() {
