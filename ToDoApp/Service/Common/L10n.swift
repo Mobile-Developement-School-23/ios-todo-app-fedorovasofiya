@@ -10,6 +10,7 @@ import Foundation
 struct L10n {
     
     static let todoScreenTitle = "Дело"
+    static let listScreenTitle = "Мои дела"
     static let cancelButtonTitle = "Отменить"
     static let saveButtonTitle = "Сохранить"
     static let deleteButtonTitle = "Удалить"
@@ -20,7 +21,17 @@ struct L10n {
     static let errorAlertTitle = "Что-то пошло не так..."
     static let successAlertTitle = "Успешно"
     static let successfullSavingMessage = "Дело сохранено!"
+    static let successfullDeletingMessage = "Дело удалено!"
     static let textIsEmpty = "Добавьте текст!"
     static let colorLabelText = "Цвет: "
+    static let today = "Сегодня"
+    static let new = "Новое"
+    static let completed = "Выполнено — "
+    static let showButton = "Показать"
+    static let hideButton = "Скрыть"
+    static let actions = "Действия"
+    static let done = "Выполнено"
+    static let info = "Информация"
+    static let delete = "Удалить"
     
 }

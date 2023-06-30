@@ -9,19 +9,23 @@ import Foundation
 
 final class DateServiceImpl: DateService {
     
-    private var dateFormatter: DateFormatter {
+    private lazy var dateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale(identifier: "ru")
-        dateFormatter.setLocalizedDateFormatFromTemplate("d MMMM yyyy")
         return dateFormatter
-    }
+    }()
     
-    func getDate(from string: String) -> Date? {
-        dateFormatter.date(from: string)
-    }
-    
-    func getString(from date: Date) -> String {
-        dateFormatter.string(from: date)
+    func getString(from date: Date?) -> String? {
+        guard let date = date else { return nil }
+        let calendar = Calendar.current
+        if !(calendar.isDate(date, equalTo: Date(), toGranularity: .year)) {
+            dateFormatter.setLocalizedDateFormatFromTemplate("d MMMM yyyy")
+        } else if !(calendar.isDateInToday(date)) {
+            dateFormatter.setLocalizedDateFormatFromTemplate("d MMMM")
+        } else {
+            return L10n.today
+        }
+        return dateFormatter.string(from: date)
     }
     
     func getNextDay() -> Date? {
