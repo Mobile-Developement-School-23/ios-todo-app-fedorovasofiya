@@ -8,6 +8,6 @@
 import Foundation
 
 protocol TodoListCoordinator: AnyObject {
-    func openDetails(of item: TodoItem, itemStateChangedCallback: (() -> ())?)
-    func openCreationOfTodoItem(itemStateChangedCallback: (() -> ())?)
+    func openDetails(of item: TodoItem, itemStateChangedCallback: (() -> Void)?)
+    func openCreationOfTodoItem(itemStateChangedCallback: (() -> Void)?)
 }

@@ -9,15 +9,15 @@ import UIKit
 import Foundation
 
 final class LightnessSelectionSlider: ColorfulSlider {
-    
+
     private(set) var lightness: Float = Constants.defaultLightness
-    var lightnessChanged: ((Float) -> ())?
+    var lightnessChanged: ((Float) -> Void)?
     var mainColor: UIColor = Constants.defaultMainColor {
         didSet {
             changeColors(colors: getColors())
         }
     }
-    
+
     init() {
         super.init(
             minimumValue: Constants.minLightness,
@@ -26,11 +26,11 @@ final class LightnessSelectionSlider: ColorfulSlider {
             colors: Constants.defaultColors
         )
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     private func getColors() -> [CGColor] {
         let colors = [
             mainColor.adjustLightness(by: Constants.minLightness).cgColor,
@@ -39,16 +39,16 @@ final class LightnessSelectionSlider: ColorfulSlider {
         ]
         return colors
     }
-    
+
     // MARK: - Actions
-    
+
     @objc override func colorValueChanged() {
         lightness = self.value
         if let lightnessChanged = lightnessChanged {
             lightnessChanged(lightness)
         }
     }
-    
+
 }
 
 // MARK: - Constants

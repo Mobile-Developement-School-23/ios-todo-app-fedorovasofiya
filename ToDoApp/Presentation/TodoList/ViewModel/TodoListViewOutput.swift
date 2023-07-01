@@ -8,9 +8,9 @@
 import Foundation
 
 protocol TodoListViewOutput {
-    var completedItemsCountUpdated: ((Int) -> ())? { get set }
-    var todoListUpdated: (([TodoItemTableViewCell.DisplayData]) -> ())? { get set }
-    var errorOccurred: ((String) -> ())? { get set }
+    var completedItemsCountUpdated: ((Int) -> Void)? { get set }
+    var todoListUpdated: (([TodoItemTableViewCell.DisplayData]) -> Void)? { get set }
+    var errorOccurred: ((String) -> Void)? { get set }
     func loadItems()
     func changedCompletedAreShownValue(newValue: Bool)
     func didTapAdd()

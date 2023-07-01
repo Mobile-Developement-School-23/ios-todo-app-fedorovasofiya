@@ -8,13 +8,13 @@
 import Foundation
 
 final class DateServiceImpl: DateService {
-    
+
     private lazy var dateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale(identifier: "ru")
         return dateFormatter
     }()
-    
+
     func getString(from date: Date?) -> String? {
         guard let date = date else { return nil }
         let calendar = Calendar.current
@@ -27,9 +27,9 @@ final class DateServiceImpl: DateService {
         }
         return dateFormatter.string(from: date)
     }
-    
+
     func getNextDay() -> Date? {
         Calendar.current.date(byAdding: .day, value: 1, to: Date())
     }
-    
+
 }

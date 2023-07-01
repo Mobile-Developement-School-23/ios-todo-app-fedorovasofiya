@@ -13,4 +13,3 @@ extension UITableViewCell {
         String(describing: Self.self)
     }
 }
-

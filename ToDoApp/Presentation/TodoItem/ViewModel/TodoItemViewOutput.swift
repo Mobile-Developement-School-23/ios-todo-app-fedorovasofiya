@@ -8,11 +8,11 @@
 import Foundation
 
 protocol TodoItemViewOutput {
-    var todoItemLoaded: ((TodoItem) -> ())? { get set }
-    var successfullySaved: (() -> ())? { get set }
-    var successfullyDeleted: (() -> ())? { get set }
-    var errorOccurred: ((String) -> ())? { get set }
-    var itemStateChanged: (() -> ())? { get set }
+    var todoItemLoaded: ((TodoItem) -> Void)? { get set }
+    var successfullySaved: (() -> Void)? { get set }
+    var successfullyDeleted: (() -> Void)? { get set }
+    var errorOccurred: ((String) -> Void)? { get set }
+    var itemStateChanged: (() -> Void)? { get set }
     func loadItemIfExist()
     func saveItem(text: String, importance: Importance, deadline: Date?, textColor: String)
     func deleteItem()

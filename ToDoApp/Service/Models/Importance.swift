@@ -8,11 +8,11 @@
 import Foundation
 
 enum Importance: String {
-    
+
     case unimportant
     case regular
     case important
-    
+
     var index: Int {
         switch self {
         case .unimportant:
@@ -23,7 +23,7 @@ enum Importance: String {
             return 2
         }
     }
-    
+
     static func getValue(index: Int) -> Importance {
         switch index {
         case 0:
@@ -34,5 +34,5 @@ enum Importance: String {
             return .regular
         }
     }
-    
+
 }
