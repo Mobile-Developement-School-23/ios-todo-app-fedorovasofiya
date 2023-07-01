@@ -8,11 +8,11 @@
 import Foundation
 
 struct TodoItem: Hashable {
-    
+
     private enum Properties: CodingKey {
         case id, text, importance, deadline, isDone, creationDate, modificationDate, textColor
     }
-    
+
     let id: UUID
     let text: String
     let importance: Importance
@@ -21,7 +21,7 @@ struct TodoItem: Hashable {
     let creationDate: Date
     let modificationDate: Date?
     let textColor: String
-    
+
     init(
         id: UUID = UUID(),
         text: String,
@@ -41,13 +41,13 @@ struct TodoItem: Hashable {
         self.modificationDate = modificationDate
         self.textColor = textColor
     }
-    
+
 }
 
 // MARK: - JSON Parsing
 
 extension TodoItem {
-    
+
     var json: Any {
         var dictionary: [String: Any] = [:]
         dictionary[Properties.id.stringValue] = id.uuidString
@@ -62,7 +62,7 @@ extension TodoItem {
         dictionary[Properties.textColor.stringValue] = textColor
         return dictionary
     }
-    
+
     static func parse(json: Any) -> TodoItem? {
         guard
             let dictionary = json as? [String: Any],
@@ -75,13 +75,13 @@ extension TodoItem {
             let creationDateTimeInterval = dictionary[Properties.creationDate.stringValue] as? TimeInterval,
             let textColor = dictionary[Properties.textColor.stringValue] as? String
         else { return nil }
-        
+
         let creationDate = Date(timeIntervalSince1970: creationDateTimeInterval)
         let deadline = (dictionary[Properties.deadline.stringValue] as? TimeInterval)
             .map { interval in Date(timeIntervalSince1970: interval) }
         let modificationDate = (dictionary[Properties.modificationDate.stringValue] as? TimeInterval)
             .map { interval in Date(timeIntervalSince1970: interval) }
-        
+
         return TodoItem(
             id: id,
             text: text,
@@ -93,16 +93,16 @@ extension TodoItem {
             textColor: textColor
         )
     }
-    
+
 }
 
 // MARK: - CSV Parsing
 
 extension TodoItem {
-    
+
     static let csvColumnsDelimiter = ";"
     static let csvRowsDelimiter = "\r"
-    
+
     static var csvTitles: String {
         var values = [String]()
         values.append(Properties.id.stringValue)
@@ -115,7 +115,7 @@ extension TodoItem {
         values.append(Properties.textColor.stringValue)
         return values.joined(separator: TodoItem.csvColumnsDelimiter)
     }
-    
+
     var csv: String {
         var values = [String]()
         values.append(id.uuidString)
@@ -128,10 +128,10 @@ extension TodoItem {
         values.append(textColor)
         return values.joined(separator: TodoItem.csvColumnsDelimiter)
     }
-    
+
     static func parse(csv: String) -> TodoItem? {
         let columns = csv.components(separatedBy: TodoItem.csvColumnsDelimiter)
-        
+
         guard
             columns.count == 8,
             let id = UUID(uuidString: columns[0]),
@@ -140,14 +140,14 @@ extension TodoItem {
             isDoneInt == 0 || isDoneInt == 1,
             let creationDateTimeInterval = TimeInterval(columns[5])
         else { return nil }
-        
+
         let text = columns[1]
         let isDone = isDoneInt != 0
         let creationDate = Date(timeIntervalSince1970: creationDateTimeInterval)
         let deadline = TimeInterval(columns[3]).map { interval in Date(timeIntervalSince1970: interval) }
         let modificationDate = TimeInterval(columns[6]).map { interval in Date(timeIntervalSince1970: interval) }
         let textColor = columns[7]
-        
+
         return TodoItem(
             id: id,
             text: text,
@@ -159,5 +159,5 @@ extension TodoItem {
             textColor: textColor
         )
     }
-    
+
 }

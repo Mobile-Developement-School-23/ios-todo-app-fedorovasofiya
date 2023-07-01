@@ -8,7 +8,7 @@
 import Foundation
 
 struct L10n {
-    
+
     static let todoScreenTitle = "Дело"
     static let listScreenTitle = "Мои дела"
     static let cancelButtonTitle = "Отменить"
@@ -33,5 +33,5 @@ struct L10n {
     static let done = "Выполнено"
     static let info = "Информация"
     static let delete = "Удалить"
-    
+
 }

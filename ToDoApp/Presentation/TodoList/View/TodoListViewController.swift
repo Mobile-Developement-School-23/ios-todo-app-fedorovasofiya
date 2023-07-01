@@ -9,68 +9,68 @@ import UIKit
 import CocoaLumberjackSwift
 
 final class TodoListViewController: UIViewController {
-    
+
     enum Section: Hashable {
         case main
     }
-    
+
     enum Item: Hashable {
         case todoItem(TodoItemTableViewCell.DisplayData)
         case createNew
     }
-    
+
     // MARK: - Private Properties
-    
+
     private lazy var tableView = UITableView(frame: .zero, style: .insetGrouped)
     private lazy var dataSource = TodoListDataSource(tableView, viewOutput: viewOutput)
     private lazy var plusButton = UIButton()
     private lazy var completedLabel = UILabel()
     private lazy var completedAreShownButton = UIButton(type: .system)
     private lazy var headerView = UIView()
-    
+
     private var viewOutput: TodoListViewOutput
     private var animator: Animator
-    
+
     // MARK: - Life Cycle
-    
+
     init(viewOutput: TodoListViewOutput, animator: Animator) {
         self.viewOutput = viewOutput
         self.animator = animator
         super.init(nibName: nil, bundle: nil)
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor(named: "BackPrimary")
-        
+
         setupNavigationBar()
         setupHeaderView()
         setupTableView()
         setupPlusButton()
-        
+
         bindViewModel()
         viewOutput.loadItems()
         DDLogDebug("TodoListViewController's view loaded")
     }
-    
+
     // MARK: - UI Setup
-    
+
     private func setupNavigationBar() {
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.navigationBar.layoutMargins.left = Constants.titleMargin
         navigationItem.title = L10n.listScreenTitle
     }
-    
+
     private func setupHeaderView() {
         completedLabel.textColor = UIColor(named: "LabelTertiary")
         completedLabel.font = .systemFont(ofSize: Constants.fontSize)
         completedLabel.translatesAutoresizingMaskIntoConstraints = false
         headerView.addSubview(completedLabel)
-        
+
         completedAreShownButton.addAction(
             UIAction(handler: { [weak self] _ in
                 DDLogDebug("completedAreShownButton was tapped")
@@ -82,7 +82,7 @@ final class TodoListViewController: UIViewController {
         completedAreShownButton.titleLabel?.font = .boldSystemFont(ofSize: Constants.fontSize)
         completedAreShownButton.translatesAutoresizingMaskIntoConstraints = false
         headerView.addSubview(completedAreShownButton)
-        
+
         NSLayoutConstraint.activate([
             completedLabel.centerYAnchor.constraint(equalTo: headerView.centerYAnchor),
             completedLabel.leadingAnchor.constraint(equalTo: headerView.leadingAnchor, constant: Constants.margin),
@@ -94,7 +94,7 @@ final class TodoListViewController: UIViewController {
             headerView.heightAnchor.constraint(equalToConstant: Constants.headerHeight)
         ])
     }
-    
+
     private func setupTableView() {
         tableView.backgroundColor = nil
         tableView.estimatedRowHeight = Constants.estimatedRowHeight
@@ -105,7 +105,7 @@ final class TodoListViewController: UIViewController {
         tableView.delegate = self
         tableView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(tableView)
-        
+
         let safeArea = view.safeAreaLayoutGuide
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: safeArea.topAnchor),
@@ -114,7 +114,7 @@ final class TodoListViewController: UIViewController {
             tableView.trailingAnchor.constraint(equalTo: safeArea.trailingAnchor)
         ])
     }
-    
+
     private func setupPlusButton() {
         let imageConfig = UIImage.SymbolConfiguration(pointSize: 20, weight: .bold, scale: .large)
         let plusImage = UIImage(systemName: "plus", withConfiguration: imageConfig)?
@@ -128,7 +128,7 @@ final class TodoListViewController: UIViewController {
         plusButton.layer.shadowOffset = CGSize(width: 0, height: Constants.shadowOffsetY)
         plusButton.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(plusButton)
-        
+
         let safeArea = view.safeAreaLayoutGuide
         NSLayoutConstraint.activate([
             plusButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -136,33 +136,33 @@ final class TodoListViewController: UIViewController {
             plusButton.widthAnchor.constraint(equalToConstant: Constants.buttonSize),
             plusButton.heightAnchor.constraint(equalToConstant: Constants.buttonSize)
         ])
-        
+
         plusButton.addAction(
             UIAction(handler: { [weak self] _ in self?.viewOutput.didTapAdd() }),
             for: .touchUpInside
         )
     }
-    
+
     // MARK: - Tools
-    
+
     private func bindViewModel() {
         viewOutput.todoListUpdated = { [weak self] todoList in
             self?.updateDataSource(data: todoList, animated: true)
         }
-        
+
         viewOutput.completedItemsCountUpdated = { [weak self] completedItemsCount in
             self?.updateCompletedItemsCount(newValue: completedItemsCount)
         }
-        
+
         viewOutput.errorOccurred = { [weak self] description in
             self?.presentAlert(title: L10n.errorAlertTitle, message: description)
         }
     }
-    
+
     private func updateCompletedItemsCount(newValue: Int) {
         completedLabel.text = L10n.completed + String(newValue)
     }
-    
+
     private func updateDataSource(data: [TodoItemTableViewCell.DisplayData], animated: Bool = false) {
         var snapshot = NSDiffableDataSourceSnapshot<Section, Item>()
         snapshot.appendSections([.main])
@@ -170,7 +170,7 @@ final class TodoListViewController: UIViewController {
         snapshot.appendItems([Item.createNew])
         dataSource.apply(snapshot, animatingDifferences: animated)
     }
-    
+
     private func toggleCompletedAreShownButton() {
         if completedAreShownButton.currentTitle == L10n.showButton {
             viewOutput.changedCompletedAreShownValue(newValue: true)
@@ -180,40 +180,33 @@ final class TodoListViewController: UIViewController {
             completedAreShownButton.setTitle(L10n.showButton, for: .normal)
         }
     }
-    
+
 }
 
 // MARK: - UITableViewDelegate
 
 extension TodoListViewController: UITableViewDelegate {
-    
+
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         DDLogDebug("Cell with indexPath(\(indexPath)) was selected")
-        
+
         if indexPath.row == tableView.numberOfRows(inSection: 0) - 1 {
             guard tableView.cellForRow(at: indexPath) is CreateNewTableViewCell else { return }
             viewOutput.didTapAdd()
             return
         }
-        
-        guard
-            let cell = tableView.cellForRow(at: indexPath) as? TodoItemTableViewCell,
-            let displayedItemID = cell.displayedItemID
-        else {
-            return
-        }
+
+        guard let cell = tableView.cellForRow(at: indexPath) as? TodoItemTableViewCell,
+              let displayedItemID = cell.displayedItemID
+        else { return }
         viewOutput.didSelectItem(with: displayedItemID)
     }
-    
+
     func tableView(
-        _ tableView: UITableView,
-        leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath
+        _ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath
     ) -> UISwipeActionsConfiguration? {
-        guard indexPath.row != tableView.numberOfRows(inSection: 0) - 1
-        else {
-            return nil
-        }
-        
+        guard indexPath.row != tableView.numberOfRows(inSection: 0) - 1 else { return nil }
+
         let doneAction = UIContextualAction(style: .normal, title: nil) { [weak self] _, _, completion in
             guard
                 let cell = tableView.cellForRow(at: indexPath) as? TodoItemTableViewCell,
@@ -231,16 +224,12 @@ extension TodoListViewController: UITableViewDelegate {
         doneAction.backgroundColor = UIColor(named: "Green")
         return UISwipeActionsConfiguration(actions: [doneAction])
     }
-    
+
     func tableView(
-        _ tableView: UITableView,
-        trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath
+        _ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath
     ) -> UISwipeActionsConfiguration? {
-        guard indexPath.row != tableView.numberOfRows(inSection: 0) - 1
-        else {
-            return nil
-        }
-        
+        guard indexPath.row != tableView.numberOfRows(inSection: 0) - 1 else { return nil }
+
         let deleteAction = UIContextualAction(style: .destructive, title: nil) { [weak self] _, _, completion in
             guard
                 let cell = tableView.cellForRow(at: indexPath) as? TodoItemTableViewCell,
@@ -271,16 +260,12 @@ extension TodoListViewController: UITableViewDelegate {
         )
         return UISwipeActionsConfiguration(actions: [deleteAction, infoAction])
     }
-    
+
     func tableView(
-        _ tableView: UITableView,
-        contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint
+        _ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint
     ) -> UIContextMenuConfiguration? {
-        guard indexPath.row != tableView.numberOfRows(inSection: 0) - 1
-        else {
-            return nil
-        }
-        
+        guard indexPath.row != tableView.numberOfRows(inSection: 0) - 1 else { return nil }
+
         let doneAction = UIAction(title: L10n.done, image: UIImage(systemName: "checkmark")) { [weak self] _ in
             guard
                 let cell = tableView.cellForRow(at: indexPath) as? TodoItemTableViewCell,
@@ -294,7 +279,7 @@ extension TodoListViewController: UITableViewDelegate {
             systemName: "checkmark",
             withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)
         )
-        
+
         let infoAction = UIAction(title: L10n.info) { [weak self] _ in
             guard
                 let cell = tableView.cellForRow(at: indexPath) as? TodoItemTableViewCell,
@@ -309,7 +294,7 @@ extension TodoListViewController: UITableViewDelegate {
             systemName: "info",
             withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)
         )
-        
+
         let deleteAction = UIAction(
             title: L10n.delete,
             image: UIImage(systemName: "trash"),
@@ -327,15 +312,14 @@ extension TodoListViewController: UITableViewDelegate {
             systemName: "trash",
             withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)
         )
-        
+
         return UIContextMenuConfiguration(identifier: indexPath as NSIndexPath, previewProvider: nil) { _ in
             UIMenu(title: L10n.actions, children: [doneAction, infoAction, deleteAction])
         }
     }
-    
+
     func tableView(
-        _ tableView: UITableView,
-        willPerformPreviewActionForMenuWith configuration: UIContextMenuConfiguration,
+        _ tableView: UITableView, willPerformPreviewActionForMenuWith configuration: UIContextMenuConfiguration,
         animator: UIContextMenuInteractionCommitAnimating
     ) {
         DDLogDebug("willPerformPreviewActionForMenuWith")
@@ -349,21 +333,21 @@ extension TodoListViewController: UITableViewDelegate {
         tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
         viewOutput.didSelectItem(with: displayedItemID)
     }
-    
+
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return Constants.headerHeight
     }
-    
+
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         return headerView
     }
-    
+
 }
 
 // MARK: - UIViewControllerTransitioningDelegate
 
 extension TodoListViewController: UIViewControllerTransitioningDelegate {
-    
+
     func animationController(
         forPresented presented: UIViewController,
         presenting: UIViewController,
@@ -385,20 +369,19 @@ extension TodoListViewController: UIViewControllerTransitioningDelegate {
             width: animator.originFrame.size.width - 40,
             height: animator.originFrame.size.height - 40
         )
-        
+
         return animator
     }
-    
+
     func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         return nil
     }
-    
+
 }
 
 // MARK: - Constants
 
 extension TodoListViewController {
-    
     private struct Constants {
         static let margin: CGFloat = 16
         static let titleMargin: CGFloat = 32
@@ -412,42 +395,4 @@ extension TodoListViewController {
         static let fontSize: CGFloat = 15
         static let estimatedRowHeight: CGFloat = 56
     }
-    
-}
-
-// MARK: - Data Source
-
-final class TodoListDataSource:
-    UITableViewDiffableDataSource<TodoListViewController.Section, TodoListViewController.Item> {
-    
-    init(_ tableView: UITableView, viewOutput: TodoListViewOutput) {
-        super.init(tableView: tableView) { tableView, indexPath, itemIdentifier in
-            switch itemIdentifier {
-            case .todoItem(let displayData):
-                guard let cell = tableView.dequeueReusableCell(
-                    withIdentifier: TodoItemTableViewCell.reuseIdentifier,
-                    for: indexPath
-                ) as? TodoItemTableViewCell
-                else {
-                    return UITableViewCell()
-                }
-                cell.accessoryType = .disclosureIndicator
-                cell.checkmarkCallback = { displayedItemID in
-                    viewOutput.toggleIsDoneValue(for: displayedItemID)
-                }
-                cell.configure(with: displayData)
-                return cell
-            case .createNew:
-                guard let cell = tableView.dequeueReusableCell(
-                    withIdentifier: CreateNewTableViewCell.reuseIdentifier,
-                    for: indexPath
-                ) as? CreateNewTableViewCell
-                else {
-                    return UITableViewCell()
-                }
-                return cell
-            }
-        }
-    }
-    
 }

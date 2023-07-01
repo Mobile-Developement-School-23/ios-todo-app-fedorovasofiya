@@ -9,10 +9,10 @@ import UIKit
 import Foundation
 
 final class ColorSelectionSlider: ColorfulSlider {
-    
+
     private(set) var color: UIColor = .red
-    var colorChanged: ((UIColor) -> ())?
-    
+    var colorChanged: ((UIColor) -> Void)?
+
     init() {
         super.init(
             minimumValue: Constants.minValue,
@@ -21,13 +21,13 @@ final class ColorSelectionSlider: ColorfulSlider {
             colors: Constants.colors
         )
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     // MARK: - Actions
-    
+
     @objc override func colorValueChanged() {
         let value = round(self.value)
         color = getColorBy(number: Int(value))
@@ -35,7 +35,7 @@ final class ColorSelectionSlider: ColorfulSlider {
             colorChanged(color)
         }
     }
-    
+
 }
 
 // MARK: - Colors
@@ -49,7 +49,7 @@ extension ColorSelectionSlider {
         static let blue = UIColor(red: 0, green: 0, blue: 1, alpha: 1)
         static let pink = UIColor(red: 1, green: 0, blue: 1, alpha: 1)
     }
-    
+
     private func getColorBy(number: Int) -> UIColor {
         switch number {
         case 1, 7:

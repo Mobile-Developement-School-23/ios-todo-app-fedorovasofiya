@@ -9,19 +9,19 @@ import Foundation
 import UIKit
 
 final class RootCoordinatorImpl: RootCoordinator {
-    
+
     private weak var window: UIWindow?
     private var transitioningDelegate: UIViewControllerTransitioningDelegate?
     private lazy var fileCache = FileCacheImpl()
     private lazy var dateService = DateServiceImpl()
-    
+
     func start(in window: UIWindow) {
         self.window = window
         openTodoList()
     }
-    
+
     // MARK: - Navigation
-    
+
     private func openTodoList() {
         let viewModel = TodoListViewModel(fileCache: fileCache, dateService: dateService, coordinator: self)
         let animator = Animator()
@@ -31,8 +31,8 @@ final class RootCoordinatorImpl: RootCoordinator {
         window?.rootViewController = navigationController
         window?.makeKeyAndVisible()
     }
-    
-    private func openTodoItem(_ item: TodoItem?, itemStateChangedCallback: (() -> ())?) {
+
+    private func openTodoItem(_ item: TodoItem?, itemStateChangedCallback: (() -> Void)?) {
         let viewModel = TodoItemViewModel(
             todoItem: item,
             fileCache: fileCache,
@@ -45,7 +45,7 @@ final class RootCoordinatorImpl: RootCoordinator {
         window?.rootViewController?.dismiss(animated: true)
         window?.rootViewController?.present(navigationController, animated: true)
     }
-    
+
     private func closeTodoItem() {
         window?.rootViewController?.dismiss(animated: true)
     }
@@ -55,23 +55,23 @@ final class RootCoordinatorImpl: RootCoordinator {
 // MARK: - TodoListCoordinator
 
 extension RootCoordinatorImpl: TodoListCoordinator {
-    
-    func openDetails(of item: TodoItem, itemStateChangedCallback: (() -> ())?) {
+
+    func openDetails(of item: TodoItem, itemStateChangedCallback: (() -> Void)?) {
         openTodoItem(item, itemStateChangedCallback: itemStateChangedCallback)
     }
-    
-    func openCreationOfTodoItem(itemStateChangedCallback: (() -> ())?) {
+
+    func openCreationOfTodoItem(itemStateChangedCallback: (() -> Void)?) {
         openTodoItem(nil, itemStateChangedCallback: itemStateChangedCallback)
     }
-    
+
 }
 
 // MARK: - TodoItemCoordinator
 
 extension RootCoordinatorImpl: TodoItemCoordinator {
-    
+
     func closeDetails() {
         closeTodoItem()
     }
-    
+
 }

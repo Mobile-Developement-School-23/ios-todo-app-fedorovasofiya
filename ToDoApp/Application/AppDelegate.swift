@@ -10,7 +10,7 @@ import CocoaLumberjackSwift
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
-    
+
     var window: UIWindow?
     var coordinator: RootCoordinator?
 
@@ -18,7 +18,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
-        
+
         DDLog.add(DDOSLogger.sharedInstance)
         let window = UIWindow()
         self.window = window
