@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import CocoaLumberjackSwift
 
 final class TodoItemViewController: UIViewController {
     
@@ -72,6 +73,7 @@ final class TodoItemViewController: UIViewController {
         
         bindViewModel()
         viewOutput.loadItemIfExist()
+        DDLogDebug("TodoItemViewController's view loaded")
     }
     
     // MARK: - UI Setup

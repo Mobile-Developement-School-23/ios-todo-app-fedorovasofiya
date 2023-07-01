@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import CocoaLumberjackSwift
 
 final class TodoListViewController: UIViewController {
     
@@ -53,6 +54,7 @@ final class TodoListViewController: UIViewController {
         
         bindViewModel()
         viewOutput.loadItems()
+        DDLogDebug("TodoListViewController's view loaded")
     }
     
     // MARK: - UI Setup
@@ -71,6 +73,7 @@ final class TodoListViewController: UIViewController {
         
         completedAreShownButton.addAction(
             UIAction(handler: { [weak self] _ in
+                DDLogDebug("completedAreShownButton was tapped")
                 self?.toggleCompletedAreShownButton()
             }),
             for: .touchUpInside
@@ -185,6 +188,8 @@ final class TodoListViewController: UIViewController {
 extension TodoListViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        DDLogDebug("Cell with indexPath(\(indexPath)) was selected")
+        
         if indexPath.row == tableView.numberOfRows(inSection: 0) - 1 {
             guard tableView.cellForRow(at: indexPath) is CreateNewTableViewCell else { return }
             viewOutput.didTapAdd()
@@ -333,6 +338,7 @@ extension TodoListViewController: UITableViewDelegate {
         willPerformPreviewActionForMenuWith configuration: UIContextMenuConfiguration,
         animator: UIContextMenuInteractionCommitAnimating
     ) {
+        DDLogDebug("willPerformPreviewActionForMenuWith")
         guard let indexPath = configuration.identifier as? IndexPath else { return }
         guard
             let cell = tableView.cellForRow(at: indexPath) as? TodoItemTableViewCell,
@@ -363,7 +369,6 @@ extension TodoListViewController: UIViewControllerTransitioningDelegate {
         presenting: UIViewController,
         source: UIViewController
     ) -> UIViewControllerAnimatedTransitioning? {
-        
         guard
             let selectedIndexPathCell = tableView.indexPathForSelectedRow,
             let selectedCell = tableView.cellForRow(at: selectedIndexPathCell) as? TodoItemTableViewCell
