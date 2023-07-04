@@ -43,7 +43,6 @@ final class TodoItemViewModel: TodoItemViewOutput {
         guard let todoItem = todoItem else { return }
         fileCache.addItem(todoItem)
         saveChanges()
-        DDLogInfo("Item with id \(todoItem.id) was saved")
 
         if let successfullySaved = successfullySaved {
             successfullySaved()
@@ -57,7 +56,6 @@ final class TodoItemViewModel: TodoItemViewOutput {
         guard let id = todoItem?.id else { return }
         fileCache.deleteItem(with: id)
         saveChanges()
-        DDLogInfo("Item with id \(id) was deleted")
 
         if let successfullyDeleted = successfullyDeleted {
             successfullyDeleted()

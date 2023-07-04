@@ -11,7 +11,7 @@ import UIKit
 final class RootCoordinatorImpl: RootCoordinator {
 
     private weak var window: UIWindow?
-    private var transitioningDelegate: UIViewControllerTransitioningDelegate?
+    private weak var transitioningDelegate: UIViewControllerTransitioningDelegate?
     private lazy var fileCache = FileCacheImpl()
     private lazy var dateService = DateServiceImpl()
 

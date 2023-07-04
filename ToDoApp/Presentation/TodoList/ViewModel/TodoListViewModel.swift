@@ -59,7 +59,6 @@ final class TodoListViewModel: TodoListViewOutput {
         guard let item = fileCache.todoItems[id] else { return }
         let newIsDoneValue = item.isDone ? false : true
         changeIsDoneValue(for: item, newIsDoneValue: newIsDoneValue)
-        DDLogInfo("For item with id \(item.id) changed isDoneValue: \(newIsDoneValue)")
         updateDataFromFileCache()
         sendData()
     }
@@ -67,7 +66,6 @@ final class TodoListViewModel: TodoListViewOutput {
     func deleteItem(with id: UUID) {
         guard let item = fileCache.todoItems[id] else { return }
         fileCache.deleteItem(with: item.id)
-        DDLogInfo("Item with id \(item.id) was deleted")
         saveChanges()
         updateDataFromFileCache()
         sendData()

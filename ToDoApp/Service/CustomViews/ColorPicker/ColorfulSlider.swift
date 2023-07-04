@@ -14,7 +14,6 @@ class ColorfulSlider: UIView {
         return slider.value
     }
 
-    private lazy var imageView = UIImageView()
     private lazy var slider = UISlider()
     private lazy var gradientLayer = CAGradientLayer()
 
@@ -37,26 +36,12 @@ class ColorfulSlider: UIView {
 
     override func layoutSubviews() {
         super.layoutSubviews()
-        gradientLayer.frame = imageView.frame
+        gradientLayer.frame = self.bounds
     }
 
     override func draw(_ rect: CGRect) {
-        setupColorImageView()
-        setupColorSlider()
         setupColorGradientLayer(cornerRadius: rect.height / 2)
-    }
-
-    private func setupColorImageView() {
-        imageView.frame = frame
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        self.addSubview(imageView)
-
-        NSLayoutConstraint.activate([
-            imageView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
-            imageView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
-            imageView.topAnchor.constraint(equalTo: self.topAnchor),
-            imageView.bottomAnchor.constraint(equalTo: self.bottomAnchor)
-        ])
+        setupColorSlider()
     }
 
     private func setupColorSlider() {
@@ -82,7 +67,7 @@ class ColorfulSlider: UIView {
         gradientLayer.startPoint = CGPoint(x: 0.0, y: 0.0)
         gradientLayer.endPoint = CGPoint(x: 1.0, y: 0.0)
         gradientLayer.colors = colors
-        imageView.layer.addSublayer(gradientLayer)
+        self.layer.addSublayer(gradientLayer)
     }
 
     func changeColors(colors: [CGColor]) {
