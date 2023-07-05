@@ -88,6 +88,6 @@ extension ImportanceView {
         static let margin: CGFloat = 16
         static let mediumMargin: CGFloat = 12
         static let fontSize: CGFloat = 17
-        static let separatorHeight: CGFloat = 1 / UIScreen.main.scale
+        @MainActor static let separatorHeight: CGFloat = 1 / UIScreen.main.scale
     }
 }

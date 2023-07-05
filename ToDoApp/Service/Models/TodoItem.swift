@@ -9,8 +9,15 @@ import Foundation
 
 struct TodoItem: Hashable {
 
-    private enum Properties: CodingKey {
-        case id, text, importance, deadline, isDone, creationDate, modificationDate, textColor
+    private enum CodingKeys: String, CodingKey {
+        case id
+        case text
+        case importance
+        case deadline
+        case isDone = "done"
+        case creationDate = "created_at"
+        case modificationDate = "changed_at"
+        case textColor = "color"
     }
 
     let id: UUID
@@ -50,36 +57,36 @@ extension TodoItem {
 
     var json: Any {
         var dictionary: [String: Any] = [:]
-        dictionary[Properties.id.stringValue] = id.uuidString
-        dictionary[Properties.text.stringValue] = text
+        dictionary[CodingKeys.id.rawValue] = id.uuidString
+        dictionary[CodingKeys.text.rawValue] = text
         if importance != .regular {
-            dictionary[Properties.importance.stringValue] = importance.rawValue
+            dictionary[CodingKeys.importance.rawValue] = importance.rawValue
         }
-        dictionary[Properties.deadline.stringValue] = deadline?.timeIntervalSince1970
-        dictionary[Properties.isDone.stringValue] = isDone
-        dictionary[Properties.creationDate.stringValue] = creationDate.timeIntervalSince1970
-        dictionary[Properties.modificationDate.stringValue] = modificationDate?.timeIntervalSince1970
-        dictionary[Properties.textColor.stringValue] = textColor
+        dictionary[CodingKeys.deadline.rawValue] = deadline?.timeIntervalSince1970
+        dictionary[CodingKeys.isDone.rawValue] = isDone
+        dictionary[CodingKeys.creationDate.rawValue] = creationDate.timeIntervalSince1970
+        dictionary[CodingKeys.modificationDate.rawValue] = modificationDate?.timeIntervalSince1970
+        dictionary[CodingKeys.textColor.rawValue] = textColor
         return dictionary
     }
 
     static func parse(json: Any) -> TodoItem? {
         guard
             let dictionary = json as? [String: Any],
-            let idString = dictionary[Properties.id.stringValue] as? String,
+            let idString = dictionary[CodingKeys.id.rawValue] as? String,
             let id = UUID(uuidString: idString),
-            let text = dictionary[Properties.text.stringValue] as? String,
-            let importance = (dictionary[Properties.importance.stringValue] as? String)
+            let text = dictionary[CodingKeys.text.rawValue] as? String,
+            let importance = (dictionary[CodingKeys.importance.rawValue] as? String)
                 .map(Importance.init(rawValue:)) ?? Importance.regular,
-            let isDone = dictionary[Properties.isDone.stringValue] as? Bool,
-            let creationDateTimeInterval = dictionary[Properties.creationDate.stringValue] as? TimeInterval,
-            let textColor = dictionary[Properties.textColor.stringValue] as? String
+            let isDone = dictionary[CodingKeys.isDone.rawValue] as? Bool,
+            let creationDateTimeInterval = dictionary[CodingKeys.creationDate.rawValue] as? TimeInterval,
+            let textColor = dictionary[CodingKeys.textColor.rawValue] as? String
         else { return nil }
 
         let creationDate = Date(timeIntervalSince1970: creationDateTimeInterval)
-        let deadline = (dictionary[Properties.deadline.stringValue] as? TimeInterval)
+        let deadline = (dictionary[CodingKeys.deadline.rawValue] as? TimeInterval)
             .map { interval in Date(timeIntervalSince1970: interval) }
-        let modificationDate = (dictionary[Properties.modificationDate.stringValue] as? TimeInterval)
+        let modificationDate = (dictionary[CodingKeys.modificationDate.rawValue] as? TimeInterval)
             .map { interval in Date(timeIntervalSince1970: interval) }
 
         return TodoItem(
@@ -105,14 +112,14 @@ extension TodoItem {
 
     static var csvTitles: String {
         var values = [String]()
-        values.append(Properties.id.stringValue)
-        values.append(Properties.text.stringValue)
-        values.append(Properties.importance.stringValue)
-        values.append(Properties.deadline.stringValue)
-        values.append(Properties.isDone.stringValue)
-        values.append(Properties.creationDate.stringValue)
-        values.append(Properties.modificationDate.stringValue)
-        values.append(Properties.textColor.stringValue)
+        values.append(CodingKeys.id.rawValue)
+        values.append(CodingKeys.text.rawValue)
+        values.append(CodingKeys.importance.rawValue)
+        values.append(CodingKeys.deadline.rawValue)
+        values.append(CodingKeys.isDone.rawValue)
+        values.append(CodingKeys.creationDate.rawValue)
+        values.append(CodingKeys.modificationDate.rawValue)
+        values.append(CodingKeys.textColor.rawValue)
         return values.joined(separator: TodoItem.csvColumnsDelimiter)
     }
 

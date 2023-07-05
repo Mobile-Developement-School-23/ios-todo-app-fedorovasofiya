@@ -65,6 +65,7 @@ final class TodoItemViewModel: TodoItemViewOutput {
         }
     }
 
+    @MainActor
     func close() {
         coordinator?.closeDetails()
     }
@@ -75,7 +76,6 @@ final class TodoItemViewModel: TodoItemViewOutput {
         do {
             try fileCache.saveItemsToJSON(fileName: cacheFileName)
         } catch {
-            DDLogError(error)
             if let errorOccurred = errorOccurred {
                 errorOccurred(error.localizedDescription)
             }

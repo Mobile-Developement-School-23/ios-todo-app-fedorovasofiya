@@ -16,5 +16,5 @@ protocol TodoItemViewOutput {
     func loadItemIfExist()
     func saveItem(text: String, importance: Importance, deadline: Date?, textColor: String)
     func deleteItem()
-    func close()
+    @MainActor func close()
 }

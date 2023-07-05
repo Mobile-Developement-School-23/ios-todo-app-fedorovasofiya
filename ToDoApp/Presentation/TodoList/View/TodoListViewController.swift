@@ -53,7 +53,7 @@ final class TodoListViewController: UIViewController {
         setupPlusButton()
 
         bindViewModel()
-        viewOutput.loadItems()
+        viewOutput.viewDidLoad()
     }
 
     // MARK: - UI Setup

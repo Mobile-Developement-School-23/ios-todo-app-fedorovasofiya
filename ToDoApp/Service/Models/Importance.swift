@@ -9,8 +9,8 @@ import Foundation
 
 enum Importance: String {
 
-    case unimportant
-    case regular
+    case unimportant = "low"
+    case regular = "basic"
     case important
 
     var index: Int {

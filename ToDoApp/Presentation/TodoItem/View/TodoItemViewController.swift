@@ -392,6 +392,6 @@ extension TodoItemViewController {
         static let fontSize: CGFloat = 17
         static let cornerRadius: CGFloat = 16
         static let datePickerHeight: CGFloat = 312
-        static let separatorHeight: CGFloat = 1 / UIScreen.main.scale
+        @MainActor static let separatorHeight: CGFloat = 1 / UIScreen.main.scale
     }
 }
