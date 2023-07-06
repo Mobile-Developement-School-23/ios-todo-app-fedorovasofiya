@@ -13,8 +13,8 @@ protocol FileCache {
     func updateIsDirtyValue(by newValue: Bool)
     func addItem(_ item: TodoItem)
     func deleteItem(with id: UUID)
-    func saveItemsToJSON(fileName: String) throws
-    func loadItemsFromJSON(fileName: String) throws
-    func saveItemsToCSV(fileName: String) throws
-    func loadItemsFromCSV(fileName: String) throws
+    func saveItemsToJSON(fileName: String) async throws
+    func loadItemsFromJSON(fileName: String) async throws
+    func saveItemsToCSV(fileName: String) async throws
+    func loadItemsFromCSV(fileName: String) async throws
 }

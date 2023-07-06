@@ -43,13 +43,8 @@ final class TodoItemViewModel: TodoItemViewOutput {
     func saveItem(text: String, importance: Importance, deadline: Date?, textColor: String) {
         let newItem = getTodoItem(text: text, importance: importance, deadline: deadline, textColor: textColor)
         let isNewItem = todoItem == nil ? true : false
-        self.todoItem = newItem
-        fileCache.addItem(newItem)
-        saveDataToLocalStorage()
-
-        if let dataChanged = dataChanged {
-            dataChanged()
-        }
+        todoItem = newItem
+        saveItemToCache(newItem)
 
         if fileCache.isDirty {
             syncData()
@@ -62,12 +57,7 @@ final class TodoItemViewModel: TodoItemViewOutput {
 
     func deleteItem() {
         guard let id = todoItem?.id else { return }
-        fileCache.deleteItem(with: id)
-        saveDataToLocalStorage()
-
-        if let dataChanged = dataChanged {
-            dataChanged()
-        }
+        deleteItemFromCache(with: id)
 
         if fileCache.isDirty {
             syncData()
@@ -107,13 +97,13 @@ final class TodoItemViewModel: TodoItemViewOutput {
             guard let self = self else { return }
             do {
                 try await self.networkService.addTodoItem(item)
-                if let changesSaved = changesSaved {
+                if let changesSaved = self.changesSaved {
                     changesSaved()
                 }
             } catch {
                 DDLogError(error.localizedDescription)
-                fileCache.updateIsDirtyValue(by: true)
-                if let errorOccurred = errorOccurred {
+                self.fileCache.updateIsDirtyValue(by: true)
+                if let errorOccurred = self.errorOccurred {
                     errorOccurred(error.localizedDescription)
                 }
             }
@@ -125,13 +115,13 @@ final class TodoItemViewModel: TodoItemViewOutput {
             guard let self = self else { return }
             do {
                 try await self.networkService.changeTodoItem(item)
-                if let changesSaved = changesSaved {
+                if let changesSaved = self.changesSaved {
                     changesSaved()
                 }
             } catch {
                 DDLogError(error.localizedDescription)
-                fileCache.updateIsDirtyValue(by: true)
-                if let errorOccurred = errorOccurred {
+                self.fileCache.updateIsDirtyValue(by: true)
+                if let errorOccurred = self.errorOccurred {
                     errorOccurred(error.localizedDescription)
                 }
             }
@@ -143,13 +133,13 @@ final class TodoItemViewModel: TodoItemViewOutput {
             guard let self = self else { return }
             do {
                 try await self.networkService.deleteTodoItem(id: id.uuidString)
-                if let changesSaved = changesSaved {
+                if let changesSaved = self.changesSaved {
                     changesSaved()
                 }
             } catch {
                 DDLogError(error.localizedDescription)
-                fileCache.updateIsDirtyValue(by: true)
-                if let errorOccurred = errorOccurred {
+                self.fileCache.updateIsDirtyValue(by: true)
+                if let errorOccurred = self.errorOccurred {
                     errorOccurred(error.localizedDescription)
                 }
             }
@@ -163,16 +153,13 @@ final class TodoItemViewModel: TodoItemViewOutput {
                 let currentTodoList = Array(self.fileCache.todoItems.values)
                 let todoList = try await self.networkService.syncTodoList(currentTodoList)
                 self.updateCache(with: todoList)
-                fileCache.updateIsDirtyValue(by: false)
-                if let dataChanged = dataChanged {
-                    dataChanged()
-                }
-                if let changesSaved = changesSaved {
+                self.fileCache.updateIsDirtyValue(by: false)
+                if let changesSaved = self.changesSaved {
                     changesSaved()
                 }
             } catch {
                 DDLogError(error.localizedDescription)
-                if let errorOccurred = errorOccurred {
+                if let errorOccurred = self.errorOccurred {
                     errorOccurred(error.localizedDescription)
                 }
             }
@@ -181,17 +168,39 @@ final class TodoItemViewModel: TodoItemViewOutput {
 
     // MARK: - Caching
 
+    private func deleteItemFromCache(with id: UUID) {
+        fileCache.deleteItem(with: id)
+        saveDataToLocalStorage()
+        if let dataChanged = dataChanged {
+            dataChanged()
+        }
+    }
+
+    private func saveItemToCache(_ item: TodoItem) {
+        fileCache.addItem(item)
+        saveDataToLocalStorage()
+        if let dataChanged = dataChanged {
+            dataChanged()
+        }
+    }
+
     private func updateCache(with todoList: [TodoItem]) {
         fileCache.todoItems.keys.forEach(fileCache.deleteItem(with:))
         todoList.forEach(self.fileCache.addItem(_:))
         saveDataToLocalStorage()
+        if let dataChanged = dataChanged {
+            dataChanged()
+        }
     }
 
     private func saveDataToLocalStorage() {
-        do {
-            try fileCache.saveItemsToJSON(fileName: cacheFileName)
-        } catch {
-            DDLogError(error.localizedDescription)
+        Task(priority: .utility) { [weak self] in
+            guard let self = self else { return }
+            do {
+                try await self.fileCache.saveItemsToJSON(fileName: self.cacheFileName)
+            } catch {
+                DDLogError(error.localizedDescription)
+            }
         }
     }
 

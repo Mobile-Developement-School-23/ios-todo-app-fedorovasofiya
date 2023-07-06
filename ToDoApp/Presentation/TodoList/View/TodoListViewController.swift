@@ -51,7 +51,7 @@ final class TodoListViewController: UIViewController {
         setupHeaderView()
         setupTableView()
         setupPlusButton()
-
+        updateDataSource(data: [])
         bindViewModel()
         viewOutput.viewDidLoad()
     }
@@ -65,6 +65,7 @@ final class TodoListViewController: UIViewController {
     }
 
     private func setupHeaderView() {
+        headerView.isHidden = true
         completedLabel.textColor = UIColor(named: "LabelTertiary")
         completedLabel.font = .systemFont(ofSize: Constants.fontSize)
         completedLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -145,6 +146,7 @@ final class TodoListViewController: UIViewController {
 
     private func bindViewModel() {
         viewOutput.todoListUpdated = { [weak self] todoList in
+            self?.headerView.isHidden = false
             self?.updateDataSource(data: todoList, animated: true)
         }
 
