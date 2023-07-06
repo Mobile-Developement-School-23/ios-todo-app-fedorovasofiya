@@ -50,7 +50,12 @@ final class TodoListViewModel: TodoListViewOutput {
 
     func viewDidLoad() {
         sendData()
-        loadTodoList()
+
+        if fileCache.isDirty {
+            syncTodoList()
+        } else {
+            loadTodoList()
+        }
     }
 
     func changedCompletedAreShownValue(newValue: Bool) {

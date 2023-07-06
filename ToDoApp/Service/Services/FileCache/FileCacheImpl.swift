@@ -7,10 +7,17 @@
 
 import Foundation
 
-class FileCacheImpl: FileCache {
+final class FileCacheImpl: FileCache {
 
     private(set) var todoItems: [UUID: TodoItem] = [:]
-    private(set) var isDirty: Bool = false
+    private(set) var isDirty: Bool {
+        get {
+            UserDefaults.standard.bool(forKey: "isDirty")
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: "isDirty")
+        }
+    }
 
     // MARK: - Public Methods
 
