@@ -14,6 +14,7 @@ final class TodoListViewModel: TodoListViewOutput {
     var completedItemsCountUpdated: ((Int) -> Void)?
     var todoListUpdated: (([TodoItemTableViewCell.DisplayData]) -> Void)?
     var errorOccurred: ((String) -> Void)?
+    var updateActivityIndicatorState: ((Bool) -> Void)?
 
     // MARK: - Private Properties
 
@@ -52,6 +53,8 @@ final class TodoListViewModel: TodoListViewOutput {
             await loadDataFromLocalStorage()
             sendData()
 
+            handleActivityIndicator(by: true)
+            networkService.incrementNumberOfTasks()
             if fileCache.isDirty {
                 syncTodoList()
             } else {
@@ -72,6 +75,8 @@ final class TodoListViewModel: TodoListViewOutput {
         sendData()
         saveDataToLocalStorage()
 
+        handleActivityIndicator(by: true)
+        networkService.incrementNumberOfTasks()
         if fileCache.isDirty {
             syncTodoList()
         } else {
@@ -84,6 +89,8 @@ final class TodoListViewModel: TodoListViewOutput {
         sendData()
         saveDataToLocalStorage()
 
+        handleActivityIndicator(by: true)
+        networkService.incrementNumberOfTasks()
         if fileCache.isDirty {
             syncTodoList()
         } else {
@@ -149,9 +156,17 @@ final class TodoListViewModel: TodoListViewOutput {
         }
     }
 
+    private func handleActivityIndicator(by state: Bool) {
+        if networkService.numberOfTasks == 0,
+           let updateActivityIndicatorState = updateActivityIndicatorState {
+            updateActivityIndicatorState(state)
+        }
+    }
+
     // MARK: - Networking
 
     private func syncTodoList() {
+        DDLogError(#function)
         Task(priority: .userInitiated) { [weak self] in
             guard let self = self else { return }
             do {
@@ -161,11 +176,13 @@ final class TodoListViewModel: TodoListViewOutput {
                 self.saveDataToLocalStorage()
                 self.fileCache.updateIsDirtyValue(by: false)
             } catch {
-                DDLogError(error.localizedDescription)
+                DDLogError("\(#function): \(error.localizedDescription)")
                 if let errorOccurred = self.errorOccurred {
                     errorOccurred(error.localizedDescription)
                 }
             }
+            self.networkService.decrementNumberOfTasks()
+            self.handleActivityIndicator(by: false)
         }
     }
 
@@ -179,39 +196,58 @@ final class TodoListViewModel: TodoListViewOutput {
                 self.saveDataToLocalStorage()
             } catch {
                 DDLogError(error.localizedDescription)
-                self.fileCache.updateIsDirtyValue(by: true)
                 if let errorOccurred = self.errorOccurred {
                     errorOccurred(error.localizedDescription)
                 }
             }
+            self.networkService.decrementNumberOfTasks()
+            self.handleActivityIndicator(by: false)
         }
     }
 
-    private func changeTodoItem(_ item: TodoItem) {
+    private func changeTodoItem(_ item: TodoItem, retryDelay: Int = Backoff.minDelay) {
+        DDLogError(#function)
         Task(priority: .userInitiated) { [weak self] in
             guard let self = self else { return }
             do {
                 try await self.networkService.changeTodoItem(item)
+                self.networkService.decrementNumberOfTasks()
+                self.handleActivityIndicator(by: false)
             } catch {
-                DDLogError(error.localizedDescription)
-                self.fileCache.updateIsDirtyValue(by: true)
-                if let errorOccurred = self.errorOccurred {
-                    errorOccurred(error.localizedDescription)
+                DDLogError("\(#function): \(error.localizedDescription)")
+                if retryDelay < Backoff.maxDelay,
+                   let requestError = error as? RequestError,
+                   case .serverError = requestError {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(retryDelay)) {
+                        self.changeTodoItem(item, retryDelay: Backoff.getNextDelay(from: retryDelay))
+                    }
+                } else {
+                    self.fileCache.updateIsDirtyValue(by: true)
+                    self.syncTodoList()
                 }
             }
         }
     }
 
-    private func deleteTodoItem(with id: UUID) {
+    private func deleteTodoItem(with id: UUID, retryDelay: Int = Backoff.minDelay) {
+        DDLogError(#function)
         Task(priority: .userInitiated) { [weak self] in
             guard let self = self else { return }
             do {
                 try await self.networkService.deleteTodoItem(id: id.uuidString)
+                self.networkService.decrementNumberOfTasks()
+                self.handleActivityIndicator(by: false)
             } catch {
-                DDLogError(error.localizedDescription)
-                self.fileCache.updateIsDirtyValue(by: true)
-                if let errorOccurred = self.errorOccurred {
-                    errorOccurred(error.localizedDescription)
+                DDLogError("\(#function): \(error.localizedDescription)")
+                if retryDelay < Backoff.maxDelay,
+                   let requestError = error as? RequestError,
+                   case .serverError = requestError {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(retryDelay)) {
+                        self.deleteTodoItem(with: id, retryDelay: Backoff.getNextDelay(from: retryDelay))
+                    }
+                } else {
+                    self.fileCache.updateIsDirtyValue(by: true)
+                    self.syncTodoList()
                 }
             }
         }

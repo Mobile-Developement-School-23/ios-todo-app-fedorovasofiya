@@ -16,6 +16,7 @@ final class NetworkServiceImpl: NetworkService {
         static let token = "throatless"
     }
 
+    private(set) var numberOfTasks = 0
     private let urlSession: URLSession
     private var revision: Int = 0
     private let deviceID: String
@@ -26,6 +27,14 @@ final class NetworkServiceImpl: NetworkService {
     }
 
     // MARK: - Public Methods
+
+    func incrementNumberOfTasks() {
+        numberOfTasks += 1
+    }
+
+    func decrementNumberOfTasks() {
+        numberOfTasks -= 1
+    }
 
     func loadTodoList() async throws -> [TodoItem] {
         let request = try makeGetRequest(path: "/\(Configuration.path)/list")

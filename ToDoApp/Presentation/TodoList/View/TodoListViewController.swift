@@ -1,10 +1,3 @@
-//
-//  TodoListViewController.swift
-//  ToDoApp
-//
-//  Created by Sonya Fedorova on 28.06.2023.
-//
-
 import UIKit
 import CocoaLumberjackSwift
 
@@ -27,6 +20,7 @@ final class TodoListViewController: UIViewController {
     private lazy var completedLabel = UILabel()
     private lazy var completedAreShownButton = UIButton(type: .system)
     private lazy var headerView = UIView()
+    private lazy var activityIndicator = UIActivityIndicatorView()
 
     private var viewOutput: TodoListViewOutput
     private var animator: Animator
@@ -62,6 +56,7 @@ final class TodoListViewController: UIViewController {
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.navigationBar.layoutMargins.left = Constants.titleMargin
         navigationItem.title = L10n.listScreenTitle
+        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: activityIndicator)
     }
 
     private func setupHeaderView() {
@@ -156,6 +151,14 @@ final class TodoListViewController: UIViewController {
 
         viewOutput.errorOccurred = { [weak self] description in
             self?.presentAlert(title: L10n.errorAlertTitle, message: description)
+        }
+
+        viewOutput.updateActivityIndicatorState = { [weak self] isActive in
+            if isActive {
+                self?.activityIndicator.startAnimating()
+            } else {
+                self?.activityIndicator.stopAnimating()
+            }
         }
     }
 

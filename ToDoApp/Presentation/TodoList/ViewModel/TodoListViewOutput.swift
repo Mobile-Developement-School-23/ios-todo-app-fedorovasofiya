@@ -11,6 +11,7 @@ import Foundation
 protocol TodoListViewOutput {
     var completedItemsCountUpdated: ((Int) -> Void)? { get set }
     var todoListUpdated: (([TodoItemTableViewCell.DisplayData]) -> Void)? { get set }
+    var updateActivityIndicatorState: ((Bool) -> Void)? { get set }
     var errorOccurred: ((String) -> Void)? { get set }
     func viewDidLoad()
     func changedCompletedAreShownValue(newValue: Bool)
