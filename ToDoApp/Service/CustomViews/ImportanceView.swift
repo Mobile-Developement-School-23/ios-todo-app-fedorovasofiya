@@ -12,6 +12,7 @@ final class ImportanceView: UIView {
     private lazy var importanceLabel = UILabel()
     private lazy var importanceControl = UISegmentedControl()
     private lazy var separator = UIView()
+    private var selectedIndex = 1
 
     override func draw(_ rect: CGRect) {
         setupImportanceLabel()
@@ -24,7 +25,7 @@ final class ImportanceView: UIView {
     }
 
     func setSelectedIndex(_ index: Int) {
-        importanceControl.selectedSegmentIndex = index
+        selectedIndex = index
     }
 
     private func setupImportanceLabel() {
@@ -54,7 +55,7 @@ final class ImportanceView: UIView {
         importanceControl.insertSegment(with: arrowImage, at: 0, animated: true)
         importanceControl.insertSegment(withTitle: L10n.regularImportanceChoice, at: 1, animated: true)
         importanceControl.insertSegment(with: exclamationmarkImage, at: 2, animated: true)
-        importanceControl.selectedSegmentIndex = 1
+        importanceControl.selectedSegmentIndex = selectedIndex
 
         importanceControl.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(importanceControl)

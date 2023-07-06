@@ -10,8 +10,9 @@ import Foundation
 enum RequestError: Error {
     case wrongURL(URLComponents)
     case unexpectedResponse
-    case redirect
     case badRequest
+    case wrongAuth
+    case notFound
     case serverError
     case unexpectedStatusCode(Int)
 }
@@ -23,10 +24,12 @@ extension RequestError: LocalizedError {
             return "Could not construct url with components: \(urlComponents)"
         case .unexpectedResponse:
             return "Unexpected response from server"
-        case .redirect:
-            return "Redirect"
         case .badRequest:
-            return "Bad request"
+            return "Wrong request or unsynchronized data"
+        case .wrongAuth:
+            return "Wrong authorization"
+        case .notFound:
+            return "Element not found"
         case .serverError:
             return "Server error"
         case .unexpectedStatusCode(let code):

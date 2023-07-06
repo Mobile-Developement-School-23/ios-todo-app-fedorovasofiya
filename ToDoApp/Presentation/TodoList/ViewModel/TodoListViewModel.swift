@@ -22,9 +22,11 @@ final class TodoListViewModel: TodoListViewOutput {
     private var todoList: [TodoItem] = []
 
     private lazy var cacheFileName = "cache"
-    private lazy var itemStateChangedCallback: (() -> Void)? = { [weak self] in
-        self?.loadTodoList // TODO
-    }()
+    private lazy var dataChangedCallback: (() -> Void)? = { [weak self] in
+        guard let self = self else { return }
+        self.updateData(with: Array(self.fileCache.todoItems.values))
+        self.sendData()
+    }
 
     private let networkService: NetworkService
     private let fileCache: FileCache
@@ -41,7 +43,7 @@ final class TodoListViewModel: TodoListViewOutput {
         self.fileCache = fileCache
         self.dateService = dateService
         self.coordinator = coordinator
-        loadDataFromCache()
+        loadDataFromLocalStorage()
     }
 
     // MARK: - Public Methods
@@ -59,27 +61,36 @@ final class TodoListViewModel: TodoListViewOutput {
     func toggleIsDoneValue(for id: UUID) {
         guard let item = fileCache.todoItems[id] else { return }
         let newItem = getUpdatedItem(for: item, newIsDoneValue: item.isDone ? false : true)
-        fileCache.addItem(newItem)
-        updateData(with: Array(fileCache.todoItems.values))
+        updateItemInCache(newItem)
         sendData()
-        saveDataToCache()
+        saveDataToLocalStorage()
+
+        if fileCache.isDirty {
+            syncTodoList()
+        } else {
+            changeTodoItem(newItem)
+        }
     }
 
     func deleteItem(with id: UUID) {
-        guard let item = fileCache.todoItems[id] else { return }
-        fileCache.deleteItem(with: item.id)
-        updateData(with: Array(fileCache.todoItems.values))
+        deleteFromCacheItem(with: id)
         sendData()
-        saveDataToCache()
+        saveDataToLocalStorage()
+
+        if fileCache.isDirty {
+            syncTodoList()
+        } else {
+            deleteTodoItem(with: id)
+        }
     }
 
     func didSelectItem(with id: UUID) {
         guard let item = fileCache.todoItems[id] else { return }
-        coordinator?.openDetails(of: item, itemStateChangedCallback: itemStateChangedCallback)
+        coordinator?.openDetails(of: item, dataChangedCallback: dataChangedCallback)
     }
 
     func didTapAdd() {
-        coordinator?.openCreationOfTodoItem(itemStateChangedCallback: itemStateChangedCallback)
+        coordinator?.openCreationOfTodoItem(dataChangedCallback: dataChangedCallback)
     }
 
     // MARK: - Private Methods
@@ -114,7 +125,7 @@ final class TodoListViewModel: TodoListViewOutput {
             deadline: item.deadline,
             isDone: newIsDoneValue,
             creationDate: item.creationDate,
-            modificationDate: item.modificationDate,
+            modificationDate: Date(),
             textColor: item.textColor
         )
     }
@@ -133,15 +144,65 @@ final class TodoListViewModel: TodoListViewOutput {
 
     // MARK: - Networking
 
+    private func syncTodoList() {
+        Task(priority: .userInitiated) { [weak self] in
+            guard let self = self else { return }
+            do {
+                let todoList = try await self.networkService.syncTodoList(todoList)
+                self.updateCache(with: todoList)
+                self.sendData()
+                self.saveDataToLocalStorage()
+                fileCache.updateIsDirtyValue(by: false)
+            } catch {
+                DDLogError(error.localizedDescription)
+                if let errorOccurred = errorOccurred {
+                    errorOccurred(error.localizedDescription)
+                }
+            }
+        }
+    }
+
     private func loadTodoList() {
         Task(priority: .userInitiated) { [weak self] in
             guard let self = self else { return }
             do {
                 let todoList = try await self.networkService.loadTodoList()
-                self.updateData(with: todoList)
+                self.updateCache(with: todoList)
                 self.sendData()
-                self.updateCache()
+                self.saveDataToLocalStorage()
             } catch {
+                DDLogError(error.localizedDescription)
+                fileCache.updateIsDirtyValue(by: true)
+                if let errorOccurred = errorOccurred {
+                    errorOccurred(error.localizedDescription)
+                }
+            }
+        }
+    }
+
+    private func changeTodoItem(_ item: TodoItem) {
+        Task(priority: .userInitiated) { [weak self] in
+            guard let self = self else { return }
+            do {
+                try await self.networkService.changeTodoItem(item)
+            } catch {
+                DDLogError(error.localizedDescription)
+                fileCache.updateIsDirtyValue(by: true)
+                if let errorOccurred = errorOccurred {
+                    errorOccurred(error.localizedDescription)
+                }
+            }
+        }
+    }
+
+    private func deleteTodoItem(with id: UUID) {
+        Task(priority: .userInitiated) { [weak self] in
+            guard let self = self else { return }
+            do {
+                try await self.networkService.deleteTodoItem(id: id.uuidString)
+            } catch {
+                DDLogError(error.localizedDescription)
+                fileCache.updateIsDirtyValue(by: true)
                 if let errorOccurred = errorOccurred {
                     errorOccurred(error.localizedDescription)
                 }
@@ -151,13 +212,23 @@ final class TodoListViewModel: TodoListViewOutput {
 
     // MARK: - Caching
 
-    private func updateCache() {
-        fileCache.todoItems.keys.forEach(fileCache.deleteItem(with:))
-        todoList.forEach(self.fileCache.addItem(_:))
-        saveDataToCache()
+    private func updateItemInCache(_ item: TodoItem) {
+        fileCache.addItem(item)
+        updateData(with: Array(fileCache.todoItems.values))
     }
 
-    private func saveDataToCache() {
+    private func deleteFromCacheItem(with id: UUID) {
+        fileCache.deleteItem(with: id)
+        updateData(with: Array(fileCache.todoItems.values))
+    }
+
+    private func updateCache(with todoList: [TodoItem]) {
+        fileCache.todoItems.keys.forEach(fileCache.deleteItem(with:))
+        todoList.forEach(self.fileCache.addItem(_:))
+        updateData(with: todoList)
+    }
+
+    private func saveDataToLocalStorage() {
         do {
             try fileCache.saveItemsToJSON(fileName: cacheFileName)
         } catch {
@@ -165,7 +236,7 @@ final class TodoListViewModel: TodoListViewOutput {
         }
     }
 
-    private func loadDataFromCache() {
+    private func loadDataFromLocalStorage() {
         do {
             try fileCache.loadItemsFromJSON(fileName: cacheFileName)
             updateData(with: Array(fileCache.todoItems.values))

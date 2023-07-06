@@ -17,9 +17,12 @@ final class NetworkServiceImpl: NetworkService {
     }
 
     private let urlSession: URLSession
+    private var revision: Int = 0
+    private let deviceID: String
 
-    init(urlSession: URLSession = URLSession.shared) {
+    init(urlSession: URLSession = URLSession.shared, deviceID: String) {
         self.urlSession = urlSession
+        self.deviceID = deviceID
     }
 
     // MARK: - Public Methods
@@ -27,8 +30,73 @@ final class NetworkServiceImpl: NetworkService {
     func loadTodoList() async throws -> [TodoItem] {
         let request = try makeGetRequest(path: "/\(Configuration.path)/list")
         let (data, _) = try await performRequest(request)
-        let response = try JSONDecoder().decode(ListResponse.self, from: data)
+        let response = try JSONDecoder().decode(TodoListDTO.self, from: data)
+        if let revision = response.revision {
+            self.revision = revision
+        }
         return response.list.compactMap(mapData(element:))
+    }
+
+    func syncTodoList(_ todoList: [TodoItem]) async throws -> [TodoItem] {
+        let todoListDTO = TodoListDTO(list: todoList.map { mapData(todoItem: $0) })
+        let requestBody = try JSONEncoder().encode(todoListDTO)
+        let request = try makePatchRequest(path: "/\(Configuration.path)/list", body: requestBody)
+        let (data, _) = try await performRequest(request)
+        let response = try JSONDecoder().decode(TodoListDTO.self, from: data)
+        if let revision = response.revision {
+            self.revision = revision
+        }
+        return response.list.compactMap(mapData(element:))
+    }
+
+    func getTodoItem(id: String) async throws -> TodoItem? {
+        let request = try makeGetRequest(path: "/\(Configuration.path)/list/\(id)")
+        let (data, _) = try await performRequest(request)
+        let response = try JSONDecoder().decode(TodoItemDTO.self, from: data)
+        if let revision = response.revision {
+            self.revision = revision
+        }
+        return mapData(element: response.element)
+    }
+
+    @discardableResult
+    func addTodoItem(_ todoItem: TodoItem) async throws -> TodoItem? {
+        let todoItemDTO = TodoItemDTO(element: mapData(todoItem: todoItem))
+        let requestBody = try JSONEncoder().encode(todoItemDTO)
+        let request = try makePostRequest(path: "/\(Configuration.path)/list", body: requestBody)
+        let (data, _) = try await performRequest(request)
+        let response = try JSONDecoder().decode(TodoItemDTO.self, from: data)
+        if let revision = response.revision {
+            self.revision = revision
+        }
+        return mapData(element: response.element)
+    }
+
+    @discardableResult
+    func changeTodoItem(_ todoItem: TodoItem) async throws -> TodoItem? {
+        let todoItemDTO = TodoItemDTO(element: mapData(todoItem: todoItem))
+        let requestBody = try JSONEncoder().encode(todoItemDTO)
+        let request = try makePutRequest(
+            path: "/\(Configuration.path)/list/\(todoItem.id.uuidString)",
+            body: requestBody
+        )
+        let (data, _) = try await performRequest(request)
+        let response = try JSONDecoder().decode(TodoItemDTO.self, from: data)
+        if let revision = response.revision {
+            self.revision = revision
+        }
+        return mapData(element: response.element)
+    }
+
+    @discardableResult
+    func deleteTodoItem(id: String) async throws -> TodoItem? {
+        let request = try makeDeleteRequest(path: "/\(Configuration.path)/list/\(id)")
+        let (data, _) = try await performRequest(request)
+        let response = try JSONDecoder().decode(TodoItemDTO.self, from: data)
+        if let revision = response.revision {
+            self.revision = revision
+        }
+        return mapData(element: response.element)
     }
 
     // MARK: - Private Methods
@@ -50,6 +118,50 @@ final class NetworkServiceImpl: NetworkService {
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue("Bearer \(Configuration.token)", forHTTPHeaderField: "Authorization")
+        request.setValue("20", forHTTPHeaderField: "X-Generate-Fails") // generate fails
+        return request
+    }
+
+    private func makePatchRequest(path: String, body: Data) throws -> URLRequest {
+        let url = try makeURL(path: path)
+        var request = URLRequest(url: url)
+        request.httpMethod = "PATCH"
+        request.setValue("Bearer \(Configuration.token)", forHTTPHeaderField: "Authorization")
+        request.setValue("\(revision)", forHTTPHeaderField: "X-Last-Known-Revision")
+        request.setValue("20", forHTTPHeaderField: "X-Generate-Fails") // generate fails
+        request.httpBody = body
+        return request
+    }
+
+    private func makePostRequest(path: String, body: Data) throws -> URLRequest {
+        let url = try makeURL(path: path)
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(Configuration.token)", forHTTPHeaderField: "Authorization")
+        request.setValue("\(revision)", forHTTPHeaderField: "X-Last-Known-Revision")
+        request.setValue("20", forHTTPHeaderField: "X-Generate-Fails") // generate fails
+        request.httpBody = body
+        return request
+    }
+
+    private func makePutRequest(path: String, body: Data) throws -> URLRequest {
+        let url = try makeURL(path: path)
+        var request = URLRequest(url: url)
+        request.httpMethod = "PUT"
+        request.setValue("Bearer \(Configuration.token)", forHTTPHeaderField: "Authorization")
+        request.setValue("\(revision)", forHTTPHeaderField: "X-Last-Known-Revision")
+        request.setValue("20", forHTTPHeaderField: "X-Generate-Fails") // generate fails
+        request.httpBody = body
+        return request
+    }
+
+    private func makeDeleteRequest(path: String) throws -> URLRequest {
+        let url = try makeURL(path: path)
+        var request = URLRequest(url: url)
+        request.httpMethod = "DELETE"
+        request.setValue("Bearer \(Configuration.token)", forHTTPHeaderField: "Authorization")
+        request.setValue("\(revision)", forHTTPHeaderField: "X-Last-Known-Revision")
+        request.setValue("20", forHTTPHeaderField: "X-Generate-Fails") // generate fails
         return request
     }
 
@@ -64,20 +176,36 @@ final class NetworkServiceImpl: NetworkService {
 
     private func handleStatusCode(response: HTTPURLResponse) throws {
         switch response.statusCode {
-        case (100...299):
+        case 100 ... 299:
             return
-        case (300...399):
-            throw RequestError.redirect
-        case (400...499):
+        case 400:
             throw RequestError.badRequest
-        case (500...599):
+        case 401:
+            throw RequestError.wrongAuth
+        case 404:
+            throw RequestError.notFound
+        case 500 ... 599:
             throw RequestError.serverError
         default:
             throw RequestError.unexpectedStatusCode(response.statusCode)
         }
     }
 
-    private func mapData(element: Element) -> TodoItem? {
+    private func mapData(todoItem: TodoItem) -> ElementDTO {
+        return ElementDTO(
+            id: todoItem.id.uuidString,
+            text: todoItem.text,
+            importance: todoItem.importance.rawValue,
+            deadline: todoItem.deadline.map { Int($0.timeIntervalSince1970) },
+            done: todoItem.isDone,
+            color: todoItem.textColor,
+            creationDate: Int(todoItem.creationDate.timeIntervalSince1970),
+            modificationDate: Int((todoItem.modificationDate ?? todoItem.creationDate).timeIntervalSince1970),
+            lastUpdatedBy: deviceID
+        )
+    }
+
+    private func mapData(element: ElementDTO) -> TodoItem? {
         guard
             let id = UUID(uuidString: element.id),
             let importance = Importance(rawValue: element.importance),

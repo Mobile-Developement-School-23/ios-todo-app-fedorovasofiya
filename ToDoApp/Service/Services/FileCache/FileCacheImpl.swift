@@ -10,8 +10,13 @@ import Foundation
 class FileCacheImpl: FileCache {
 
     private(set) var todoItems: [UUID: TodoItem] = [:]
+    private(set) var isDirty: Bool = false
 
     // MARK: - Public Methods
+
+    func updateIsDirtyValue(by newValue: Bool) {
+        isDirty = newValue
+    }
 
     func addItem(_ item: TodoItem) {
         todoItems[item.id] = item

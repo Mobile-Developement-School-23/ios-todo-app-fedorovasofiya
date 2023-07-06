@@ -286,20 +286,17 @@ extension TodoItemViewController {
             self?.colorView.setText(todoItem.textColor)
             self?.deleteButton.isEnabled = true
         }
-        viewOutput.successfullySaved = { [weak self] in
+        viewOutput.changesSaved = { [weak self] in
             self?.presentAlert(
                 title: L10n.successAlertTitle, message: L10n.successfullSavingMessage,
                 okActionHandler: { _ in self?.viewOutput.close() }
             )
         }
-        viewOutput.successfullyDeleted = { [weak self] in
+        viewOutput.errorOccurred = { [weak self] description in
             self?.presentAlert(
-                title: L10n.successAlertTitle, message: L10n.successfullDeletingMessage,
+                title: L10n.errorAlertTitle, message: description,
                 okActionHandler: { _ in self?.viewOutput.close() }
             )
-        }
-        viewOutput.errorOccurred = { [weak self] description in
-            self?.presentAlert(title: L10n.errorAlertTitle, message: description)
         }
     }
 

@@ -9,6 +9,8 @@ import Foundation
 
 protocol FileCache {
     var todoItems: [UUID: TodoItem] { get }
+    var isDirty: Bool { get }
+    func updateIsDirtyValue(by newValue: Bool)
     func addItem(_ item: TodoItem)
     func deleteItem(with id: UUID)
     func saveItemsToJSON(fileName: String) throws

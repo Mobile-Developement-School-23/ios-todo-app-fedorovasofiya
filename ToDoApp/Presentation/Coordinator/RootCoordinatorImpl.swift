@@ -12,9 +12,11 @@ final class RootCoordinatorImpl: RootCoordinator {
 
     private weak var window: UIWindow?
     private weak var transitioningDelegate: UIViewControllerTransitioningDelegate?
-    private lazy var networkService: NetworkService = NetworkServiceImpl()
     private lazy var fileCache: FileCache = FileCacheImpl()
     private lazy var dateService: DateService = DateServiceImpl()
+    private lazy var networkService: NetworkService = NetworkServiceImpl(
+        deviceID: UIDevice.current.identifierForVendor?.uuidString ?? ""
+    )
 
     func start(in window: UIWindow) {
         self.window = window
@@ -36,12 +38,13 @@ final class RootCoordinatorImpl: RootCoordinator {
         window?.makeKeyAndVisible()
     }
 
-    private func openTodoItem(_ item: TodoItem?, itemStateChangedCallback: (() -> Void)?) {
+    private func openTodoItem(_ item: TodoItem?, dataChangedCallback: (() -> Void)?) {
         let viewModel = TodoItemViewModel(
             todoItem: item,
             fileCache: fileCache,
+            networkService: networkService,
             coordinator: self,
-            itemStateChanged: itemStateChangedCallback
+            dataChanged: dataChangedCallback
         )
         let viewController = TodoItemViewController(viewOutput: viewModel, dateService: dateService)
         let navigationController = UINavigationController(rootViewController: viewController)
@@ -60,12 +63,12 @@ final class RootCoordinatorImpl: RootCoordinator {
 
 extension RootCoordinatorImpl: TodoListCoordinator {
 
-    func openDetails(of item: TodoItem, itemStateChangedCallback: (() -> Void)?) {
-        openTodoItem(item, itemStateChangedCallback: itemStateChangedCallback)
+    func openDetails(of item: TodoItem, dataChangedCallback: (() -> Void)?) {
+        openTodoItem(item, dataChangedCallback: dataChangedCallback)
     }
 
-    func openCreationOfTodoItem(itemStateChangedCallback: (() -> Void)?) {
-        openTodoItem(nil, itemStateChangedCallback: itemStateChangedCallback)
+    func openCreationOfTodoItem(dataChangedCallback: (() -> Void)?) {
+        openTodoItem(nil, dataChangedCallback: dataChangedCallback)
     }
 
 }

@@ -1,5 +1,5 @@
 //
-//  Element.swift
+//  ElementDTO.swift
 //  ToDoApp
 //
 //  Created by Sonya Fedorova on 05.07.2023.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Element: Codable {
+struct ElementDTO: Codable {
     let id: String
     let text: String
     let importance: String
