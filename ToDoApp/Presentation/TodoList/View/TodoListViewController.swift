@@ -57,6 +57,8 @@ final class TodoListViewController: UIViewController {
         navigationController?.navigationBar.layoutMargins.left = Constants.titleMargin
         navigationItem.title = L10n.listScreenTitle
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: activityIndicator)
+        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Проверка отмены запроса", style: .done,
+                                                           target: self, action: #selector(check))
     }
 
     private func setupHeaderView() {
@@ -144,15 +146,12 @@ final class TodoListViewController: UIViewController {
             self?.headerView.isHidden = false
             self?.updateDataSource(data: todoList, animated: true)
         }
-
         viewOutput.completedItemsCountUpdated = { [weak self] completedItemsCount in
             self?.updateCompletedItemsCount(newValue: completedItemsCount)
         }
-
         viewOutput.errorOccurred = { [weak self] description in
             self?.presentAlert(title: L10n.errorAlertTitle, message: description)
         }
-
         viewOutput.updateActivityIndicatorState = { [weak self] isActive in
             if isActive {
                 self?.activityIndicator.startAnimating()
@@ -182,6 +181,10 @@ final class TodoListViewController: UIViewController {
             viewOutput.changedCompletedAreShownValue(newValue: false)
             completedAreShownButton.setTitle(L10n.showButton, for: .normal)
         }
+    }
+
+    @objc func check() {
+        viewOutput.checkCancellation()
     }
 
 }
@@ -348,7 +351,6 @@ extension TodoListViewController: UITableViewDelegate {
 // MARK: - UIViewControllerTransitioningDelegate
 
 extension TodoListViewController: UIViewControllerTransitioningDelegate {
-
     func animationController(
         forPresented presented: UIViewController,
         presenting: UIViewController,
@@ -373,11 +375,9 @@ extension TodoListViewController: UIViewControllerTransitioningDelegate {
 
         return animator
     }
-
     func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         return nil
     }
-
 }
 
 // MARK: - Constants

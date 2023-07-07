@@ -1,6 +1,7 @@
 #  ToDo App
 Concurrency:
 - Все запросы к серверу выполняются с помощью кастомной функции `func dataTask(for urlRequest: URLRequest) async throws -> (Data, URLResponse)`
+- Для проверки отмены запроса в NavigationBar добавлена кнопка "Проверка отмены запроса". При нажатии на нее будет предпринята попытка добавления в список задачи и отмена этой попытки (смотреть `func checkCancellation()` в TodoListViewModel.swift). При отмене кидается ошибка CancellationError. 
 
 Networking:
 - Ко всем запросам на сервер добавлен заголовок X-Generate-Fails для генерации ошибок сервера
