@@ -6,26 +6,21 @@
 //
 
 import Foundation
-import CocoaLumberjackSwift
 
+@MainActor
 final class TodoItemViewModel: TodoItemViewOutput {
 
-    var itemStateChanged: (() -> Void)?
     var todoItemLoaded: ((TodoItem) -> Void)?
-    var successfullySaved: (() -> Void)?
-    var successfullyDeleted: (() -> Void)?
-    var errorOccurred: ((String) -> Void)?
+    var changesSaved: (() -> Void)?
 
-    private let fileCache: FileCache
-    private weak var coordinator: TodoItemCoordinator?
-    private let cacheFileName = "cache"
     private var todoItem: TodoItem?
+    private weak var coordinator: TodoItemCoordinator?
+    private weak var delegate: TodoItemViewModelDelegate?
 
-    init(todoItem: TodoItem?, fileCache: FileCache, coordinator: TodoItemCoordinator, itemStateChanged: (() -> Void)?) {
+    init(todoItem: TodoItem?, coordinator: TodoItemCoordinator?, delegate: TodoItemViewModelDelegate?) {
         self.todoItem = todoItem
-        self.fileCache = fileCache
         self.coordinator = coordinator
-        self.itemStateChanged = itemStateChanged
+        self.delegate = delegate
     }
 
     // MARK: - Public Methods
@@ -38,31 +33,27 @@ final class TodoItemViewModel: TodoItemViewOutput {
     }
 
     func saveItem(text: String, importance: Importance, deadline: Date?, textColor: String) {
-        updateTodoItem(text: text, importance: importance, deadline: deadline, textColor: textColor)
+        let newItem = getTodoItem(text: text, importance: importance, deadline: deadline, textColor: textColor)
+        let isNewItem = todoItem == nil ? true : false
 
-        guard let todoItem = todoItem else { return }
-        fileCache.addItem(todoItem)
-        saveChanges()
+        delegate?.saveToCacheTodoItem(newItem)
+        todoItem = newItem
+        if let changesSaved = changesSaved {
+            changesSaved()
+        }
 
-        if let successfullySaved = successfullySaved {
-            successfullySaved()
-        }
-        if let itemStateChanged = itemStateChanged {
-            itemStateChanged()
-        }
+        delegate?.saveToServerTodoItem(newItem, isNewItem: isNewItem)
     }
 
     func deleteItem() {
         guard let id = todoItem?.id else { return }
-        fileCache.deleteItem(with: id)
-        saveChanges()
 
-        if let successfullyDeleted = successfullyDeleted {
-            successfullyDeleted()
+        delegate?.deleteFromCacheTodoItem(with: id)
+        if let changesSaved = changesSaved {
+            changesSaved()
         }
-        if let itemStateChanged = itemStateChanged {
-            itemStateChanged()
-        }
+
+        delegate?.deleteFromServerTodoItem(with: id)
     }
 
     func close() {
@@ -71,18 +62,7 @@ final class TodoItemViewModel: TodoItemViewOutput {
 
     // MARK: - Private Methods
 
-    private func saveChanges() {
-        do {
-            try fileCache.saveItemsToJSON(fileName: cacheFileName)
-        } catch {
-            DDLogError(error)
-            if let errorOccurred = errorOccurred {
-                errorOccurred(error.localizedDescription)
-            }
-        }
-    }
-
-    private func updateTodoItem(text: String, importance: Importance, deadline: Date?, textColor: String) {
+    private func getTodoItem(text: String, importance: Importance, deadline: Date?, textColor: String) -> TodoItem {
         if let currentTodoItem = todoItem {
             let newItem = TodoItem(
                 id: currentTodoItem.id,
@@ -91,12 +71,12 @@ final class TodoItemViewModel: TodoItemViewOutput {
                 deadline: deadline,
                 isDone: currentTodoItem.isDone,
                 creationDate: currentTodoItem.creationDate,
-                modificationDate: currentTodoItem.modificationDate,
+                modificationDate: Date(),
                 textColor: textColor
             )
-            self.todoItem = newItem
+            return newItem
         } else {
-            self.todoItem = TodoItem(text: text, importance: importance, deadline: deadline, textColor: textColor)
+            return TodoItem(text: text, importance: importance, deadline: deadline, textColor: textColor)
         }
     }
 

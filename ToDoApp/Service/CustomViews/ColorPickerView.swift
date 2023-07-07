@@ -84,6 +84,6 @@ extension ColorPickerView {
     private struct Constants {
         static let margin: CGFloat = 16
         static let sliderHeight: CGFloat = 12
-        static let separatorHeight: CGFloat = 1 / UIScreen.main.scale
+        @MainActor static let separatorHeight: CGFloat = 1 / UIScreen.main.scale
     }
 }

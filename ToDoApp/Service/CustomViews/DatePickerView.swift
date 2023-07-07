@@ -75,6 +75,6 @@ extension DatePickerView {
     private struct Constants {
         static let margin: CGFloat = 16
         static let smallMargin: CGFloat = 9
-        static let separatorHeight: CGFloat = 1 / UIScreen.main.scale
+        @MainActor static let separatorHeight: CGFloat = 1 / UIScreen.main.scale
     }
 }

@@ -286,20 +286,11 @@ extension TodoItemViewController {
             self?.colorView.setText(todoItem.textColor)
             self?.deleteButton.isEnabled = true
         }
-        viewOutput.successfullySaved = { [weak self] in
+        viewOutput.changesSaved = { [weak self] in
             self?.presentAlert(
                 title: L10n.successAlertTitle, message: L10n.successfullSavingMessage,
                 okActionHandler: { _ in self?.viewOutput.close() }
             )
-        }
-        viewOutput.successfullyDeleted = { [weak self] in
-            self?.presentAlert(
-                title: L10n.successAlertTitle, message: L10n.successfullDeletingMessage,
-                okActionHandler: { _ in self?.viewOutput.close() }
-            )
-        }
-        viewOutput.errorOccurred = { [weak self] description in
-            self?.presentAlert(title: L10n.errorAlertTitle, message: description)
         }
     }
 
@@ -392,6 +383,6 @@ extension TodoItemViewController {
         static let fontSize: CGFloat = 17
         static let cornerRadius: CGFloat = 16
         static let datePickerHeight: CGFloat = 312
-        static let separatorHeight: CGFloat = 1 / UIScreen.main.scale
+        @MainActor static let separatorHeight: CGFloat = 1 / UIScreen.main.scale
     }
 }

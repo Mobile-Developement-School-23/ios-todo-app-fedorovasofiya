@@ -12,8 +12,11 @@ final class RootCoordinatorImpl: RootCoordinator {
 
     private weak var window: UIWindow?
     private weak var transitioningDelegate: UIViewControllerTransitioningDelegate?
-    private lazy var fileCache = FileCacheImpl()
-    private lazy var dateService = DateServiceImpl()
+    private lazy var fileCache: FileCache = FileCacheImpl()
+    private lazy var dateService: DateService = DateServiceImpl()
+    private lazy var networkService: NetworkService = NetworkServiceImpl(
+        deviceID: UIDevice.current.identifierForVendor?.uuidString ?? ""
+    )
 
     func start(in window: UIWindow) {
         self.window = window
@@ -23,7 +26,10 @@ final class RootCoordinatorImpl: RootCoordinator {
     // MARK: - Navigation
 
     private func openTodoList() {
-        let viewModel = TodoListViewModel(fileCache: fileCache, dateService: dateService, coordinator: self)
+        let viewModel = TodoListViewModel(
+            networkService: networkService, fileCache: fileCache, dateService: dateService,
+            coordinator: self
+        )
         let animator = Animator()
         let viewController = TodoListViewController(viewOutput: viewModel, animator: animator)
         transitioningDelegate = viewController
@@ -32,13 +38,8 @@ final class RootCoordinatorImpl: RootCoordinator {
         window?.makeKeyAndVisible()
     }
 
-    private func openTodoItem(_ item: TodoItem?, itemStateChangedCallback: (() -> Void)?) {
-        let viewModel = TodoItemViewModel(
-            todoItem: item,
-            fileCache: fileCache,
-            coordinator: self,
-            itemStateChanged: itemStateChangedCallback
-        )
+    private func openTodoItem(_ item: TodoItem?, delegate: TodoItemViewModelDelegate?) {
+        let viewModel = TodoItemViewModel(todoItem: item, coordinator: self, delegate: delegate)
         let viewController = TodoItemViewController(viewOutput: viewModel, dateService: dateService)
         let navigationController = UINavigationController(rootViewController: viewController)
         navigationController.transitioningDelegate = transitioningDelegate
@@ -56,12 +57,12 @@ final class RootCoordinatorImpl: RootCoordinator {
 
 extension RootCoordinatorImpl: TodoListCoordinator {
 
-    func openDetails(of item: TodoItem, itemStateChangedCallback: (() -> Void)?) {
-        openTodoItem(item, itemStateChangedCallback: itemStateChangedCallback)
+    func openDetails(of item: TodoItem, delegate: TodoItemViewModelDelegate?) {
+        openTodoItem(item, delegate: delegate)
     }
 
-    func openCreationOfTodoItem(itemStateChangedCallback: (() -> Void)?) {
-        openTodoItem(nil, itemStateChangedCallback: itemStateChangedCallback)
+    func openCreationOfTodoItem(delegate: TodoItemViewModelDelegate?) {
+        openTodoItem(nil, delegate: delegate)
     }
 
 }
