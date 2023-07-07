@@ -38,14 +38,8 @@ final class RootCoordinatorImpl: RootCoordinator {
         window?.makeKeyAndVisible()
     }
 
-    private func openTodoItem(_ item: TodoItem?, dataChangedCallback: (() -> Void)?) {
-        let viewModel = TodoItemViewModel(
-            todoItem: item,
-            fileCache: fileCache,
-            networkService: networkService,
-            coordinator: self,
-            dataChanged: dataChangedCallback
-        )
+    private func openTodoItem(_ item: TodoItem?, delegate: TodoItemViewModelDelegate?) {
+        let viewModel = TodoItemViewModel(todoItem: item, coordinator: self, delegate: delegate)
         let viewController = TodoItemViewController(viewOutput: viewModel, dateService: dateService)
         let navigationController = UINavigationController(rootViewController: viewController)
         navigationController.transitioningDelegate = transitioningDelegate
@@ -63,12 +57,12 @@ final class RootCoordinatorImpl: RootCoordinator {
 
 extension RootCoordinatorImpl: TodoListCoordinator {
 
-    func openDetails(of item: TodoItem, dataChangedCallback: (() -> Void)?) {
-        openTodoItem(item, dataChangedCallback: dataChangedCallback)
+    func openDetails(of item: TodoItem, delegate: TodoItemViewModelDelegate?) {
+        openTodoItem(item, delegate: delegate)
     }
 
-    func openCreationOfTodoItem(dataChangedCallback: (() -> Void)?) {
-        openTodoItem(nil, dataChangedCallback: dataChangedCallback)
+    func openCreationOfTodoItem(delegate: TodoItemViewModelDelegate?) {
+        openTodoItem(nil, delegate: delegate)
     }
 
 }

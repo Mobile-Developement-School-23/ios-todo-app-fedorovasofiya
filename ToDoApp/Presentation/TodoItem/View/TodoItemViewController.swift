@@ -292,12 +292,6 @@ extension TodoItemViewController {
                 okActionHandler: { _ in self?.viewOutput.close() }
             )
         }
-        viewOutput.errorOccurred = { [weak self] description in
-            self?.presentAlert(
-                title: L10n.errorAlertTitle, message: description,
-                okActionHandler: { _ in self?.viewOutput.close() }
-            )
-        }
     }
 
     private func updateText(text: String) {

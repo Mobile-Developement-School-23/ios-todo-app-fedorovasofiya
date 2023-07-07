@@ -23,12 +23,6 @@ final class TodoListViewModel: TodoListViewOutput {
     private var todoList: [TodoItem] = []
 
     private lazy var cacheFileName = "cache"
-    private lazy var dataChangedCallback: (() -> Void)? = { [weak self] in
-        guard let self = self else { return }
-        self.updateData(with: Array(self.fileCache.todoItems.values))
-        self.sendData()
-    }
-
     private let networkService: NetworkService
     private let fileCache: FileCache
     private let dateService: DateService
@@ -100,11 +94,11 @@ final class TodoListViewModel: TodoListViewOutput {
 
     func didSelectItem(with id: UUID) {
         guard let item = fileCache.todoItems[id] else { return }
-        coordinator?.openDetails(of: item, dataChangedCallback: dataChangedCallback)
+        coordinator?.openDetails(of: item, delegate: self)
     }
 
     func didTapAdd() {
-        coordinator?.openCreationOfTodoItem(dataChangedCallback: dataChangedCallback)
+        coordinator?.openCreationOfTodoItem(delegate: self)
     }
 
     // MARK: - Private Methods
@@ -163,10 +157,74 @@ final class TodoListViewModel: TodoListViewOutput {
         }
     }
 
-    // MARK: - Networking
+}
+
+// MARK: - TodoItemViewModelDelegate
+
+extension TodoListViewModel: TodoItemViewModelDelegate {
+
+    func saveToCacheTodoItem(_ newItem: TodoItem) {
+        updateItemInCache(newItem)
+        sendData()
+        saveDataToLocalStorage()
+    }
+
+    func deleteFromCacheTodoItem(with id: UUID) {
+        deleteFromCacheItem(with: id)
+        sendData()
+        saveDataToLocalStorage()
+    }
+
+    func saveToServerTodoItem(_ newItem: TodoItem, isNewItem: Bool) {
+        handleActivityIndicator(by: true)
+        networkService.incrementNumberOfTasks()
+        if fileCache.isDirty {
+            syncTodoList()
+        } else if isNewItem {
+            addTodoItem(newItem)
+        } else {
+            changeTodoItem(newItem)
+        }
+    }
+
+    func deleteFromServerTodoItem(with id: UUID) {
+        handleActivityIndicator(by: true)
+        networkService.incrementNumberOfTasks()
+        if fileCache.isDirty {
+            syncTodoList()
+        } else {
+            deleteTodoItem(with: id)
+        }
+    }
+
+}
+
+// MARK: - Networking
+
+extension TodoListViewModel {
+
+    private func loadTodoList() {
+        DDLogInfo(#function)
+        Task(priority: .userInitiated) { [weak self] in
+            guard let self = self else { return }
+            do {
+                let todoList = try await self.networkService.loadTodoList()
+                self.updateCache(with: todoList)
+                self.sendData()
+                self.saveDataToLocalStorage()
+            } catch {
+                DDLogError("\(#function): \(error.localizedDescription)")
+                if let errorOccurred = self.errorOccurred {
+                    errorOccurred(error.localizedDescription)
+                }
+            }
+            self.networkService.decrementNumberOfTasks()
+            self.handleActivityIndicator(by: false)
+        }
+    }
 
     private func syncTodoList() {
-        DDLogError(#function)
+        DDLogInfo(#function)
         Task(priority: .userInitiated) { [weak self] in
             guard let self = self else { return }
             do {
@@ -186,27 +244,8 @@ final class TodoListViewModel: TodoListViewOutput {
         }
     }
 
-    private func loadTodoList() {
-        Task(priority: .userInitiated) { [weak self] in
-            guard let self = self else { return }
-            do {
-                let todoList = try await self.networkService.loadTodoList()
-                self.updateCache(with: todoList)
-                self.sendData()
-                self.saveDataToLocalStorage()
-            } catch {
-                DDLogError(error.localizedDescription)
-                if let errorOccurred = self.errorOccurred {
-                    errorOccurred(error.localizedDescription)
-                }
-            }
-            self.networkService.decrementNumberOfTasks()
-            self.handleActivityIndicator(by: false)
-        }
-    }
-
     private func changeTodoItem(_ item: TodoItem, retryDelay: Int = Backoff.minDelay) {
-        DDLogError(#function)
+        DDLogInfo(#function)
         Task(priority: .userInitiated) { [weak self] in
             guard let self = self else { return }
             do {
@@ -229,8 +268,32 @@ final class TodoListViewModel: TodoListViewOutput {
         }
     }
 
+    private func addTodoItem(_ item: TodoItem, retryDelay: Int = Backoff.minDelay) {
+        DDLogInfo(#function)
+        Task(priority: .userInitiated) { [weak self] in
+            guard let self = self else { return }
+            do {
+                try await self.networkService.addTodoItem(item)
+                self.networkService.decrementNumberOfTasks()
+                self.handleActivityIndicator(by: false)
+            } catch {
+                DDLogError("\(#function): \(error.localizedDescription)")
+                if retryDelay < Backoff.maxDelay,
+                   let requestError = error as? RequestError,
+                   case .serverError = requestError {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(retryDelay)) {
+                        self.changeTodoItem(item, retryDelay: Backoff.getNextDelay(from: retryDelay))
+                    }
+                } else {
+                    self.fileCache.updateIsDirtyValue(by: true)
+                    self.syncTodoList()
+                }
+            }
+        }
+    }
+
     private func deleteTodoItem(with id: UUID, retryDelay: Int = Backoff.minDelay) {
-        DDLogError(#function)
+        DDLogInfo(#function)
         Task(priority: .userInitiated) { [weak self] in
             guard let self = self else { return }
             do {
@@ -253,7 +316,11 @@ final class TodoListViewModel: TodoListViewOutput {
         }
     }
 
-    // MARK: - Caching
+}
+
+// MARK: - Caching
+
+extension TodoListViewModel {
 
     private func updateItemInCache(_ item: TodoItem) {
         fileCache.addItem(item)

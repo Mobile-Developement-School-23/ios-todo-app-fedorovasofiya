@@ -28,10 +28,12 @@ final class NetworkServiceImpl: NetworkService {
 
     // MARK: - Public Methods
 
+    @MainActor
     func incrementNumberOfTasks() {
         numberOfTasks += 1
     }
 
+    @MainActor
     func decrementNumberOfTasks() {
         numberOfTasks -= 1
     }

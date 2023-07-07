@@ -9,8 +9,8 @@ import Foundation
 
 protocol NetworkService {
     var numberOfTasks: Int { get }
-    func incrementNumberOfTasks()
-    func decrementNumberOfTasks()
+    @MainActor func incrementNumberOfTasks()
+    @MainActor func decrementNumberOfTasks()
     func loadTodoList() async throws -> [TodoItem]
     func syncTodoList(_ todoList: [TodoItem]) async throws -> [TodoItem]
     func getTodoItem(id: String) async throws -> TodoItem?
