@@ -15,6 +15,7 @@ enum RequestError: Error {
     case notFound
     case serverError
     case unexpectedStatusCode(Int)
+    case emptyResult
 }
 
 extension RequestError: LocalizedError {
@@ -34,6 +35,8 @@ extension RequestError: LocalizedError {
             return "Server error"
         case .unexpectedStatusCode(let code):
             return "Unexpected status code: \(code)"
+        case .emptyResult:
+            return "Empty result of request"
         }
     }
 }

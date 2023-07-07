@@ -177,7 +177,7 @@ final class NetworkServiceImpl: NetworkService {
     }
 
     private func performRequest(_ request: URLRequest) async throws -> (Data, HTTPURLResponse) {
-        let (data, response) = try await urlSession.data(for: request)
+        let (data, response) = try await urlSession.dataTask(for: request)
         guard let response = response as? HTTPURLResponse else {
             throw RequestError.unexpectedResponse
         }
