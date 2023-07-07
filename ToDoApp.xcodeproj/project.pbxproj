@@ -18,6 +18,7 @@
 		EB2D9D932A55C7DC0084E12A /* RequestMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB2D9D922A55C7DC0084E12A /* RequestMethod.swift */; };
 		EB2D9D962A5767690084E12A /* Backoff.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB2D9D952A5767690084E12A /* Backoff.swift */; };
 		EB2D9D9D2A5847F90084E12A /* TodoItemViewModelDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB2D9D9C2A5847F90084E12A /* TodoItemViewModelDelegate.swift */; };
+		EB2D9DA12A5897190084E12A /* URLSession+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB2D9DA02A5897190084E12A /* URLSession+Extensions.swift */; };
 		EB6B61E72A4235020011F01F /* L10n.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB6B61E62A4235020011F01F /* L10n.swift */; };
 		EB73DF1D2A4FA6B30028F5CE /* CocoaLumberjack in Frameworks */ = {isa = PBXBuildFile; productRef = EB73DF1C2A4FA6B30028F5CE /* CocoaLumberjack */; };
 		EB73DF1F2A4FA6B30028F5CE /* CocoaLumberjackSwift in Frameworks */ = {isa = PBXBuildFile; productRef = EB73DF1E2A4FA6B30028F5CE /* CocoaLumberjackSwift */; };
@@ -87,6 +88,7 @@
 		EB2D9D922A55C7DC0084E12A /* RequestMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestMethod.swift; sourceTree = "<group>"; };
 		EB2D9D952A5767690084E12A /* Backoff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backoff.swift; sourceTree = "<group>"; };
 		EB2D9D9C2A5847F90084E12A /* TodoItemViewModelDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoItemViewModelDelegate.swift; sourceTree = "<group>"; };
+		EB2D9DA02A5897190084E12A /* URLSession+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URLSession+Extensions.swift"; sourceTree = "<group>"; };
 		EB6B61E62A4235020011F01F /* L10n.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = L10n.swift; sourceTree = "<group>"; };
 		EB7978A02A45F63300CEB75F /* UIColor+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extensions.swift"; sourceTree = "<group>"; };
 		EB7978A82A460DED00CEB75F /* ColorSelectionSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorSelectionSlider.swift; sourceTree = "<group>"; };
@@ -469,6 +471,7 @@
 			isa = PBXGroup;
 			children = (
 				EBD34FF82A44EBA100129695 /* UIKit */,
+				EB2D9DA02A5897190084E12A /* URLSession+Extensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -670,6 +673,7 @@
 				EBD34FE82A4461C300129695 /* TodoItemViewOutput.swift in Sources */,
 				EB7978AB2A460DFB00CEB75F /* LightnessSelectionSlider.swift in Sources */,
 				EB929DC12A4FBB8E00683CA7 /* ColorPickerView.swift in Sources */,
+				EB2D9DA12A5897190084E12A /* URLSession+Extensions.swift in Sources */,
 				EB7978A12A45F63300CEB75F /* UIColor+Extensions.swift in Sources */,
 				EB8D42902A3CABC7002180BC /* TodoItemViewController.swift in Sources */,
 				EB9344622A4F6AED007BDE5B /* CreateNewTableViewCell.swift in Sources */,

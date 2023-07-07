@@ -358,3 +358,32 @@ extension TodoListViewModel {
     }
 
 }
+
+// MARK: - Cancellation checking
+
+extension TodoListViewModel {
+    func checkCancellation() {
+        Task {
+            await tryToCancelAdding()
+        }
+    }
+
+    private func tryToCancelAdding() async {
+        let testItem = TodoItem(text: "CHECK", importance: .important, deadline: nil, textColor: "#FFFFFF")
+        let testTaskToAddNewItem = Task(priority: .userInitiated) {
+            do {
+                DDLogInfo("Task will start")
+                try? await Task.sleep(nanoseconds: 2000000000) // 2 секунды для увеличения длительности выполнения
+                let added = try await networkService.addTodoItem(testItem)
+                DDLogInfo("Task completed, response: \(added.debugDescription)")
+                loadTodoList() // Загрузка списка, чтобы посмотреть изменения на сервере
+            } catch {
+                DDLogInfo("Task finished with error: \(error.localizedDescription)")
+            }
+        }
+        try? await Task.sleep(nanoseconds: 1000000000) // 1 секунда
+        DDLogInfo("Will cancel task")
+        testTaskToAddNewItem.cancel() // Отмена запроса
+        DDLogInfo("Did cancel task")
+    }
+}
