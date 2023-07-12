@@ -12,15 +12,14 @@ final class TodoItemViewModel: TodoItemViewOutput {
 
     var todoItemLoaded: ((TodoItem) -> Void)?
     var changesSaved: (() -> Void)?
+    weak var delegate: TodoItemViewModelDelegate?
 
     private var todoItem: TodoItem?
     private weak var coordinator: TodoItemCoordinator?
-    private weak var delegate: TodoItemViewModelDelegate?
 
-    init(todoItem: TodoItem?, coordinator: TodoItemCoordinator?, delegate: TodoItemViewModelDelegate?) {
+    init(todoItem: TodoItem?, coordinator: TodoItemCoordinator?) {
         self.todoItem = todoItem
         self.coordinator = coordinator
-        self.delegate = delegate
     }
 
     // MARK: - Public Methods

@@ -4,6 +4,8 @@
 //
 //  Created by Sonya Fedorova on 07.07.2023.
 //
+// Реализация своего Async API func dataTask(for urlRequest: URLRequest) async throws -> (Data, URLResponse)
+// На основе существующего Callback API
 
 import Foundation
 

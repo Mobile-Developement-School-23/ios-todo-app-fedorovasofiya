@@ -57,8 +57,6 @@ final class TodoListViewController: UIViewController {
         navigationController?.navigationBar.layoutMargins.left = Constants.titleMargin
         navigationItem.title = L10n.listScreenTitle
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: activityIndicator)
-        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Проверка отмены запроса", style: .done,
-                                                           target: self, action: #selector(check))
     }
 
     private func setupHeaderView() {
@@ -181,10 +179,6 @@ final class TodoListViewController: UIViewController {
             viewOutput.changedCompletedAreShownValue(newValue: false)
             completedAreShownButton.setTitle(L10n.showButton, for: .normal)
         }
-    }
-
-    @objc func check() {
-        viewOutput.checkCancellation()
     }
 
 }

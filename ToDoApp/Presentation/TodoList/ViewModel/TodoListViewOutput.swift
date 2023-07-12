@@ -19,5 +19,4 @@ protocol TodoListViewOutput {
     func deleteItem(with: UUID)
     func didSelectItem(with: UUID)
     func toggleIsDoneValue(for: UUID)
-    func checkCancellation()
 }

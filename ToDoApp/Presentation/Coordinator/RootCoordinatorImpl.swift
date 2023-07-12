@@ -12,6 +12,7 @@ final class RootCoordinatorImpl: RootCoordinator {
 
     private weak var window: UIWindow?
     private weak var transitioningDelegate: UIViewControllerTransitioningDelegate?
+    private weak var todoItemViewModelDelegate: TodoItemViewModelDelegate?
     private lazy var fileCache: FileCache = FileCacheImpl()
     private lazy var dateService: DateService = DateServiceImpl()
     private lazy var networkService: NetworkService = NetworkServiceImpl(
@@ -30,6 +31,7 @@ final class RootCoordinatorImpl: RootCoordinator {
             networkService: networkService, fileCache: fileCache, dateService: dateService,
             coordinator: self
         )
+        todoItemViewModelDelegate = viewModel
         let animator = Animator()
         let viewController = TodoListViewController(viewOutput: viewModel, animator: animator)
         transitioningDelegate = viewController
@@ -39,7 +41,8 @@ final class RootCoordinatorImpl: RootCoordinator {
     }
 
     private func openTodoItem(_ item: TodoItem?, delegate: TodoItemViewModelDelegate?) {
-        let viewModel = TodoItemViewModel(todoItem: item, coordinator: self, delegate: delegate)
+        let viewModel = TodoItemViewModel(todoItem: item, coordinator: self)
+        viewModel.delegate = todoItemViewModelDelegate
         let viewController = TodoItemViewController(viewOutput: viewModel, dateService: dateService)
         let navigationController = UINavigationController(rootViewController: viewController)
         navigationController.transitioningDelegate = transitioningDelegate
