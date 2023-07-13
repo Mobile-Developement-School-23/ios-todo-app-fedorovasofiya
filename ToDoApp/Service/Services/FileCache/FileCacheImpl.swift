@@ -33,13 +33,13 @@ final class FileCacheImpl: FileCache {
         todoItems.removeValue(forKey: id)
     }
 
-    func saveItemsToJSON(fileName: String) async throws {
+    func saveItemsToJSON(fileName: String) throws {
         let itemsArray = todoItems.values.map(\.json)
         let jsonData = try JSONSerialization.data(withJSONObject: itemsArray, options: [.prettyPrinted, .sortedKeys])
         try saveDataToDocuments(jsonData, fileName: "\(fileName).json")
     }
 
-    func loadItemsFromJSON(fileName: String) async throws {
+    func loadItemsFromJSON(fileName: String) throws {
         let jsonData = try loadDataFromDocuments(fileName: "\(fileName).json")
         let decodedData = try JSONSerialization.jsonObject(with: jsonData, options: [])
         guard let itemsArray = decodedData as? [[String: Any]] else { return }
@@ -53,7 +53,7 @@ final class FileCacheImpl: FileCache {
         todoItems = newTodoItems
     }
 
-    func saveItemsToCSV(fileName: String) async throws {
+    func saveItemsToCSV(fileName: String) throws {
         var csvString = TodoItem.csvTitles
         csvString.append(TodoItem.csvRowsDelimiter)
         todoItems.values.forEach { item in
@@ -63,7 +63,7 @@ final class FileCacheImpl: FileCache {
         try saveStringToDocuments(csvString, fileName: "\(fileName).csv")
     }
 
-    func loadItemsFromCSV(fileName: String) async throws {
+    func loadItemsFromCSV(fileName: String) throws {
         let csvString = try loadStringFromDocuments(fileName: "\(fileName).csv")
         var rows = csvString.components(separatedBy: TodoItem.csvRowsDelimiter)
         rows.removeFirst()

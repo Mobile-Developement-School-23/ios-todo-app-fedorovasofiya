@@ -239,8 +239,8 @@
 			children = (
 				EBB637222A6015C7004960B1 /* CacheService */,
 				EB2D9D822A55BB9D0084E12A /* NetworkService */,
-				EBD34FEE2A44D29A00129695 /* FileCache */,
 				EBD34FEF2A44D2A300129695 /* DateService */,
+				EBD34FEE2A44D29A00129695 /* FileCache */,
 			);
 			path = Services;
 			sourceTree = "<group>";
