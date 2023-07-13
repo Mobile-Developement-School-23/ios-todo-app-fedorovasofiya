@@ -129,7 +129,6 @@ final class NetworkServiceImpl: NetworkService {
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue("Bearer \(Configuration.token)", forHTTPHeaderField: "Authorization")
-//        request.setValue("20", forHTTPHeaderField: "X-Generate-Fails") // generate fails
         return request
     }
 
@@ -139,7 +138,6 @@ final class NetworkServiceImpl: NetworkService {
         request.httpMethod = "PATCH"
         request.setValue("Bearer \(Configuration.token)", forHTTPHeaderField: "Authorization")
         request.setValue("\(revision)", forHTTPHeaderField: "X-Last-Known-Revision")
-//        request.setValue("20", forHTTPHeaderField: "X-Generate-Fails") // generate fails
         request.httpBody = body
         return request
     }
@@ -150,7 +148,6 @@ final class NetworkServiceImpl: NetworkService {
         request.httpMethod = "POST"
         request.setValue("Bearer \(Configuration.token)", forHTTPHeaderField: "Authorization")
         request.setValue("\(revision)", forHTTPHeaderField: "X-Last-Known-Revision")
-//        request.setValue("20", forHTTPHeaderField: "X-Generate-Fails") // generate fails
         request.httpBody = body
         return request
     }
@@ -161,7 +158,6 @@ final class NetworkServiceImpl: NetworkService {
         request.httpMethod = "PUT"
         request.setValue("Bearer \(Configuration.token)", forHTTPHeaderField: "Authorization")
         request.setValue("\(revision)", forHTTPHeaderField: "X-Last-Known-Revision")
-//        request.setValue("20", forHTTPHeaderField: "X-Generate-Fails") // generate fails
         request.httpBody = body
         return request
     }
@@ -172,7 +168,6 @@ final class NetworkServiceImpl: NetworkService {
         request.httpMethod = "DELETE"
         request.setValue("Bearer \(Configuration.token)", forHTTPHeaderField: "Authorization")
         request.setValue("\(revision)", forHTTPHeaderField: "X-Last-Known-Revision")
-//        request.setValue("20", forHTTPHeaderField: "X-Generate-Fails") // generate fails
         return request
     }
 

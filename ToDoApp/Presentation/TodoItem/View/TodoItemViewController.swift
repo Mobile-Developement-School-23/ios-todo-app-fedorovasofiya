@@ -287,10 +287,7 @@ extension TodoItemViewController {
             self?.deleteButton.isEnabled = true
         }
         viewOutput.changesSaved = { [weak self] in
-            self?.presentAlert(
-                title: L10n.successAlertTitle, message: L10n.successfullSavingMessage,
-                okActionHandler: { _ in self?.viewOutput.close() }
-            )
+            self?.viewOutput.close()
         }
     }
 

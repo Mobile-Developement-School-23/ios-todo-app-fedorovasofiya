@@ -13,7 +13,7 @@ protocol TodoListViewOutput {
     var todoListUpdated: (([TodoItemTableViewCell.DisplayData]) -> Void)? { get set }
     var updateActivityIndicatorState: ((Bool) -> Void)? { get set }
     var errorOccurred: ((String) -> Void)? { get set }
-    func viewDidLoad()
+    func loadData()
     func changedCompletedAreShownValue(newValue: Bool)
     func didTapAdd()
     func deleteItem(with: UUID)
