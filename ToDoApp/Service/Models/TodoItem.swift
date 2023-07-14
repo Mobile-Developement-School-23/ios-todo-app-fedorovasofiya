@@ -9,7 +9,7 @@ import Foundation
 
 struct TodoItem: Hashable {
 
-    private enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey {
         case id
         case text
         case importance

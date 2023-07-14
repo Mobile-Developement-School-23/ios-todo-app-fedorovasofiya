@@ -162,9 +162,13 @@ final class TodoListViewModel: TodoListViewOutput {
 
 extension TodoListViewModel: TodoItemViewModelDelegate {
 
-    func saveToCacheTodoItem(_ newItem: TodoItem) {
+    func saveToCacheTodoItem(_ newItem: TodoItem, isNewItem: Bool) {
         Task(priority: .userInitiated) {
-            await updateItemInCache(newItem)
+            if isNewItem {
+                await addItemToCache(newItem)
+            } else {
+                await updateItemInCache(newItem)
+            }
             sendData()
         }
     }
@@ -316,7 +320,7 @@ extension TodoListViewModel {
 
 extension TodoListViewModel {
 
-    private func addItemInCache(_ item: TodoItem) async {
+    private func addItemToCache(_ item: TodoItem) async {
         do {
             try await cacheService.insertTodoItem(item)
             updateData(with: Array(cacheService.todoItems.values))
