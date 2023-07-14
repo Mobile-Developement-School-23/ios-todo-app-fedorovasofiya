@@ -33,15 +33,15 @@ final class TodoItemViewModel: TodoItemViewOutput {
 
     func saveItem(text: String, importance: Importance, deadline: Date?, textColor: String) {
         let newItem = getTodoItem(text: text, importance: importance, deadline: deadline, textColor: textColor)
-        let isNewItem = todoItem == nil ? true : false
+        let isNewItem = todoItem == nil
 
-        delegate?.saveToCacheTodoItem(newItem)
-        todoItem = newItem
+        delegate?.saveToCacheTodoItem(newItem, isNewItem: isNewItem)
         if let changesSaved = changesSaved {
             changesSaved()
         }
-
         delegate?.saveToServerTodoItem(newItem, isNewItem: isNewItem)
+
+        todoItem = newItem
     }
 
     func deleteItem() {

@@ -15,7 +15,6 @@
 		EB2D9D8B2A55C1490084E12A /* ElementDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB2D9D8A2A55C1490084E12A /* ElementDTO.swift */; };
 		EB2D9D8D2A55C37A0084E12A /* TodoItemDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB2D9D8C2A55C37A0084E12A /* TodoItemDTO.swift */; };
 		EB2D9D902A55C4470084E12A /* RequestError.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB2D9D8F2A55C4470084E12A /* RequestError.swift */; };
-		EB2D9D932A55C7DC0084E12A /* RequestMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB2D9D922A55C7DC0084E12A /* RequestMethod.swift */; };
 		EB2D9D962A5767690084E12A /* Backoff.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB2D9D952A5767690084E12A /* Backoff.swift */; };
 		EB2D9D9D2A5847F90084E12A /* TodoItemViewModelDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB2D9D9C2A5847F90084E12A /* TodoItemViewModelDelegate.swift */; };
 		EB2D9DA12A5897190084E12A /* URLSession+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB2D9DA02A5897190084E12A /* URLSession+Extensions.swift */; };
@@ -52,6 +51,12 @@
 		EB9344622A4F6AED007BDE5B /* CreateNewTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9344612A4F6AED007BDE5B /* CreateNewTableViewCell.swift */; };
 		EB9344652A4F839A007BDE5B /* Animator.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9344642A4F839A007BDE5B /* Animator.swift */; };
 		EBA798322A4FB2270005F1A1 /* TodoItemCSVTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBA798312A4FB2270005F1A1 /* TodoItemCSVTests.swift */; };
+		EBB637242A6015D8004960B1 /* CacheService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBB637232A6015D8004960B1 /* CacheService.swift */; };
+		EBB637262A6015EF004960B1 /* CoreDataCacheServiceImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBB637252A6015EF004960B1 /* CoreDataCacheServiceImpl.swift */; };
+		EBB6372A2A6016FD004960B1 /* TodoDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = EBB637282A6016FD004960B1 /* TodoDataModel.xcdatamodeld */; };
+		EBB6372C2A60A170004960B1 /* SQLiteCacheServiceImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBB6372B2A60A170004960B1 /* SQLiteCacheServiceImpl.swift */; };
+		EBB6372F2A60A9E5004960B1 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = EBB6372E2A60A9E5004960B1 /* SQLite */; };
+		EBB637332A618F91004960B1 /* SQLiteError.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBB637322A618F91004960B1 /* SQLiteError.swift */; };
 		EBD34FE62A44612E00129695 /* TodoItemViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBD34FE52A44612E00129695 /* TodoItemViewModel.swift */; };
 		EBD34FE82A4461C300129695 /* TodoItemViewOutput.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBD34FE72A4461C300129695 /* TodoItemViewOutput.swift */; };
 		EBD34FEA2A44625300129695 /* FileCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBD34FE92A44625300129695 /* FileCache.swift */; };
@@ -85,7 +90,6 @@
 		EB2D9D8A2A55C1490084E12A /* ElementDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElementDTO.swift; sourceTree = "<group>"; };
 		EB2D9D8C2A55C37A0084E12A /* TodoItemDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoItemDTO.swift; sourceTree = "<group>"; };
 		EB2D9D8F2A55C4470084E12A /* RequestError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestError.swift; sourceTree = "<group>"; };
-		EB2D9D922A55C7DC0084E12A /* RequestMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestMethod.swift; sourceTree = "<group>"; };
 		EB2D9D952A5767690084E12A /* Backoff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Backoff.swift; sourceTree = "<group>"; };
 		EB2D9D9C2A5847F90084E12A /* TodoItemViewModelDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoItemViewModelDelegate.swift; sourceTree = "<group>"; };
 		EB2D9DA02A5897190084E12A /* URLSession+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URLSession+Extensions.swift"; sourceTree = "<group>"; };
@@ -124,6 +128,11 @@
 		EB9344642A4F839A007BDE5B /* Animator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animator.swift; sourceTree = "<group>"; };
 		EBA798312A4FB2270005F1A1 /* TodoItemCSVTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoItemCSVTests.swift; sourceTree = "<group>"; };
 		EBB11E5D2A3D0260009FDEA0 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		EBB637232A6015D8004960B1 /* CacheService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheService.swift; sourceTree = "<group>"; };
+		EBB637252A6015EF004960B1 /* CoreDataCacheServiceImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataCacheServiceImpl.swift; sourceTree = "<group>"; };
+		EBB637292A6016FD004960B1 /* TodoDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = TodoDataModel.xcdatamodel; sourceTree = "<group>"; };
+		EBB6372B2A60A170004960B1 /* SQLiteCacheServiceImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SQLiteCacheServiceImpl.swift; sourceTree = "<group>"; };
+		EBB637322A618F91004960B1 /* SQLiteError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SQLiteError.swift; sourceTree = "<group>"; };
 		EBD34FE52A44612E00129695 /* TodoItemViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoItemViewModel.swift; sourceTree = "<group>"; };
 		EBD34FE72A4461C300129695 /* TodoItemViewOutput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoItemViewOutput.swift; sourceTree = "<group>"; };
 		EBD34FE92A44625300129695 /* FileCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileCache.swift; sourceTree = "<group>"; };
@@ -139,6 +148,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EBB6372F2A60A9E5004960B1 /* SQLite in Frameworks */,
 				EB73DF1F2A4FA6B30028F5CE /* CocoaLumberjackSwift in Frameworks */,
 				EB73DF1D2A4FA6B30028F5CE /* CocoaLumberjack in Frameworks */,
 				D0AB8AC099E0E1E7CE5B54BB /* Pods_ToDoApp.framework in Frameworks */,
@@ -203,7 +213,6 @@
 			children = (
 				EB2D9D872A55BF100084E12A /* RequestModels */,
 				EB2D9D8F2A55C4470084E12A /* RequestError.swift */,
-				EB2D9D922A55C7DC0084E12A /* RequestMethod.swift */,
 			);
 			path = Base;
 			sourceTree = "<group>";
@@ -212,9 +221,9 @@
 			isa = PBXGroup;
 			children = (
 				EB9344572A4DDE4B007BDE5B /* Coordinator */,
+				EBB637212A5EFF40004960B1 /* Transitioning */,
 				EB9344442A4CBF7D007BDE5B /* TodoList */,
 				EB9344432A4CBF44007BDE5B /* TodoItem */,
-				EB9344642A4F839A007BDE5B /* Animator.swift */,
 			);
 			path = Presentation;
 			sourceTree = "<group>";
@@ -231,9 +240,10 @@
 		EB6B61E42A42270C0011F01F /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				EBB637222A6015C7004960B1 /* CacheService */,
 				EB2D9D822A55BB9D0084E12A /* NetworkService */,
-				EBD34FEE2A44D29A00129695 /* FileCache */,
 				EBD34FEF2A44D2A300129695 /* DateService */,
+				EBD34FEE2A44D29A00129695 /* FileCache */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -263,9 +273,9 @@
 		EB7978A72A45F83100CEB75F /* ColorPicker */ = {
 			isa = PBXGroup;
 			children = (
+				EB7978B02A462CE600CEB75F /* ColorfulSlider.swift */,
 				EB7978A82A460DED00CEB75F /* ColorSelectionSlider.swift */,
 				EB7978AA2A460DFB00CEB75F /* LightnessSelectionSlider.swift */,
-				EB7978B02A462CE600CEB75F /* ColorfulSlider.swift */,
 			);
 			path = ColorPicker;
 			sourceTree = "<group>";
@@ -324,10 +334,9 @@
 			isa = PBXGroup;
 			children = (
 				EB9344632A4F6B03007BDE5B /* Protocols */,
-				EB7978A22A45F7B600CEB75F /* CustomViews */,
 				EBD34FF72A44EB9B00129695 /* Extensions */,
-				EB6B61E52A4234670011F01F /* Common */,
 				EB6B61E32A4226F20011F01F /* Models */,
+				EB6B61E52A4234670011F01F /* Common */,
 				EB6B61E42A42270C0011F01F /* Services */,
 			);
 			path = Service;
@@ -422,9 +431,62 @@
 			path = Protocols;
 			sourceTree = "<group>";
 		};
+		EBB637212A5EFF40004960B1 /* Transitioning */ = {
+			isa = PBXGroup;
+			children = (
+				EB9344642A4F839A007BDE5B /* Animator.swift */,
+			);
+			path = Transitioning;
+			sourceTree = "<group>";
+		};
+		EBB637222A6015C7004960B1 /* CacheService */ = {
+			isa = PBXGroup;
+			children = (
+				EBB637232A6015D8004960B1 /* CacheService.swift */,
+				EBB637302A61852A004960B1 /* CoreDataCacheServiceImpl */,
+				EBB637312A618540004960B1 /* SQLiteCacheServiceImpl */,
+			);
+			path = CacheService;
+			sourceTree = "<group>";
+		};
+		EBB637272A60169A004960B1 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				EBB637282A6016FD004960B1 /* TodoDataModel.xcdatamodeld */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		EBB637302A61852A004960B1 /* CoreDataCacheServiceImpl */ = {
+			isa = PBXGroup;
+			children = (
+				EBB637272A60169A004960B1 /* Model */,
+				EBB637252A6015EF004960B1 /* CoreDataCacheServiceImpl.swift */,
+			);
+			path = CoreDataCacheServiceImpl;
+			sourceTree = "<group>";
+		};
+		EBB637312A618540004960B1 /* SQLiteCacheServiceImpl */ = {
+			isa = PBXGroup;
+			children = (
+				EBB637342A61A050004960B1 /* SQLiteError */,
+				EBB6372B2A60A170004960B1 /* SQLiteCacheServiceImpl.swift */,
+			);
+			path = SQLiteCacheServiceImpl;
+			sourceTree = "<group>";
+		};
+		EBB637342A61A050004960B1 /* SQLiteError */ = {
+			isa = PBXGroup;
+			children = (
+				EBB637322A618F91004960B1 /* SQLiteError.swift */,
+			);
+			path = SQLiteError;
+			sourceTree = "<group>";
+		};
 		EBD34FEB2A44626800129695 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				EB7978A22A45F7B600CEB75F /* CustomViews */,
 				EB8D428F2A3CABC7002180BC /* TodoItemViewController.swift */,
 			);
 			path = View;
@@ -507,6 +569,7 @@
 			packageProductDependencies = (
 				EB73DF1C2A4FA6B30028F5CE /* CocoaLumberjack */,
 				EB73DF1E2A4FA6B30028F5CE /* CocoaLumberjackSwift */,
+				EBB6372E2A60A9E5004960B1 /* SQLite */,
 			);
 			productName = ToDoApp;
 			productReference = EB8D42882A3CABC7002180BC /* ToDoApp.app */;
@@ -561,6 +624,7 @@
 			mainGroup = EB8D427F2A3CABC7002180BC;
 			packageReferences = (
 				EB73DF1B2A4FA6B30028F5CE /* XCRemoteSwiftPackageReference "CocoaLumberjack" */,
+				EBB6372D2A60A9E5004960B1 /* XCRemoteSwiftPackageReference "SQLite.swift" */,
 			);
 			productRefGroup = EB8D42892A3CABC7002180BC /* Products */;
 			projectDirPath = "";
@@ -677,9 +741,11 @@
 				EB7978A12A45F63300CEB75F /* UIColor+Extensions.swift in Sources */,
 				EB8D42902A3CABC7002180BC /* TodoItemViewController.swift in Sources */,
 				EB9344622A4F6AED007BDE5B /* CreateNewTableViewCell.swift in Sources */,
+				EBB6372C2A60A170004960B1 /* SQLiteCacheServiceImpl.swift in Sources */,
 				EB93445D2A4DE00D007BDE5B /* TodoListCoordinator.swift in Sources */,
 				EB929DBD2A4FB42600683CA7 /* ImportanceView.swift in Sources */,
 				EB2D9D902A55C4470084E12A /* RequestError.swift in Sources */,
+				EBB6372A2A6016FD004960B1 /* TodoDataModel.xcdatamodeld in Sources */,
 				EB929DBF2A4FB65300683CA7 /* ColorView.swift in Sources */,
 				EBD34FFA2A44EBB700129695 /* UIViewController+Extensions.swift in Sources */,
 				EB2D9D8B2A55C1490084E12A /* ElementDTO.swift in Sources */,
@@ -695,15 +761,17 @@
 				EB93445B2A4DDE9A007BDE5B /* RootCoordinatorImpl.swift in Sources */,
 				EB2D9D962A5767690084E12A /* Backoff.swift in Sources */,
 				EB8D42A22A3CAD1B002180BC /* TodoItem.swift in Sources */,
+				EBB637242A6015D8004960B1 /* CacheService.swift in Sources */,
 				EBD34FE62A44612E00129695 /* TodoItemViewModel.swift in Sources */,
 				EB929DC52A4FC3B700683CA7 /* DatePickerView.swift in Sources */,
 				EB9344482A4CBFAF007BDE5B /* TodoListViewController.swift in Sources */,
+				EBB637332A618F91004960B1 /* SQLiteError.swift in Sources */,
 				EB8D42A42A3CAD37002180BC /* FileCacheImpl.swift in Sources */,
+				EBB637262A6015EF004960B1 /* CoreDataCacheServiceImpl.swift in Sources */,
 				EB9344542A4D8B84007BDE5B /* TodoListViewModel.swift in Sources */,
 				EBD34FEA2A44625300129695 /* FileCache.swift in Sources */,
 				EB9344502A4D88E0007BDE5B /* Configurable.swift in Sources */,
 				EB9344522A4D8A29007BDE5B /* UITableViewCell+Extensions.swift in Sources */,
-				EB2D9D932A55C7DC0084E12A /* RequestMethod.swift in Sources */,
 				EB6B61E72A4235020011F01F /* L10n.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -998,6 +1066,14 @@
 				minimumVersion = 3.0.0;
 			};
 		};
+		EBB6372D2A60A9E5004960B1 /* XCRemoteSwiftPackageReference "SQLite.swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/stephencelis/SQLite.swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.14.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1011,7 +1087,25 @@
 			package = EB73DF1B2A4FA6B30028F5CE /* XCRemoteSwiftPackageReference "CocoaLumberjack" */;
 			productName = CocoaLumberjackSwift;
 		};
+		EBB6372E2A60A9E5004960B1 /* SQLite */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = EBB6372D2A60A9E5004960B1 /* XCRemoteSwiftPackageReference "SQLite.swift" */;
+			productName = SQLite;
+		};
 /* End XCSwiftPackageProductDependency section */
+
+/* Begin XCVersionGroup section */
+		EBB637282A6016FD004960B1 /* TodoDataModel.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				EBB637292A6016FD004960B1 /* TodoDataModel.xcdatamodel */,
+			);
+			currentVersion = EBB637292A6016FD004960B1 /* TodoDataModel.xcdatamodel */;
+			path = TodoDataModel.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = EB8D42802A3CABC7002180BC /* Project object */;
 }

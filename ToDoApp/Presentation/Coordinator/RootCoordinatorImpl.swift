@@ -15,6 +15,8 @@ final class RootCoordinatorImpl: RootCoordinator {
     private weak var todoItemViewModelDelegate: TodoItemViewModelDelegate?
     private lazy var fileCache: FileCache = FileCacheImpl()
     private lazy var dateService: DateService = DateServiceImpl()
+//    private lazy var cacheService: CacheService = SQLiteCacheServiceImpl()
+    private lazy var cacheService: CacheService = CoreDataCacheServiceImpl()
     private lazy var networkService: NetworkService = NetworkServiceImpl(
         deviceID: UIDevice.current.identifierForVendor?.uuidString ?? ""
     )
@@ -28,7 +30,9 @@ final class RootCoordinatorImpl: RootCoordinator {
 
     private func openTodoList() {
         let viewModel = TodoListViewModel(
-            networkService: networkService, fileCache: fileCache, dateService: dateService,
+            networkService: networkService,
+            dateService: dateService,
+            cacheService: cacheService,
             coordinator: self
         )
         todoItemViewModelDelegate = viewModel

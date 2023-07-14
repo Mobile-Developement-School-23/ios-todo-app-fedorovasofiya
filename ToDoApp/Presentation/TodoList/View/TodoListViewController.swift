@@ -47,7 +47,11 @@ final class TodoListViewController: UIViewController {
         setupPlusButton()
         updateDataSource(data: [])
         bindViewModel()
-        viewOutput.viewDidLoad()
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        viewOutput.loadData()
     }
 
     // MARK: - UI Setup
