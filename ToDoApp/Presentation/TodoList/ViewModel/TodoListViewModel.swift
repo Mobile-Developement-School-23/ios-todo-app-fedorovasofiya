@@ -63,7 +63,7 @@ final class TodoListViewModel: TodoListViewOutput {
         guard let item = cacheService.todoItems[id] else { return }
         let newItem = getUpdatedItem(for: item, newIsDoneValue: !item.isDone)
         Task(priority: .userInitiated) {
-            await updateItemInCache(newItem)
+            await upsertItemToCache(newItem)
             sendData()
         }
 
@@ -162,13 +162,9 @@ final class TodoListViewModel: TodoListViewOutput {
 
 extension TodoListViewModel: TodoItemViewModelDelegate {
 
-    func saveToCacheTodoItem(_ newItem: TodoItem, isNewItem: Bool) {
+    func saveToCacheTodoItem(_ newItem: TodoItem) {
         Task(priority: .userInitiated) {
-            if isNewItem {
-                await addItemToCache(newItem)
-            } else {
-                await updateItemInCache(newItem)
-            }
+            await upsertItemToCache(newItem)
             sendData()
         }
     }
@@ -320,21 +316,9 @@ extension TodoListViewModel {
 
 extension TodoListViewModel {
 
-    private func addItemToCache(_ item: TodoItem) async {
+    private func upsertItemToCache(_ item: TodoItem) async {
         do {
-            try await cacheService.insertTodoItem(item)
-            updateData(with: Array(cacheService.todoItems.values))
-        } catch {
-            DDLogError("\(#function): \(error.localizedDescription)")
-            if let errorOccurred = self.errorOccurred {
-                errorOccurred(error.localizedDescription)
-            }
-        }
-    }
-
-    private func updateItemInCache(_ item: TodoItem) async {
-        do {
-            try await cacheService.updateTodoItem(item)
+            try await cacheService.upsertTodoItem(item)
             updateData(with: Array(cacheService.todoItems.values))
         } catch {
             DDLogError("\(#function): \(error.localizedDescription)")

@@ -154,12 +154,11 @@ final class SQLiteCacheServiceImpl: CacheService {
         todoItems = newTodoItems
     }
 
-    func insertTodoItem(_ todoItem: TodoItem) async throws {
+    func upsertTodoItem(_ todoItem: TodoItem) async throws {
         guard let connection = dbConnection else {
             throw SQLiteError.noConnection
         }
-        let insertQuery = Configuration.todoListTable.insert(
-            or: .replace,
+        let upsertQuery = Configuration.todoListTable.upsert(
             Configuration.idExpression <- todoItem.id,
             Configuration.textExpression <- todoItem.text,
             Configuration.importanceExpression <- todoItem.importance.rawValue,
@@ -167,30 +166,10 @@ final class SQLiteCacheServiceImpl: CacheService {
             Configuration.isDoneExpression <- todoItem.isDone,
             Configuration.creationDateExpression <- todoItem.creationDate,
             Configuration.modificationDateExpression <- todoItem.modificationDate,
-            Configuration.textColorExpression <- todoItem.textColor
+            Configuration.textColorExpression <- todoItem.textColor,
+            onConflictOf: Configuration.idExpression
         )
-        try connection.run(insertQuery)
-
-        todoItems[todoItem.id] = todoItem
-    }
-
-    func updateTodoItem(_ todoItem: TodoItem) async throws {
-        guard let connection = dbConnection else {
-            throw SQLiteError.noConnection
-        }
-        let existingTodoModel = Configuration.todoListTable.filter(Configuration.idExpression == todoItem.id)
-        let updateQuery = existingTodoModel.update(
-            Configuration.textExpression <- todoItem.text,
-            Configuration.importanceExpression <- todoItem.importance.rawValue,
-            Configuration.deadlineExpression <- todoItem.deadline,
-            Configuration.isDoneExpression <- todoItem.isDone,
-            Configuration.creationDateExpression <- todoItem.creationDate,
-            Configuration.modificationDateExpression <- todoItem.modificationDate,
-            Configuration.textColorExpression <- todoItem.textColor
-        )
-        if try connection.run(updateQuery) <= 0 {
-            throw SQLiteError.notFound
-        }
+        try connection.run(upsertQuery)
 
         todoItems[todoItem.id] = todoItem
     }

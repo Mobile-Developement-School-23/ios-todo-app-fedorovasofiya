@@ -35,7 +35,7 @@ final class TodoItemViewModel: TodoItemViewOutput {
         let newItem = getTodoItem(text: text, importance: importance, deadline: deadline, textColor: textColor)
         let isNewItem = todoItem == nil
 
-        delegate?.saveToCacheTodoItem(newItem, isNewItem: isNewItem)
+        delegate?.saveToCacheTodoItem(newItem)
         if let changesSaved = changesSaved {
             changesSaved()
         }

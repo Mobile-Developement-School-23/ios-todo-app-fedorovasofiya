@@ -136,33 +136,7 @@ final class CoreDataCacheServiceImpl: CacheService {
         todoItems.removeValue(forKey: id)
     }
 
-    // Реализация методов insert и update заведомо одинаковая:
-    // - При вставке нового надо проверить, нет ли уже существующего c таким же id
-    // - При обновлении старого, нужно проверить, а существует ли он
-    // После сдачи дз заменю на один метод
-
-    func insertTodoItem(_ todoItem: TodoItem) async throws {
-        try await save { [weak self] context in
-            var todoItemDB: TodoItemDB
-            if let existingTodoItemDB = self?.fetchTodoItem(with: todoItem.id, context: context) {
-                todoItemDB = existingTodoItemDB
-            } else {
-                todoItemDB = TodoItemDB(context: context)
-                todoItemDB.id = todoItem.id
-            }
-            todoItemDB.text = todoItem.text
-            todoItemDB.importance = todoItem.importance.rawValue
-            todoItemDB.deadline = todoItem.deadline
-            todoItemDB.isDone = todoItem.isDone
-            todoItemDB.creationDate = todoItem.creationDate
-            todoItemDB.modificationDate = todoItem.modificationDate
-            todoItemDB.textColor = todoItem.textColor
-        }
-
-        todoItems[todoItem.id] = todoItem
-    }
-
-    func updateTodoItem(_ todoItem: TodoItem) async throws {
+    func upsertTodoItem(_ todoItem: TodoItem) async throws {
         try await save { [weak self] context in
             var todoItemDB: TodoItemDB
             if let existingTodoItemDB = self?.fetchTodoItem(with: todoItem.id, context: context) {
