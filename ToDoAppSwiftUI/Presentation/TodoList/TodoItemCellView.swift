@@ -33,7 +33,7 @@ struct TodoItemCellView: View {
             VStack(alignment: .leading, spacing: 0) {
                 HStack(spacing: 2) {
                     if model.importance != .regular {
-                        Image(systemName: model.importance == .important ? "exclamationmark.2" : "arrow.down")
+                        Text(Image(systemName: model.importance == .important ? "exclamationmark.2" : "arrow.down"))
                             .fontWeight(.bold)
                             .foregroundColor(Color(model.importance == .important ? "Red" : "Gray"))
                     }

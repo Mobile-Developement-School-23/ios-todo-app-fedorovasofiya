@@ -43,6 +43,15 @@ struct TodoListView: View {
                 }
                 .listRowBackground(Color("BackSecondary"))
                 .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 16))
+                ZStack(alignment: .leading) {
+                    CreateNewCellView()
+                    NavigationLink(destination: Text("Новое")) {
+                        EmptyView()
+                    }
+                    .opacity(0.0)
+                }
+                .listRowBackground(Color("BackSecondary"))
+                .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 16))
             }
             .background(Color("BackPrimary"))
             .scrollContentBackground(.hidden)
@@ -53,8 +62,6 @@ struct TodoListView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        NavigationView {
-            TodoListView()
-        }
+        TodoListView()
     }
 }

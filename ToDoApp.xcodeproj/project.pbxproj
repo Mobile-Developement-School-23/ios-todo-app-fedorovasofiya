@@ -59,6 +59,7 @@
 		EB96317E2A67330300F4599B /* TodoItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB96317D2A67330300F4599B /* TodoItem.swift */; };
 		EB9631842A6733B800F4599B /* TodoItemCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9631832A6733B800F4599B /* TodoItemCellView.swift */; };
 		EB96318C2A67518900F4599B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB96318B2A67518900F4599B /* AppDelegate.swift */; };
+		EB96318E2A69F5D700F4599B /* CreateNewCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB96318D2A69F5D700F4599B /* CreateNewCellView.swift */; };
 		EBA798322A4FB2270005F1A1 /* TodoItemCSVTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBA798312A4FB2270005F1A1 /* TodoItemCSVTests.swift */; };
 		EBB637242A6015D8004960B1 /* CacheService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBB637232A6015D8004960B1 /* CacheService.swift */; };
 		EBB637262A6015EF004960B1 /* CoreDataCacheServiceImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBB637252A6015EF004960B1 /* CoreDataCacheServiceImpl.swift */; };
@@ -147,6 +148,7 @@
 		EB96317D2A67330300F4599B /* TodoItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoItem.swift; sourceTree = "<group>"; };
 		EB9631832A6733B800F4599B /* TodoItemCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoItemCellView.swift; sourceTree = "<group>"; };
 		EB96318B2A67518900F4599B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		EB96318D2A69F5D700F4599B /* CreateNewCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateNewCellView.swift; sourceTree = "<group>"; };
 		EBA798312A4FB2270005F1A1 /* TodoItemCSVTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoItemCSVTests.swift; sourceTree = "<group>"; };
 		EBB11E5D2A3D0260009FDEA0 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		EBB637232A6015D8004960B1 /* CacheService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheService.swift; sourceTree = "<group>"; };
@@ -505,6 +507,7 @@
 			isa = PBXGroup;
 			children = (
 				EB9631832A6733B800F4599B /* TodoItemCellView.swift */,
+				EB96318D2A69F5D700F4599B /* CreateNewCellView.swift */,
 				EB9631702A6729DC00F4599B /* TodoListView.swift */,
 			);
 			path = TodoList;
@@ -968,6 +971,7 @@
 			files = (
 				EB96317C2A6732CD00F4599B /* Importance.swift in Sources */,
 				EB9631712A6729DC00F4599B /* TodoListView.swift in Sources */,
+				EB96318E2A69F5D700F4599B /* CreateNewCellView.swift in Sources */,
 				EB96317E2A67330300F4599B /* TodoItem.swift in Sources */,
 				EB96318C2A67518900F4599B /* AppDelegate.swift in Sources */,
 				EB9631842A6733B800F4599B /* TodoItemCellView.swift in Sources */,
