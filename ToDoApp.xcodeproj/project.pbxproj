@@ -60,6 +60,7 @@
 		EB9631842A6733B800F4599B /* TodoItemCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9631832A6733B800F4599B /* TodoItemCellView.swift */; };
 		EB96318C2A67518900F4599B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB96318B2A67518900F4599B /* AppDelegate.swift */; };
 		EB96318E2A69F5D700F4599B /* CreateNewCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB96318D2A69F5D700F4599B /* CreateNewCellView.swift */; };
+		EB9631912A6B27FF00F4599B /* TodoItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9631902A6B27FF00F4599B /* TodoItemView.swift */; };
 		EBA798322A4FB2270005F1A1 /* TodoItemCSVTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBA798312A4FB2270005F1A1 /* TodoItemCSVTests.swift */; };
 		EBB637242A6015D8004960B1 /* CacheService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBB637232A6015D8004960B1 /* CacheService.swift */; };
 		EBB637262A6015EF004960B1 /* CoreDataCacheServiceImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBB637252A6015EF004960B1 /* CoreDataCacheServiceImpl.swift */; };
@@ -149,6 +150,7 @@
 		EB9631832A6733B800F4599B /* TodoItemCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoItemCellView.swift; sourceTree = "<group>"; };
 		EB96318B2A67518900F4599B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		EB96318D2A69F5D700F4599B /* CreateNewCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateNewCellView.swift; sourceTree = "<group>"; };
+		EB9631902A6B27FF00F4599B /* TodoItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoItemView.swift; sourceTree = "<group>"; };
 		EBA798312A4FB2270005F1A1 /* TodoItemCSVTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoItemCSVTests.swift; sourceTree = "<group>"; };
 		EBB11E5D2A3D0260009FDEA0 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		EBB637232A6015D8004960B1 /* CacheService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheService.swift; sourceTree = "<group>"; };
@@ -499,6 +501,7 @@
 			isa = PBXGroup;
 			children = (
 				EB9631802A67337000F4599B /* TodoList */,
+				EB96318F2A6B27CE00F4599B /* TodoItem */,
 			);
 			path = Presentation;
 			sourceTree = "<group>";
@@ -537,6 +540,14 @@
 				EB9631722A6729DD00F4599B /* Assets.xcassets */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		EB96318F2A6B27CE00F4599B /* TodoItem */ = {
+			isa = PBXGroup;
+			children = (
+				EB9631902A6B27FF00F4599B /* TodoItemView.swift */,
+			);
+			path = TodoItem;
 			sourceTree = "<group>";
 		};
 		EBB637212A5EFF40004960B1 /* Transitioning */ = {
@@ -974,6 +985,7 @@
 				EB96318E2A69F5D700F4599B /* CreateNewCellView.swift in Sources */,
 				EB96317E2A67330300F4599B /* TodoItem.swift in Sources */,
 				EB96318C2A67518900F4599B /* AppDelegate.swift in Sources */,
+				EB9631912A6B27FF00F4599B /* TodoItemView.swift in Sources */,
 				EB9631842A6733B800F4599B /* TodoItemCellView.swift in Sources */,
 				EB96316F2A6729DC00F4599B /* ToDoAppSwiftUIApp.swift in Sources */,
 			);
