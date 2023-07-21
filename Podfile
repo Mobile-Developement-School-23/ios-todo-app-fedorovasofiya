@@ -12,4 +12,8 @@ target 'ToDoApp' do
     # Pods for testing
   end
 
+  target 'ToDoAppSwiftUI' do
+    pod 'SwiftLint'
+  end
+
 end
